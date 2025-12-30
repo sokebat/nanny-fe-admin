@@ -8,19 +8,16 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
+  SidebarMenuItem
 } from "@/components/ui/sidebar";
 import {
   BarChart3,
   Building2,
   Layers,
   LayoutGrid,
-  LucideIcon,
   NotebookTabs,
-  Settings2,
   SlidersHorizontal,
-  UserRound,
+  UserRound
 } from "lucide-react";
 import { NavMain } from "./nav-main";
 import { NavUser } from "./nav-user";

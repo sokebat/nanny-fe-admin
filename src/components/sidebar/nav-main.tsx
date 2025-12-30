@@ -1,15 +1,15 @@
 "use client";
 
-import { usePathname } from "next/navigation"
 import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
-import { LucideIcon } from "lucide-react"
-import { cn } from "@/lib/utils"
+} from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
+import { LucideIcon } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 export function NavMain({
   items,
