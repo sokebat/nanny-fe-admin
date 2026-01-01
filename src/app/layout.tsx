@@ -36,7 +36,7 @@ export default function RootLayout({
             } as React.CSSProperties
           }
         >
-          <AppSidebar variant="inset" />
+          <AppSidebar variant="floating" />
           <SidebarInset>
 
             <div className="flex flex-1 flex-col">{children}</div>
