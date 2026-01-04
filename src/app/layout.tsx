@@ -26,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html>
-      <body>
+      <body className=" bg-muted">
 
         <SidebarProvider
           style={
