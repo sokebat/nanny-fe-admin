@@ -83,7 +83,7 @@ const Page = () => {
                             <TabsList className="grid w-full grid-cols-3 h-9">
                                 <TabsTrigger value="weekly" className="text-xs">Weekly</TabsTrigger>
                                 <TabsTrigger value="monthly" className="text-xs">Monthly</TabsTrigger>
-                                <TabsTrigger value="today" className="text-xs data-[state=active]:bg-[#f97d61] data-[state=active]:text-white">Today</TabsTrigger>
+                                <TabsTrigger value="today" className="text-xs data-[state=active]:bg-brand-orange data-[state=active]:text-white">Today</TabsTrigger>
                             </TabsList>
                         </Tabs>
                     </CardHeader>
@@ -136,7 +136,7 @@ const Page = () => {
                             <TabsList className="grid w-full grid-cols-3 h-9">
                                 <TabsTrigger value="weekly" className="text-xs">Weekly</TabsTrigger>
                                 <TabsTrigger value="monthly" className="text-xs">Monthly</TabsTrigger>
-                                <TabsTrigger value="yearly" className="text-xs data-[state=active]:bg-[#f97d61] data-[state=active]:text-white">Yearly</TabsTrigger>
+                                <TabsTrigger value="yearly" className="text-xs data-[state=active]:bg-brand-orange data-[state=active]:text-white">Yearly</TabsTrigger>
                             </TabsList>
                         </Tabs>
                     </CardHeader>
