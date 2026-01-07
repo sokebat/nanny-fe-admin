@@ -60,6 +60,11 @@ const data = {
       icon: UserRound,
     },
     {
+      title: "Subscriptions",
+      url: "/subscriptions",
+      icon: BarChart3,
+    },
+    {
       title: "Analytics",
       url: "/analytics",
       icon: BarChart3,
