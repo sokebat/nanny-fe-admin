@@ -16,6 +16,7 @@ import {
   Layers,
   LayoutGrid,
   NotebookTabs,
+  Receipt,
   SlidersHorizontal,
   UserRound
 } from "lucide-react";
@@ -64,10 +65,16 @@ const data = {
       url: "/subscriptions",
       icon: BarChart3,
     },
+
     {
       title: "Analytics",
       url: "/analytics",
       icon: BarChart3,
+    },
+    {
+      title: "Invoices",
+      url: "/invoices",
+      icon: Receipt,
     },
   ],
 };
