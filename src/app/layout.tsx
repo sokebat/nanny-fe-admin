@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
+import { SessionProvider } from "next-auth/react";
+import Provider from "@/components/shared/provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,8 +29,7 @@ export default function RootLayout({
   return (
     <html>
       <body className=" bg-muted">
-
-        {children}
+        <Provider>  {children}</Provider>
       </body>
 
     </html>
