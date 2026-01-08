@@ -16,17 +16,13 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { EllipsisVertical, LogOut } from "lucide-react";
+import { useSession } from "next-auth/react";
 
-export function NavUser({
-  user,
-}: {
-  user: {
-    name: string;
-    email: string;
-    avatar: string;
-  };
-}) {
+
+export function NavUser() {
   const { isMobile } = useSidebar();
+
+  const { data: session } = useSession();
 
   return (
     <SidebarMenu>
