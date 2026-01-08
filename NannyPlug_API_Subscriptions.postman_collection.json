@@ -1,0 +1,781 @@
+{
+  "info": {
+    "_postman_id": "nannyplug-api-subscriptions-collection",
+    "name": "NannyPlug API - Subscriptions",
+    "description": "API collection for NannyPlug backend - Subscriptions Module\n\n**Base URL:** `{{base_url}}`\n**Port:** 3000 (default)\n\n**Features:**\n- Subscription Plans Management (Admin)\n- User Subscription Management\n- Stripe Payment Integration\n- Dynamic Price Management\n\n**Setup:**\n1. Import this collection\n2. Use the same environment (`base_url`, `access_token`, `admin_token`)\n3. Login as admin to get `admin_token`\n4. Login as user to get `access_token`\n\n**Stripe Price Management:**\n- **Recommended:** Use auto-create (`?autoCreateStripePrices=true`) - Creates Stripe prices automatically\n- **Alternative:** Provide Stripe price IDs manually in request body\n- **Later:** Create Stripe prices for existing plans using separate endpoint",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Admin APIs - Plans",
+      "item": [
+        {
+          "name": "Get All Plans (Admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/subscriptions/plans?role=caregiver&isActive=true",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "subscriptions", "plans"],
+              "query": [
+                {
+                  "key": "role",
+                  "value": "caregiver",
+                  "description": "Filter by role",
+                  "disabled": false
+                },
+                {
+                  "key": "isActive",
+                  "value": "true",
+                  "description": "Filter active plans",
+                  "disabled": false
+                }
+              ]
+            },
+            "description": "Get all subscription plans (including inactive). Admin only.\n\n**Authentication:** Required (Admin Bearer token)"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Plan - Test Scenarios",
+          "item": [
+            {
+              "name": "1. Basic Caregiver Plan (Auto-Create)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{admin_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Basic Caregiver Plan\",\n    \"role\": \"caregiver\",\n    \"description\": \"Basic features for caregivers - messaging and job applications\",\n    \"features\": [\"messaging\", \"job_applications\"],\n    \"pricingMonthly\": 9.99,\n    \"pricingYearly\": 99.99,\n    \"quotas\": {\n        \"messages\": 100,\n        \"jobApplications\": 10\n    },\n    \"isActive\": true,\n    \"isPopular\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/admin/subscriptions/plans?autoCreateStripePrices=true",
+                  "host": ["{{base_url}}"],
+                  "path": ["admin", "subscriptions", "plans"],
+                  "query": [
+                    {
+                      "key": "autoCreateStripePrices",
+                      "value": "true",
+                      "description": "✅ REQUIRED: Set to 'true' to auto-create Stripe prices"
+                    }
+                  ]
+                },
+                "description": "✅ **RECOMMENDED APPROACH**\n\n**Required Fields:**\n- `name` ✅\n- `role` ✅ (caregiver | parent | vendor)\n- `features` ✅ (array)\n- `pricingMonthly` ✅\n- `pricingYearly` ✅\n\n**Optional Fields:**\n- `description` (string)\n- `quotas` (object: { messages?, jobApplications? })\n- `isActive` (boolean, default: true)\n- `isPopular` (boolean, default: false)\n\n**Query Parameter:**\n- `autoCreateStripePrices=true` ✅ REQUIRED for auto-creation\n\n**Result:** Stripe prices created automatically, price IDs saved to plan."
+              },
+              "response": []
+            },
+            {
+              "name": "2. Premium Caregiver Plan (Auto-Create)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{admin_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Premium Caregiver Plan\",\n    \"role\": \"caregiver\",\n    \"description\": \"Premium features for professional caregivers - unlimited messaging and applications\",\n    \"features\": [\"messaging\", \"unlimited_applications\", \"advanced_search\", \"priority_support\"],\n    \"pricingMonthly\": 29.99,\n    \"pricingYearly\": 299.99,\n    \"quotas\": {\n        \"messages\": 1000,\n        \"jobApplications\": 100\n    },\n    \"isActive\": true,\n    \"isPopular\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/admin/subscriptions/plans?autoCreateStripePrices=true",
+                  "host": ["{{base_url}}"],
+                  "path": ["admin", "subscriptions", "plans"],
+                  "query": [
+                    {
+                      "key": "autoCreateStripePrices",
+                      "value": "true",
+                      "description": "✅ REQUIRED: Set to 'true' to auto-create Stripe prices"
+                    }
+                  ]
+                },
+                "description": "Premium plan with higher quotas and more features.\n\n**Features:** messaging, unlimited_applications, advanced_search, priority_support\n**Quotas:** 1000 messages, 100 job applications\n**Pricing:** $29.99/month or $299.99/year"
+              },
+              "response": []
+            },
+            {
+              "name": "3. Basic Parent Plan (Auto-Create)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{admin_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Basic Parent Plan\",\n    \"role\": \"parent\",\n    \"description\": \"Basic plan for parents - post jobs and message caregivers\",\n    \"features\": [\"messaging\", \"job_posting\"],\n    \"pricingMonthly\": 19.99,\n    \"pricingYearly\": 199.99,\n    \"quotas\": {\n        \"messages\": 200,\n        \"jobPostings\": 5\n    },\n    \"isActive\": true,\n    \"isPopular\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/admin/subscriptions/plans?autoCreateStripePrices=true",
+                  "host": ["{{base_url}}"],
+                  "path": ["admin", "subscriptions", "plans"],
+                  "query": [
+                    {
+                      "key": "autoCreateStripePrices",
+                      "value": "true",
+                      "description": "✅ REQUIRED: Set to 'true' to auto-create Stripe prices"
+                    }
+                  ]
+                },
+                "description": "Basic plan for parents.\n\n**Features:** messaging, job_posting\n**Quotas:** 200 messages, 5 job postings\n**Pricing:** $19.99/month or $199.99/year"
+              },
+              "response": []
+            },
+            {
+              "name": "4. Premium Parent Plan (Auto-Create)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{admin_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Premium Parent Plan\",\n    \"role\": \"parent\",\n    \"description\": \"Premium plan for parents - unlimited job postings and messaging\",\n    \"features\": [\"messaging\", \"unlimited_job_posting\", \"advanced_search\", \"priority_support\"],\n    \"pricingMonthly\": 49.99,\n    \"pricingYearly\": 499.99,\n    \"quotas\": {\n        \"messages\": 2000,\n        \"jobPostings\": 100\n    },\n    \"isActive\": true,\n    \"isPopular\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/admin/subscriptions/plans?autoCreateStripePrices=true",
+                  "host": ["{{base_url}}"],
+                  "path": ["admin", "subscriptions", "plans"],
+                  "query": [
+                    {
+                      "key": "autoCreateStripePrices",
+                      "value": "true",
+                      "description": "✅ REQUIRED: Set to 'true' to auto-create Stripe prices"
+                    }
+                  ]
+                },
+                "description": "Premium plan for parents.\n\n**Features:** messaging, unlimited_job_posting, advanced_search, priority_support\n**Quotas:** 2000 messages, 100 job postings\n**Pricing:** $49.99/month or $499.99/year"
+              },
+              "response": []
+            },
+            {
+              "name": "5. Basic Vendor Plan (Auto-Create)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{admin_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Basic Vendor Plan\",\n    \"role\": \"vendor\",\n    \"description\": \"Basic plan for vendors - list services and products\",\n    \"features\": [\"service_listing\", \"product_listing\"],\n    \"pricingMonthly\": 39.99,\n    \"pricingYearly\": 399.99,\n    \"quotas\": {\n        \"services\": 10,\n        \"products\": 20\n    },\n    \"isActive\": true,\n    \"isPopular\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/admin/subscriptions/plans?autoCreateStripePrices=true",
+                  "host": ["{{base_url}}"],
+                  "path": ["admin", "subscriptions", "plans"],
+                  "query": [
+                    {
+                      "key": "autoCreateStripePrices",
+                      "value": "true",
+                      "description": "✅ REQUIRED: Set to 'true' to auto-create Stripe prices"
+                    }
+                  ]
+                },
+                "description": "Basic plan for vendors.\n\n**Features:** service_listing, product_listing\n**Quotas:** 10 services, 20 products\n**Pricing:** $39.99/month or $399.99/year"
+              },
+              "response": []
+            },
+            {
+              "name": "6. Premium Vendor Plan (Auto-Create)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{admin_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Premium Vendor Plan\",\n    \"role\": \"vendor\",\n    \"description\": \"Premium plan for vendors - unlimited listings and featured placement\",\n    \"features\": [\"unlimited_service_listing\", \"unlimited_product_listing\", \"featured_placement\", \"analytics\"],\n    \"pricingMonthly\": 79.99,\n    \"pricingYearly\": 799.99,\n    \"quotas\": {\n        \"services\": 1000,\n        \"products\": 2000\n    },\n    \"isActive\": true,\n    \"isPopular\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/admin/subscriptions/plans?autoCreateStripePrices=true",
+                  "host": ["{{base_url}}"],
+                  "path": ["admin", "subscriptions", "plans"],
+                  "query": [
+                    {
+                      "key": "autoCreateStripePrices",
+                      "value": "true",
+                      "description": "✅ REQUIRED: Set to 'true' to auto-create Stripe prices"
+                    }
+                  ]
+                },
+                "description": "Premium plan for vendors.\n\n**Features:** unlimited_service_listing, unlimited_product_listing, featured_placement, analytics\n**Quotas:** 1000 services, 2000 products\n**Pricing:** $79.99/month or $799.99/year"
+              },
+              "response": []
+            },
+            {
+              "name": "7. Plan with Unlimited Quotas (Auto-Create)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{admin_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Unlimited Caregiver Plan\",\n    \"role\": \"caregiver\",\n    \"description\": \"Unlimited messaging and job applications\",\n    \"features\": [\"messaging\", \"unlimited_applications\", \"advanced_search\"],\n    \"pricingMonthly\": 49.99,\n    \"pricingYearly\": 499.99,\n    \"quotas\": {\n        \"messages\": -1,\n        \"jobApplications\": -1\n    },\n    \"isActive\": true,\n    \"isPopular\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/admin/subscriptions/plans?autoCreateStripePrices=true",
+                  "host": ["{{base_url}}"],
+                  "path": ["admin", "subscriptions", "plans"],
+                  "query": [
+                    {
+                      "key": "autoCreateStripePrices",
+                      "value": "true",
+                      "description": "✅ REQUIRED: Set to 'true' to auto-create Stripe prices"
+                    }
+                  ]
+                },
+                "description": "Plan with unlimited quotas.\n\n**Note:** Use `-1` in quotas to indicate unlimited (no limit enforced)\n**Quotas:** -1 = unlimited messages and job applications"
+              },
+              "response": []
+            },
+            {
+              "name": "8. Plan without Quotas (Optional)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{admin_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Simple Caregiver Plan\",\n    \"role\": \"caregiver\",\n    \"description\": \"Simple plan without quota limits\",\n    \"features\": [\"messaging\", \"job_applications\"],\n    \"pricingMonthly\": 4.99,\n    \"pricingYearly\": 49.99,\n    \"isActive\": true,\n    \"isPopular\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/admin/subscriptions/plans?autoCreateStripePrices=true",
+                  "host": ["{{base_url}}"],
+                  "path": ["admin", "subscriptions", "plans"],
+                  "query": [
+                    {
+                      "key": "autoCreateStripePrices",
+                      "value": "true",
+                      "description": "✅ REQUIRED: Set to 'true' to auto-create Stripe prices"
+                    }
+                  ]
+                },
+                "description": "Plan without quotas field (optional).\n\n**Note:** If `quotas` is not provided, system treats as unlimited (backward compatibility)"
+              },
+              "response": []
+            },
+            {
+              "name": "9. Manual Stripe Price IDs (Alternative)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{admin_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Custom Caregiver Plan\",\n    \"role\": \"caregiver\",\n    \"description\": \"Plan with manually provided Stripe price IDs\",\n    \"features\": [\"messaging\", \"job_applications\"],\n    \"pricingMonthly\": 14.99,\n    \"pricingYearly\": 149.99,\n    \"stripePriceIdMonthly\": \"price_1234567890abcdef\",\n    \"stripePriceIdYearly\": \"price_0987654321fedcba\",\n    \"quotas\": {\n        \"messages\": 150,\n        \"jobApplications\": 15\n    },\n    \"isActive\": true,\n    \"isPopular\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/admin/subscriptions/plans",
+                  "host": ["{{base_url}}"],
+                  "path": ["admin", "subscriptions", "plans"]
+                },
+                "description": "⚠️ **ALTERNATIVE APPROACH**\n\nCreate plan with manually provided Stripe price IDs.\n\n**When to use:**\n- You already have Stripe prices created\n- Want to reuse existing Stripe products\n- More control over Stripe product setup\n\n**Required Fields:**\n- `name` ✅\n- `role` ✅\n- `features` ✅\n- `pricingMonthly` ✅\n- `pricingYearly` ✅\n- `stripePriceIdMonthly` ✅ (REQUIRED if not using auto-create)\n- `stripePriceIdYearly` ✅ (REQUIRED if not using auto-create)\n\n**Note:**\n- Do NOT use `?autoCreateStripePrices=true` query parameter\n- Must create Stripe prices in Stripe Dashboard first\n- Copy Price IDs from Stripe Dashboard"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Update Plan - Test Scenarios",
+          "item": [
+            {
+              "name": "Update Pricing Only",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{admin_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"pricingMonthly\": 24.99,\n    \"pricingYearly\": 249.99\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/admin/subscriptions/plans/{{plan_id}}",
+                  "host": ["{{base_url}}"],
+                  "path": ["admin", "subscriptions", "plans", "{{plan_id}}"]
+                },
+                "description": "Update only pricing.\n\n**Path Parameters:**\n- `plan_id` ✅ REQUIRED\n\n**Body (All Optional):**\n- `pricingMonthly` (optional)\n- `pricingYearly` (optional)\n\n**Note:** If updating prices, you may need to create new Stripe prices"
+              },
+              "response": []
+            },
+            {
+              "name": "Update Features and Quotas",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{admin_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"features\": [\"messaging\", \"job_applications\", \"advanced_search\", \"priority_support\"],\n    \"quotas\": {\n        \"messages\": 200,\n        \"jobApplications\": 20\n    }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/admin/subscriptions/plans/{{plan_id}}",
+                  "host": ["{{base_url}}"],
+                  "path": ["admin", "subscriptions", "plans", "{{plan_id}}"]
+                },
+                "description": "Update features and quotas.\n\n**Body (All Optional):**\n- `features` (optional: array of strings)\n- `quotas` (optional: object)"
+              },
+              "response": []
+            },
+            {
+              "name": "Update Status (Activate/Deactivate)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{admin_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"isActive\": false,\n    \"isPopular\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/admin/subscriptions/plans/{{plan_id}}",
+                  "host": ["{{base_url}}"],
+                  "path": ["admin", "subscriptions", "plans", "{{plan_id}}"]
+                },
+                "description": "Deactivate a plan (hide from public).\n\n**Body (All Optional):**\n- `isActive` (optional: boolean)\n- `isPopular` (optional: boolean)"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Delete Plan",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/subscriptions/plans/{{plan_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "subscriptions", "plans", "{{plan_id}}"]
+            },
+            "description": "Delete a subscription plan.\n\n**Note:** Cannot delete plans with active subscriptions. Deactivate instead.\n\n**Path Parameters:**\n- `plan_id`: Plan ID to delete"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin APIs - Stripe Price Management",
+      "item": [
+        {
+          "name": "Create Stripe Price for Plan (Monthly)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/subscriptions/plans/{{plan_id}}/create-stripe-price?billingCycle=monthly",
+              "host": ["{{base_url}}"],
+              "path": [
+                "admin",
+                "subscriptions",
+                "plans",
+                "{{plan_id}}",
+                "create-stripe-price"
+              ],
+              "query": [
+                {
+                  "key": "billingCycle",
+                  "value": "monthly",
+                  "description": "monthly or yearly"
+                }
+              ]
+            },
+            "description": "Create Stripe price for an existing plan that doesn't have a Stripe price ID yet.\n\n**When to use:**\n- Plan was created without Stripe prices\n- Need to add Stripe price later\n- Stripe price was deleted or needs to be recreated\n\n**Path Parameters:**\n- `plan_id`: Plan ID\n\n**Query Parameters:**\n- `billingCycle`: \"monthly\" or \"yearly\"\n\n**What happens:**\n1. Creates Stripe price using plan's pricing\n2. Saves Stripe price ID to plan automatically\n3. Returns created price ID\n\n**Note:** You can call this twice (once for monthly, once for yearly) if plan has no Stripe prices."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Stripe Price for Plan (Yearly)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/subscriptions/plans/{{plan_id}}/create-stripe-price?billingCycle=yearly",
+              "host": ["{{base_url}}"],
+              "path": [
+                "admin",
+                "subscriptions",
+                "plans",
+                "{{plan_id}}",
+                "create-stripe-price"
+              ],
+              "query": [
+                {
+                  "key": "billingCycle",
+                  "value": "yearly",
+                  "description": "monthly or yearly"
+                }
+              ]
+            },
+            "description": "Create Stripe price for an existing plan that doesn't have a Stripe price ID yet.\n\n**When to use:**\n- Plan was created without Stripe prices\n- Need to add Stripe price later\n- Stripe price was deleted or needs to be recreated\n\n**Path Parameters:**\n- `plan_id`: Plan ID\n\n**Query Parameters:**\n- `billingCycle`: \"monthly\" or \"yearly\"\n\n**What happens:**\n1. Creates Stripe price using plan's pricing\n2. Saves Stripe price ID to plan automatically\n3. Returns created price ID"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin APIs - User Subscriptions",
+      "item": [
+        {
+          "name": "Get All User Subscriptions",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/subscriptions/users?page=1&limit=20&role=caregiver&status=active&planId=",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "subscriptions", "users"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number"
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Items per page"
+                },
+                {
+                  "key": "role",
+                  "value": "caregiver",
+                  "description": "Filter by role",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "active",
+                  "description": "Filter by status: active, cancelled, expired, past_due",
+                  "disabled": true
+                },
+                {
+                  "key": "planId",
+                  "value": "",
+                  "description": "Filter by plan ID",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get paginated list of all user subscriptions with filters.\n\n**Query Parameters:**\n- `page`: Page number (default: 1)\n- `limit`: Items per page (default: 20)\n- `role`: Filter by user role (optional)\n- `status`: Filter by subscription status (optional)\n- `planId`: Filter by plan ID (optional)"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000/api",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "admin_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "plan_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "new_plan_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "invoice_id",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

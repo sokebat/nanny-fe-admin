@@ -11,49 +11,23 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus, Edit2, Trash2, CreditCard } from "lucide-react";
+import { Plus, Edit2, Trash2, CreditCard, Loader2 } from "lucide-react";
 import { PlanDialog } from "./plan-dialog";
-
-
-interface Plan {
-    id: string;
-    name: string;
-    description: string;
-    price: number;
-    interval: "month" | "year";
-    stripePriceId?: string;
-}
-
-const dummyPlans: Plan[] = [
-    {
-        id: "1",
-        name: "Basic Caregiver",
-        description: "Essential features for caregivers",
-        price: 19.99,
-        interval: "month",
-        stripePriceId: "price_123",
-    },
-    {
-        id: "2",
-        name: "Premium Caregiver",
-        description: "Advanced features and priority support",
-        price: 199.99,
-        interval: "year",
-        stripePriceId: "price_456",
-    },
-    {
-        id: "3",
-        name: "Family Starter",
-        description: "Basic features for families",
-        price: 29.99,
-        interval: "month",
-    },
-];
+import { useSubscriptionPlans } from "@/hooks/use-plans";
+import { Plan, CreatePlanDto, UpdatePlanDto } from "@/types/subscription";
 
 export function PlansTable() {
-    const [plans, setPlans] = useState<Plan[]>(dummyPlans);
+    const {
+        getPlansQuery: { data: plans, isLoading },
+        createPlan: createPlanMutation,
+        updatePlan: updatePlanMutation,
+        deletePlan: deletePlanMutation,
+        createStripePrice: createStripePriceMutation
+    } = useSubscriptionPlans();
+
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingPlan, setEditingPlan] = useState<Plan | undefined>(undefined);
+
 
     const handleCreate = () => {
         setEditingPlan(undefined);
@@ -65,33 +39,35 @@ export function PlansTable() {
         setIsDialogOpen(true);
     };
 
-    const handleDelete = (id: string) => {
+    const handleDelete = async (id: string) => {
         if (confirm("Are you sure you want to delete this plan?")) {
-            setPlans(plans.filter((p) => p.id !== id));
+            await deletePlanMutation.mutateAsync(id);
         }
     };
 
-    const handleStripePrice = (id: string) => {
-        console.log("Creating Stripe price for plan:", id);
-        alert("Stripe price creation initiated for plan " + id);
+    const handleStripePrice = async (id: string, billingCycle: "monthly" | "yearly") => {
+        await createStripePriceMutation.mutateAsync({ id, billingCycle });
     };
 
-    const handleSave = (data: Partial<Plan>) => {
+    const handleSave = async (data: any) => {
         if (editingPlan) {
-            setPlans(plans.map(p => p.id === editingPlan.id ? { ...p, ...data } as Plan : p));
+            await updatePlanMutation.mutateAsync({
+                id: editingPlan._id || editingPlan.id,
+                data: data as UpdatePlanDto
+            });
         } else {
-            const newPlan: Plan = {
-                id: Math.random().toString(36).substr(2, 9),
-                name: data.name || "",
-                description: data.description || "",
-                price: data.price || 0,
-                interval: data.interval || "month",
-                ...data
-            };
-            setPlans([...plans, newPlan]);
+            await createPlanMutation.mutateAsync(data as CreatePlanDto);
         }
         setIsDialogOpen(false);
     };
+
+    if (isLoading) {
+        return (
+            <div className="flex h-64 items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-brand-orange" />
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-4">
@@ -109,45 +85,64 @@ export function PlansTable() {
                             <TableHeader className="bg-slate-50/50">
                                 <TableRow className="hover:bg-transparent border-slate-100">
                                     <TableHead className="py-4 font-semibold text-slate-700">Plan Name</TableHead>
-                                    <TableHead className="py-4 font-semibold text-slate-700">Price</TableHead>
-                                    <TableHead className="py-4 font-semibold text-slate-700">Interval</TableHead>
-                                    <TableHead className="py-4 font-semibold text-slate-700">Stripe ID</TableHead>
+                                    <TableHead className="py-4 font-semibold text-slate-700">Role</TableHead>
+                                    <TableHead className="py-4 font-semibold text-slate-700">Monthly</TableHead>
+                                    <TableHead className="py-4 font-semibold text-slate-700">Yearly</TableHead>
                                     <TableHead className="py-4 font-semibold text-slate-700 text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {plans.map((plan) => (
-                                    <TableRow key={plan.id} className="border-slate-100 transition-colors">
+                                {plans?.map((plan: Plan) => (
+                                    <TableRow key={plan._id || plan.id} className="border-slate-100 transition-colors">
                                         <TableCell className="py-4 font-medium text-slate-600">
                                             <div>
                                                 <p className="font-semibold">{plan.name}</p>
                                                 <p className="text-xs text-slate-400">{plan.description}</p>
                                             </div>
                                         </TableCell>
-                                        <TableCell className="py-4 text-slate-600">${plan.price}</TableCell>
-                                        <TableCell className="py-4 text-slate-600 capitalize">{plan.interval}</TableCell>
+                                        <TableCell className="py-4 text-slate-600 capitalize">{plan.role}</TableCell>
                                         <TableCell className="py-4 text-slate-600">
-                                            {plan.stripePriceId ? (
-                                                <span className="text-xs bg-green-50 text-green-600 px-2 py-1 rounded font-mono">
-                                                    {plan.stripePriceId}
-                                                </span>
-                                            ) : (
-                                                <span className="text-xs text-slate-400 italic">Not set</span>
-                                            )}
+                                            <div>
+                                                <p>${plan.pricingMonthly}</p>
+                                                {plan.stripePriceIdMonthly ? (
+                                                    <span className="text-[10px] bg-green-50 text-green-600 px-1.5 py-0.5 rounded font-mono">
+                                                        {plan.stripePriceIdMonthly}
+                                                    </span>
+                                                ) : (
+                                                    <Button
+                                                        variant="link"
+                                                        size="sm"
+                                                        className="h-auto p-0 text-[10px] text-blue-600"
+                                                        onClick={() => handleStripePrice(plan._id || plan.id, "monthly")}
+                                                        disabled={createStripePriceMutation.isPending}
+                                                    >
+                                                        Create Price
+                                                    </Button>
+                                                )}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="py-4 text-slate-600">
+                                            <div>
+                                                <p>${plan.pricingYearly}</p>
+                                                {plan.stripePriceIdYearly ? (
+                                                    <span className="text-[10px] bg-green-50 text-green-600 px-1.5 py-0.5 rounded font-mono">
+                                                        {plan.stripePriceIdYearly}
+                                                    </span>
+                                                ) : (
+                                                    <Button
+                                                        variant="link"
+                                                        size="sm"
+                                                        className="h-auto p-0 text-[10px] text-blue-600"
+                                                        onClick={() => handleStripePrice(plan._id || plan.id, "yearly")}
+                                                        disabled={createStripePriceMutation.isPending}
+                                                    >
+                                                        Create Price
+                                                    </Button>
+                                                )}
+                                            </div>
                                         </TableCell>
                                         <TableCell className="py-4 text-right">
                                             <div className="flex justify-end gap-2">
-                                                {!plan.stripePriceId && (
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        title="Create Stripe Price"
-                                                        onClick={() => handleStripePrice(plan.id)}
-                                                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                                                    >
-                                                        <CreditCard className="w-4 h-4" />
-                                                    </Button>
-                                                )}
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
@@ -161,8 +156,9 @@ export function PlansTable() {
                                                     variant="ghost"
                                                     size="icon"
                                                     title="Delete Plan"
-                                                    onClick={() => handleDelete(plan.id)}
+                                                    onClick={() => handleDelete(plan._id || plan.id)}
                                                     className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                                                    disabled={deletePlanMutation.isPending}
                                                 >
                                                     <Trash2 className="w-4 h-4" />
                                                 </Button>
@@ -170,6 +166,13 @@ export function PlansTable() {
                                         </TableCell>
                                     </TableRow>
                                 ))}
+                                {plans?.length === 0 && (
+                                    <TableRow>
+                                        <TableCell colSpan={5} className="text-center py-8 text-slate-400">
+                                            No plans found.
+                                        </TableCell>
+                                    </TableRow>
+                                )}
                             </TableBody>
                         </Table>
                     </div>
@@ -185,3 +188,4 @@ export function PlansTable() {
         </div>
     );
 }
+

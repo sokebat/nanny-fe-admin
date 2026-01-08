@@ -1,6 +1,4 @@
-"use client";
-
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
     Dialog,
     DialogContent,
@@ -19,51 +17,66 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-
-interface Plan {
-    id: string;
-    name: string;
-    description: string;
-    price: number;
-    interval: "month" | "year";
-}
+import { Plan, CreatePlanDto, UpdatePlanDto, UserRole } from "@/types/subscription";
 
 interface PlanDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    onSave: (data: Partial<Plan>) => void;
+    onSave: (data: CreatePlanDto | UpdatePlanDto) => void;
     plan?: Plan;
 }
 
 export function PlanDialog({ open, onOpenChange, onSave, plan }: PlanDialogProps) {
-    const [formData, setFormData] = React.useState<Partial<Plan>>({
+    const [formData, setFormData] = useState<Partial<CreatePlanDto>>({
         name: "",
+        role: "caregiver",
         description: "",
-        price: 0,
-        interval: "month",
+        pricingMonthly: 0,
+        pricingYearly: 0,
+        features: [],
+        isActive: true,
+        isPopular: false,
     });
+
+    const [featuresText, setFeaturesText] = useState("");
 
     useEffect(() => {
         if (plan) {
-            setFormData(plan);
+            setFormData({
+                name: plan.name,
+                role: plan.role,
+                description: plan.description,
+                pricingMonthly: plan.pricingMonthly,
+                pricingYearly: plan.pricingYearly,
+                features: plan.features,
+                isActive: plan.isActive,
+                isPopular: plan.isPopular,
+            });
+            setFeaturesText(plan.features.join("\n"));
         } else {
             setFormData({
                 name: "",
+                role: "caregiver",
                 description: "",
-                price: 0,
-                interval: "month",
+                pricingMonthly: 0,
+                pricingYearly: 0,
+                features: [],
+                isActive: true,
+                isPopular: false,
             });
+            setFeaturesText("");
         }
     }, [plan, open]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSave(formData);
+        const features = featuresText.split("\n").map(f => f.trim()).filter(f => f !== "");
+        onSave({ ...formData, features } as CreatePlanDto);
     };
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>{plan ? "Edit Plan" : "Create Plan"}</DialogTitle>
                 </DialogHeader>
@@ -74,9 +87,27 @@ export function PlanDialog({ open, onOpenChange, onSave, plan }: PlanDialogProps
                             id="name"
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            placeholder="Basic Plan"
+                            placeholder="Basic Caregiver Plan"
                             required
                         />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="role">Role</Label>
+                        <Select
+                            value={formData.role}
+                            onValueChange={(value: UserRole) =>
+                                setFormData({ ...formData, role: value })
+                            }
+                        >
+                            <SelectTrigger id="role">
+                                <SelectValue placeholder="Select role" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="caregiver">Caregiver</SelectItem>
+                                <SelectItem value="parent">Parent</SelectItem>
+                                <SelectItem value="vendor">Vendor</SelectItem>
+                            </SelectContent>
+                        </Select>
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="description">Description</Label>
@@ -84,38 +115,64 @@ export function PlanDialog({ open, onOpenChange, onSave, plan }: PlanDialogProps
                             id="description"
                             value={formData.description}
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                            placeholder="What's included in this plan?"
-                            rows={3}
+                            placeholder="Brief description of the plan"
+                            rows={2}
                         />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="price">Price ($)</Label>
+                            <Label htmlFor="pricingMonthly">Monthly Price ($)</Label>
                             <Input
-                                id="price"
+                                id="pricingMonthly"
                                 type="number"
                                 step="0.01"
-                                value={formData.price}
-                                onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
+                                value={formData.pricingMonthly}
+                                onChange={(e) => setFormData({ ...formData, pricingMonthly: parseFloat(e.target.value) })}
                                 required
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="interval">Interval</Label>
-                            <Select
-                                value={formData.interval}
-                                onValueChange={(value: "month" | "year") =>
-                                    setFormData({ ...formData, interval: value })
-                                }
-                            >
-                                <SelectTrigger id="interval">
-                                    <SelectValue placeholder="Select interval" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="month">Monthly</SelectItem>
-                                    <SelectItem value="year">Yearly</SelectItem>
-                                </SelectContent>
-                            </Select>
+                            <Label htmlFor="pricingYearly">Yearly Price ($)</Label>
+                            <Input
+                                id="pricingYearly"
+                                type="number"
+                                step="0.01"
+                                value={formData.pricingYearly}
+                                onChange={(e) => setFormData({ ...formData, pricingYearly: parseFloat(e.target.value) })}
+                                required
+                            />
+                        </div>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="features">Features (one per line)</Label>
+                        <Textarea
+                            id="features"
+                            value={featuresText}
+                            onChange={(e) => setFeaturesText(e.target.value)}
+                            placeholder="Messaging&#10;Job Applications&#10;Priority Support"
+                            rows={4}
+                        />
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="checkbox"
+                                id="isPopular"
+                                checked={formData.isPopular}
+                                onChange={(e) => setFormData({ ...formData, isPopular: e.target.checked })}
+                                className="w-4 h-4 text-brand-orange border-slate-300 rounded focus:ring-brand-orange"
+                            />
+                            <Label htmlFor="isPopular">Popular Plan</Label>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="checkbox"
+                                id="isActive"
+                                checked={formData.isActive}
+                                onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                                className="w-4 h-4 text-brand-orange border-slate-300 rounded focus:ring-brand-orange"
+                            />
+                            <Label htmlFor="isActive">Active</Label>
                         </div>
                     </div>
                 </form>
@@ -131,3 +188,4 @@ export function PlanDialog({ open, onOpenChange, onSave, plan }: PlanDialogProps
         </Dialog>
     );
 }
+
