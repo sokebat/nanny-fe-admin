@@ -1,9 +1,4 @@
-import type { Job as ApiJob } from "@/services/job.services";
-import type { Job } from "@/types/job";
-
-/**
- * Format a date string to a readable format
- */
+ 
 export const formatDate = (dateString: string, format: "short" | "long" = "long"): string => {
   const date = new Date(dateString);
 
@@ -127,48 +122,4 @@ export const formatLocationShort = (location: {
   return `${location.city}, ${location.state}`;
 };
 
-/**
- * Transform API job to frontend Job format
- */
-export const transformApiJobToJob = (apiJob: ApiJob): Job => {
-  const locationString = formatLocationShort(apiJob.location);
-  const salary = formatSalary(apiJob.hourlyRate, apiJob.compensationType ?? "negotiable");
-  const daysRemaining = calculateDaysRemaining(apiJob.postedDate);
-
-  // Combine requirements, mustHave, and niceToHave as skills
-  const skills = [
-    ...(apiJob.requirements || []),
-    ...(apiJob.mustHave || []),
-    ...(apiJob.niceToHave || []),
-    ...(apiJob.preferredCertifications || []),
-  ].slice(0, 6); // Limit to 6 skills
-
-  // Generate a consistent logo color based on job ID
-  const logoColors = ["default", "apple", "google", "meta", "facebook"];
-  const logoColor = logoColors[Number.parseInt(apiJob._id.slice(-1), 16) % logoColors.length];
-
-  return {
-    id: Number.parseInt(apiJob._id.slice(-8), 16) || 0,
-    title: apiJob.title,
-    company: `${apiJob.location.city} Family`,
-    logo: apiJob.jobImage || null,
-    logoColor,
-    type: formatJobType(apiJob.jobType),
-    location: locationString,
-    salary,
-    daysRemaining,
-    overview: apiJob.description,
-    skills,
-    employer: {
-      name: "Family",
-      title: "Job Poster",
-      avatar: null,
-    },
-    jobDetails: {
-      rating: "4.8",
-      totalReviews: (apiJob.applicantCount || 0).toString(),
-      completionRate: "95",
-      totalSpent: `${apiJob.hourlyRate * 40}k`,
-    },
-  };
-};
+ 

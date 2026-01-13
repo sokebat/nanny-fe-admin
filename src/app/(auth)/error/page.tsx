@@ -59,7 +59,7 @@ function ErrorContent() {
             <Link href={publicRoutes.auth.login}>Try Again</Link>
           </Button>
           <Button asChild variant="outline" className="w-full sm:w-auto">
-            <Link href={publicRoutes.auth.signup}>Create Account</Link>
+            <Link href={publicRoutes.auth.login}>Login</Link>
           </Button>
         </div>
       </div>
