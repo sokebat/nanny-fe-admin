@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
   SidebarMenu,
@@ -17,14 +17,22 @@ import {
 } from "@/components/ui/sidebar";
 import { EllipsisVertical, LogOut } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
-
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
+  const router = useRouter();
 
   const { data: session } = useSession();
 
-  console.log(session)
+  console.log(session);
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.push("/login");
+    toast.success("Logged out successfully");
+  };
 
   return (
     <SidebarMenu>
@@ -36,13 +44,18 @@ export function NavUser() {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-transparent"
             >
               <Avatar className="h-8 w-8 rounded-lg grayscale">
-                <AvatarImage src={session?.user?.image || ""} alt={session?.user?.name || ""} />
+                <AvatarImage
+                  src={session?.user?.image || ""}
+                  alt={session?.user?.name || ""}
+                />
                 <AvatarFallback className="rounded-lg">
                   {session?.user?.name?.charAt(0) || "U"}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{session?.user?.name}</span>
+                <span className="truncate font-medium">
+                  {session?.user?.name}
+                </span>
                 <span className="text-muted-foreground truncate text-xs">
                   {session?.user?.email}
                 </span>
@@ -59,13 +72,18 @@ export function NavUser() {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={session?.user?.image || ""} alt={session?.user?.name || ""} />
+                  <AvatarImage
+                    src={session?.user?.image || ""}
+                    alt={session?.user?.name || ""}
+                  />
                   <AvatarFallback className="rounded-lg">
                     {session?.user?.name?.charAt(0) || "U"}
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{session?.user?.name}</span>
+                  <span className="truncate font-medium">
+                    {session?.user?.name}
+                  </span>
                   <span className="text-muted-foreground truncate text-xs">
                     {session?.user?.email}
                   </span>
@@ -74,7 +92,7 @@ export function NavUser() {
             </DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => signOut()}>
+            <DropdownMenuItem onClick={handleSignOut}>
               <LogOut />
               Log out
             </DropdownMenuItem>

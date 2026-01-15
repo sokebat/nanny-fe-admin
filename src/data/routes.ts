@@ -5,7 +5,7 @@ const publicRoutes = {
 };
 
 const protectedRoutes = {
-  dashboard: "/ ",
+  dashboard: "/",
   notifications: "/notifications",
 };
 
