@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { protectedRoutes, publicRoutes } from "./data/routes";
 
-type UserRole = "parent" | "nanny" | "vendor" | "guest" | "admin" | undefined;
+type UserRole = "parent" | "nanny" | "vendor" | "admin" | undefined;
 
 export default async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
@@ -16,23 +16,19 @@ export default async function proxy(request: NextRequest) {
     console.log("token", token);
 
     const isAuthenticated = !!token?.accessToken;
-    const isEmailVerified = !!token?.emailVerified;
     const userRole = (token?.role as UserRole) || undefined;
     const isAdmin = userRole === "admin";
 
-    // Helper function to check if pathname matches any route in an object
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation-reason-here>
-    const matchesRoute = (path: string, routes: string | Record<string, any>): boolean => {
-        if (typeof routes === "string") {
-            // Handle dynamic routes (with :id) - check if path starts with the base route
-            const baseRoute = routes.split(":")[0];
-            // Remove trailing slash for comparison
-            const cleanBaseRoute = baseRoute.replace(/\/$/, "");
-            const cleanPath = path.split("?")[0]; // Remove query params
-            return cleanPath === cleanBaseRoute || cleanPath.startsWith(`${cleanBaseRoute}/`);
-        }
-        // Recursively check nested objects
-        return Object.values(routes).some((route) => matchesRoute(path, route));
+    // Helper function to check if pathname matches any protected route
+    const isProtectedRoute = (path: string): boolean => {
+        const cleanPath = path.split("?")[0]; // Remove query params
+        return Object.values(protectedRoutes).some((route: string) => {
+            // Exact match
+            if (cleanPath === route) return true;
+            // Check if path starts with the route (for nested routes like /courses/123)
+            if (cleanPath.startsWith(route + "/")) return true;
+            return false;
+        });
     };
 
     // Check if current route is an auth route
@@ -52,18 +48,20 @@ export default async function proxy(request: NextRequest) {
 
     // User IS authenticated from here onwards
 
-    // Check if user is admin (email verification not required for admin)
-    if (!isAdmin) {
-        // Not admin - redirect to login
-        return NextResponse.redirect(new URL(publicRoutes.auth.login, request.url));
+    // Check if accessing a protected route
+    if (isProtectedRoute(pathname)) {
+        // Only admins can access protected routes
+        if (!isAdmin) {
+            return NextResponse.redirect(new URL(publicRoutes.auth.login, request.url));
+        }
     }
 
     // If authenticated admin tries to access auth routes, redirect to dashboard
-    if (isAuthRoute) {
+    if (isAuthRoute && isAdmin) {
         return NextResponse.redirect(new URL(protectedRoutes.dashboard, request.url));
     }
 
-    // Allow authenticated, verified admin to access all other routes
+    // Allow access
     return NextResponse.next();
 }
 

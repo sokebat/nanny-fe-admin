@@ -16,7 +16,7 @@ export default function AuthLayout({
       <div className="relative">
         <div className="hidden lg:block lg:w-[60%] lg:fixed lg:top-0 lg:left-0 lg:h-screen lg:z-0 relative">
           <Image
-            src="/images/authimage.jpg"
+            src="/images/authlayout.jpg"
             alt="Mother and child"
             className="w-full h-full object-cover"
             width={1000}
