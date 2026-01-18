@@ -18,8 +18,15 @@ export default function CourseDetailPage() {
     
     const [formOpen, setFormOpen] = useState(false);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [togglingStatus, setTogglingStatus] = useState<string | null>(null);
 
-    const { getCourseByIdQuery, updateCourse, deleteCourse } = useCourses();
+    const {
+        getCourseByIdQuery,
+        updateCourse,
+        deleteCourse,
+        toggleListing,
+        togglePopular,
+    } = useCourses();
 
     // Get course data using the hook's query function
     const courseQuery = courseId ? getCourseByIdQuery(courseId) : null;
@@ -47,6 +54,57 @@ export default function CourseDetailPage() {
             router.push("/courses");
         } catch (error) {
             // Error handled by hook
+        }
+    };
+
+    const handleToggleListing = async () => {
+        if (!courseId || !course) return;
+        setTogglingStatus("listing");
+        try {
+            await toggleListing.mutateAsync({
+                courseId,
+                isListed: !course.isListed,
+            });
+            // Refetch after successful toggle to get updated data from API
+            await courseQuery?.refetch();
+        } catch (error) {
+            // Error handled by hook with toast
+        } finally {
+            setTogglingStatus(null);
+        }
+    };
+
+    const handleTogglePopular = async () => {
+        if (!courseId || !course) return;
+        setTogglingStatus("popular");
+        try {
+            await togglePopular.mutateAsync({
+                courseId,
+                isPopular: !course.isPopular,
+            });
+            // Refetch after successful toggle to get updated data from API
+            await courseQuery?.refetch();
+        } catch (error) {
+            // Error handled by hook with toast
+        } finally {
+            setTogglingStatus(null);
+        }
+    };
+
+    const handleToggleActive = async () => {
+        if (!courseId || !course) return;
+        setTogglingStatus("active");
+        try {
+            await updateCourse.mutateAsync({
+                courseId,
+                data: { isActive: !course.isActive } as UpdateCourseDto,
+            });
+            // Refetch after successful toggle to get updated data from API
+            await courseQuery?.refetch();
+        } catch (error) {
+            // Error handled by hook with toast
+        } finally {
+            setTogglingStatus(null);
         }
     };
 
@@ -274,19 +332,49 @@ export default function CourseDetailPage() {
                                     <CardContent className="space-y-3">
                                         <div className="flex items-center justify-between">
                                             <span className="text-muted-foreground">Listed</span>
-                                            <Badge variant={course.isListed ? "default" : "secondary"}>
+                                            <Badge
+                                                variant={course.isListed ? "default" : "secondary"}
+                                                className={`cursor-pointer ${
+                                                    togglingStatus === "listing" ? "opacity-50" : ""
+                                                }`}
+                                                onClick={handleToggleListing}
+                                                title="Click to toggle listing status"
+                                            >
+                                                {togglingStatus === "listing" ? (
+                                                    <Loader2 className="w-3 h-3 mr-1 animate-spin inline" />
+                                                ) : null}
                                                 {course.isListed ? "Yes" : "No"}
                                             </Badge>
                                         </div>
                                         <div className="flex items-center justify-between">
                                             <span className="text-muted-foreground">Popular</span>
-                                            <Badge variant={course.isPopular ? "default" : "secondary"}>
+                                            <Badge
+                                                variant={course.isPopular ? "default" : "secondary"}
+                                                className={`cursor-pointer ${
+                                                    togglingStatus === "popular" ? "opacity-50" : ""
+                                                }`}
+                                                onClick={handleTogglePopular}
+                                                title="Click to toggle popular status"
+                                            >
+                                                {togglingStatus === "popular" ? (
+                                                    <Loader2 className="w-3 h-3 mr-1 animate-spin inline" />
+                                                ) : null}
                                                 {course.isPopular ? "Yes" : "No"}
                                             </Badge>
                                         </div>
                                         <div className="flex items-center justify-between">
                                             <span className="text-muted-foreground">Active</span>
-                                            <Badge variant={course.isActive ? "default" : "destructive"}>
+                                            <Badge
+                                                variant={course.isActive ? "default" : "destructive"}
+                                                className={`cursor-pointer ${
+                                                    togglingStatus === "active" ? "opacity-50" : ""
+                                                }`}
+                                                onClick={handleToggleActive}
+                                                title="Click to toggle active status"
+                                            >
+                                                {togglingStatus === "active" ? (
+                                                    <Loader2 className="w-3 h-3 mr-1 animate-spin inline" />
+                                                ) : null}
                                                 {course.isActive ? "Active" : "Inactive"}
                                             </Badge>
                                         </div>
