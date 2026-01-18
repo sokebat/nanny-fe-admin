@@ -1,0 +1,881 @@
+{
+  "info": {
+    "_postman_id": "nannyplug-api-courses-collection",
+    "name": "NannyPlug API - Courses",
+    "description": "API collection for NannyPlug backend - Courses Module\n\n**Base URL:** `{{base_url}}`\n**Port:** 3000 (default)\n\n**Features:**\n- Public Course Browsing\n- Course Purchase (One-time Payment)\n- Progress Tracking\n- Admin Course Management\n- Teachable Integration\n\n**Setup:**\n1. Import this collection\n2. Use the same environment (`base_url`, `access_token`, `admin_token`)\n3. Login as admin to get `admin_token`\n4. Login as user to get `access_token`\n\n**Environment Variables:**\n- `base_url`: http://localhost:3000/api (or your production URL)\n- `access_token`: JWT token for authenticated user\n- `admin_token`: JWT token for admin user\n- `course_id`: Course ID (set after creating/finding a course)\n- `lesson_id`: Lesson ID (set after getting course lessons)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Public APIs",
+      "item": [
+        {
+          "name": "Get All Courses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/public/courses?page=1&limit=10&category=&search=&minPrice=&maxPrice=",
+              "host": ["{{base_url}}"],
+              "path": ["public", "courses"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number (default: 1)",
+                  "disabled": false
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Items per page (default: 10)",
+                  "disabled": false
+                },
+                {
+                  "key": "category",
+                  "value": "",
+                  "description": "Filter by category",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search in title/description",
+                  "disabled": true
+                },
+                {
+                  "key": "minPrice",
+                  "value": "",
+                  "description": "Minimum price filter",
+                  "disabled": true
+                },
+                {
+                  "key": "maxPrice",
+                  "value": "",
+                  "description": "Maximum price filter",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get list of all listed courses. No authentication required.\n\n**Query Parameters:**\n- `page`: Page number (default: 1)\n- `limit`: Items per page (default: 10)\n- `category`: Filter by category (optional)\n- `search`: Search in title/description (optional)\n- `minPrice`: Minimum price (optional)\n- `maxPrice`: Maximum price (optional)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Popular Courses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/public/courses/popular?limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["public", "courses", "popular"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of popular courses to return (default: 10)",
+                  "disabled": false
+                }
+              ]
+            },
+            "description": "Get list of popular/featured courses. No authentication required.\n\n**Query Parameters:**\n- `limit`: Number of courses to return (default: 10)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Course Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/public/courses/{{course_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["public", "courses", "{{course_id}}"]
+            },
+            "description": "Get detailed information about a specific course. Shows preview for non-enrolled users.\n\n**Path Parameters:**\n- `course_id`: Course ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Course Lessons (Preview)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/public/courses/{{course_id}}/lessons",
+              "host": ["{{base_url}}"],
+              "path": ["public", "courses", "{{course_id}}", "lessons"]
+            },
+            "description": "Get course lessons. Only preview lessons are shown for non-enrolled users.\n\n**Path Parameters:**\n- `course_id`: Course ID"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "User APIs - Nanny",
+      "item": [
+        {
+          "name": "Get My Enrolled Courses",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/nanny/courses?page=1&limit=10&status=",
+              "host": ["{{base_url}}"],
+              "path": ["nanny", "courses"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number (default: 1)",
+                  "disabled": false
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Items per page (default: 10)",
+                  "disabled": false
+                },
+                {
+                  "key": "status",
+                  "value": "",
+                  "description": "Filter by status: active, completed, cancelled",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get list of courses enrolled by the authenticated nanny.\n\n**Authentication:** Required (Bearer token - Nanny role)\n\n**Query Parameters:**\n- `page`: Page number (default: 1)\n- `limit`: Items per page (default: 10)\n- `status`: Filter by enrollment status (optional)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Enrolled Course Details",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/nanny/courses/{{course_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["nanny", "courses", "{{course_id}}"]
+            },
+            "description": "Get detailed information about an enrolled course including progress.\n\n**Authentication:** Required (Bearer token - Nanny role)\n\n**Path Parameters:**\n- `course_id`: Course ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Purchase Course",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"paymentMethodId\": \"pm_1234567890abcdef\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/nanny/courses/{{course_id}}/purchase",
+              "host": ["{{base_url}}"],
+              "path": ["nanny", "courses", "{{course_id}}", "purchase"]
+            },
+            "description": "Purchase a course with one-time payment. Creates invoice and enrollment.\n\n**Authentication:** Required (Bearer token - All roles)\n\n**Path Parameters:**\n- `course_id`: Course ID\n\n**Request Body:**\n- `paymentMethodId`: Stripe payment method ID\n\n**Response:**\n- Returns enrollment and invoice details"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Course Progress",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/nanny/courses/{{course_id}}/progress",
+              "host": ["{{base_url}}"],
+              "path": ["nanny", "courses", "{{course_id}}", "progress"]
+            },
+            "description": "Get progress information for an enrolled course.\n\n**Authentication:** Required (Bearer token - All roles)\n\n**Path Parameters:**\n- `course_id`: Course ID\n\n**Response:**\n- Progress percentage\n- Completed lessons\n- Total lessons\n- Time spent\n- Certificate status"
+          },
+          "response": []
+        },
+        {
+          "name": "Complete Lesson",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"timeSpent\": 30\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/nanny/courses/{{course_id}}/lessons/{{lesson_id}}/complete",
+              "host": ["{{base_url}}"],
+              "path": ["nanny", "courses", "{{course_id}}", "lessons", "{{lesson_id}}", "complete"]
+            },
+            "description": "Mark a lesson as completed and update course progress.\n\n**Authentication:** Required (Bearer token - All roles)\n\n**Path Parameters:**\n- `course_id`: Course ID\n- `lesson_id`: Lesson ID\n\n**Request Body (Optional):**\n- `timeSpent`: Time spent on lesson in minutes\n\n**Response:**\n- Success status\n- Updated progress percentage"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "User APIs - Family",
+      "item": [
+        {
+          "name": "Get My Enrolled Courses",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/family/courses?page=1&limit=10&status=",
+              "host": ["{{base_url}}"],
+              "path": ["family", "courses"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number (default: 1)",
+                  "disabled": false
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Items per page (default: 10)",
+                  "disabled": false
+                },
+                {
+                  "key": "status",
+                  "value": "",
+                  "description": "Filter by status: active, completed, cancelled",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get list of courses enrolled by the authenticated parent.\n\n**Authentication:** Required (Bearer token - Parent role)\n\n**Query Parameters:**\n- `page`: Page number (default: 1)\n- `limit`: Items per page (default: 10)\n- `status`: Filter by enrollment status (optional)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "User APIs - Vendor",
+      "item": [
+        {
+          "name": "Get My Enrolled Courses",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/vendor/courses?page=1&limit=10&status=",
+              "host": ["{{base_url}}"],
+              "path": ["vendor", "courses"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number (default: 1)",
+                  "disabled": false
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Items per page (default: 10)",
+                  "disabled": false
+                },
+                {
+                  "key": "status",
+                  "value": "",
+                  "description": "Filter by status: active, completed, cancelled",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get list of courses enrolled by the authenticated vendor.\n\n**Authentication:** Required (Bearer token - Vendor role)\n\n**Query Parameters:**\n- `page`: Page number (default: 1)\n- `limit`: Items per page (default: 10)\n- `status`: Filter by enrollment status (optional)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin APIs",
+      "item": [
+        {
+          "name": "Get All Courses (Admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/courses?page=1&limit=10&category=&search=&minPrice=&maxPrice=",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "courses"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number (default: 1)",
+                  "disabled": false
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Items per page (default: 10)",
+                  "disabled": false
+                },
+                {
+                  "key": "category",
+                  "value": "",
+                  "description": "Filter by category",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search in title/description",
+                  "disabled": true
+                },
+                {
+                  "key": "minPrice",
+                  "value": "",
+                  "description": "Minimum price filter",
+                  "disabled": true
+                },
+                {
+                  "key": "maxPrice",
+                  "value": "",
+                  "description": "Maximum price filter",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get list of all courses (including unlisted). Admin only.\n\n**Authentication:** Required (Bearer token - Admin role)\n\n**Query Parameters:**\n- `page`: Page number (default: 1)\n- `limit`: Items per page (default: 10)\n- `category`: Filter by category (optional)\n- `search`: Search in title/description (optional)\n- `minPrice`: Minimum price (optional)\n- `maxPrice`: Maximum price (optional)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Course Details (Admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/courses/{{course_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "courses", "{{course_id}}"]
+            },
+            "description": "Get detailed information about a specific course. Admin can view unlisted courses.\n\n**Authentication:** Required (Bearer token - Admin role)\n\n**Path Parameters:**\n- `course_id`: Course ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Course",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "title",
+                  "value": "Introduction to Childcare",
+                  "type": "text",
+                  "description": "Course title"
+                },
+                {
+                  "key": "description",
+                  "value": "Learn the fundamentals of professional childcare",
+                  "type": "text",
+                  "description": "Course description"
+                },
+                {
+                  "key": "category",
+                  "value": "Childcare Basics",
+                  "type": "text",
+                  "description": "Course category"
+                },
+                {
+                  "key": "price",
+                  "value": "99.99",
+                  "type": "text",
+                  "description": "Course price"
+                },
+                {
+                  "key": "videoUrl",
+                  "value": "https://example.com/preview-video.mp4",
+                  "type": "text",
+                  "description": "Preview video URL (optional)"
+                },
+                {
+                  "key": "teachableCourseId",
+                  "value": "",
+                  "type": "text",
+                  "description": "Teachable course ID (optional)"
+                },
+                {
+                  "key": "isListed",
+                  "value": "true",
+                  "type": "text",
+                  "description": "Show in public listings (default: true)"
+                },
+                {
+                  "key": "isPopular",
+                  "value": "false",
+                  "type": "text",
+                  "description": "Mark as popular (default: false)"
+                },
+                {
+                  "key": "thumbnail",
+                  "type": "file",
+                  "src": [],
+                  "description": "Course thumbnail image (optional)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/courses",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "courses"]
+            },
+            "description": "Create a new course. Admin only.\n\n**Authentication:** Required (Bearer token - Admin role)\n\n**Request Body (form-data):**\n- `title`: Course title (required)\n- `description`: Course description (optional)\n- `category`: Course category (optional)\n- `price`: Course price (required)\n- `videoUrl`: Preview video URL (optional)\n- `teachableCourseId`: Teachable course ID (optional)\n- `isListed`: Show in public listings (optional, default: true)\n- `isPopular`: Mark as popular (optional, default: false)\n- `thumbnail`: Thumbnail image file (optional)"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Course",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "title",
+                  "value": "Updated Course Title",
+                  "type": "text",
+                  "description": "Course title"
+                },
+                {
+                  "key": "description",
+                  "value": "Updated course description",
+                  "type": "text",
+                  "description": "Course description"
+                },
+                {
+                  "key": "category",
+                  "value": "Updated Category",
+                  "type": "text",
+                  "description": "Course category"
+                },
+                {
+                  "key": "price",
+                  "value": "149.99",
+                  "type": "text",
+                  "description": "Course price"
+                },
+                {
+                  "key": "isListed",
+                  "value": "true",
+                  "type": "text",
+                  "description": "Show in public listings"
+                },
+                {
+                  "key": "isPopular",
+                  "value": "true",
+                  "type": "text",
+                  "description": "Mark as popular"
+                },
+                {
+                  "key": "thumbnail",
+                  "type": "file",
+                  "src": [],
+                  "description": "New thumbnail image (optional)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/courses/{{course_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "courses", "{{course_id}}"]
+            },
+            "description": "Update an existing course. Admin only.\n\n**Authentication:** Required (Bearer token - Admin role)\n\n**Path Parameters:**\n- `course_id`: Course ID\n\n**Request Body (form-data):**\n- All fields are optional\n- `thumbnail`: Upload new thumbnail (optional)"
+          },
+          "response": []
+        },
+        {
+          "name": "Toggle Course Listing",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isListed\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/courses/{{course_id}}/toggle-listing",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "courses", "{{course_id}}", "toggle-listing"]
+            },
+            "description": "List or unlist a course. Admin only.\n\n**Authentication:** Required (Bearer token - Admin role)\n\n**Path Parameters:**\n- `course_id`: Course ID\n\n**Request Body:**\n- `isListed`: true to list, false to unlist"
+          },
+          "response": []
+        },
+        {
+          "name": "Toggle Popular Status",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isPopular\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/courses/{{course_id}}/toggle-popular",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "courses", "{{course_id}}", "toggle-popular"]
+            },
+            "description": "Mark a course as popular or remove popular status. Admin only.\n\n**Authentication:** Required (Bearer token - Admin role)\n\n**Path Parameters:**\n- `course_id`: Course ID\n\n**Request Body:**\n- `isPopular`: true to mark as popular, false to remove"
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Course Thumbnail",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "thumbnail",
+                  "type": "file",
+                  "src": [],
+                  "description": "Thumbnail image file (JPEG, PNG, WebP, max 5MB)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/courses/{{course_id}}/thumbnail",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "courses", "{{course_id}}", "thumbnail"]
+            },
+            "description": "Upload or update course thumbnail. Admin only.\n\n**Authentication:** Required (Bearer token - Admin role)\n\n**Path Parameters:**\n- `course_id`: Course ID\n\n**Request Body (form-data):**\n- `thumbnail`: Image file (required)"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Course",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/courses/{{course_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "courses", "{{course_id}}"]
+            },
+            "description": "Delete a course. Only allowed if course has no enrollments. Admin only.\n\n**Authentication:** Required (Bearer token - Admin role)\n\n**Path Parameters:**\n- `course_id`: Course ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Sync Courses from Teachable",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/courses/sync-teachable",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "courses", "sync-teachable"]
+            },
+            "description": "Sync courses from Teachable API. Creates new courses or updates existing ones. Admin only.\n\n**Authentication:** Required (Bearer token - Admin role)\n\n**Response:**\n- `synced`: Number of courses synced\n- `errors`: Number of errors encountered"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Course Enrollments",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/courses/{{course_id}}/enrollments?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "courses", "{{course_id}}", "enrollments"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number (default: 1)",
+                  "disabled": false
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Items per page (default: 10)",
+                  "disabled": false
+                }
+              ]
+            },
+            "description": "Get all enrollments for a specific course. Admin only.\n\n**Authentication:** Required (Bearer token - Admin role)\n\n**Path Parameters:**\n- `course_id`: Course ID\n\n**Query Parameters:**\n- `page`: Page number (default: 1)\n- `limit`: Items per page (default: 10)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Course Statistics",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/courses/stats",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "courses", "stats"]
+            },
+            "description": "Get course statistics including total courses, enrollments, etc. Admin only.\n\n**Authentication:** Required (Bearer token - Admin role)\n\n**Response:**\n- Total courses\n- Listed courses\n- Popular courses\n- Total enrollments\n- Active enrollments\n- Completed enrollments"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000/api",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "admin_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "course_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "lesson_id",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
