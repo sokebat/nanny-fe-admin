@@ -6,7 +6,8 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { StatusBadge, StatusType } from "@/components/shared/status-badge";
+import { Button } from "@/components/ui/button";
+import { Trash2, Eye, Loader2 } from "lucide-react";
 
 export interface CourseItem {
     id: number;
@@ -14,14 +15,24 @@ export interface CourseItem {
     detail: string;
     location: string;
     price: string;
-    status: StatusType;
+    _id?: string;
+    isPopular?: boolean;
+    isListed?: boolean;
 }
 
 interface CoursesTableProps {
     courses: CourseItem[];
+    onView?: (courseId: string) => void;
+    onDelete?: (courseId: string) => void;
+    isDeleting?: boolean;
 }
 
-export function CoursesTable({ courses }: CoursesTableProps) {
+export function CoursesTable({
+    courses,
+    onView,
+    onDelete,
+    isDeleting = false,
+}: CoursesTableProps) {
     if (courses.length === 0) {
         return (
             <div className="text-center py-12">
@@ -35,29 +46,67 @@ export function CoursesTable({ courses }: CoursesTableProps) {
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead>Courses</TableHead>
-                        <TableHead>Detail</TableHead>
-                        <TableHead>Location</TableHead>
+                        <TableHead>Course Title</TableHead>
+                        <TableHead>Description</TableHead>
+                        <TableHead>Category</TableHead>
                         <TableHead>Price</TableHead>
-                        <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {courses.map((course) => (
-                        <TableRow key={course.id}>
-                            <TableCell className="font-medium text-foreground">
-                                {course.name}
-                            </TableCell>
-                            <TableCell className="text-muted-foreground">
-                                {course.detail}
-                            </TableCell>
-                            <TableCell className="text-foreground">{course.location}</TableCell>
-                            <TableCell className="text-foreground">{course.price}</TableCell>
-                            <TableCell>
-                                <StatusBadge status={course.status} />
-                            </TableCell>
-                        </TableRow>
-                    ))}
+                    {courses.map((course) => {
+                        return (
+                            <TableRow key={course.id || course._id}>
+                                <TableCell className="font-medium text-foreground">
+                                    <a
+                                        href={`/courses/${course._id}`}
+                                        className="flex items-center gap-2 hover:text-primary transition-colors"
+                                    >
+                                        {course.name}
+                                    </a>
+                                </TableCell>
+                                <TableCell className="text-muted-foreground max-w-md truncate">
+                                    {course.detail}
+                                </TableCell>
+                                <TableCell className="text-foreground">{course.location}</TableCell>
+                                <TableCell className="text-foreground font-semibold">
+                                    {course.price}
+                                </TableCell>
+                                <TableCell className="text-right">
+                                    <div className="flex justify-end gap-2">
+
+                                        {onView && (
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                title="View Course"
+                                                onClick={() => onView(course._id!)}
+                                            >
+                                                <Eye className="w-4 h-4" />
+                                            </Button>
+                                        )}
+
+                                        {onDelete && course._id && (
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                title="Delete Course"
+                                                onClick={() => onDelete(course._id!)}
+                                                disabled={isDeleting}
+                                                className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                                            >
+                                                {isDeleting ? (
+                                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                                ) : (
+                                                    <Trash2 className="w-4 h-4" />
+                                                )}
+                                            </Button>
+                                        )}
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        );
+                    })}
                 </TableBody>
             </Table>
         </div>

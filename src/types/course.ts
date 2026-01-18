@@ -7,13 +7,19 @@ export interface Course {
     videoUrl?: string;
     teachableCourseId?: string;
     thumbnail?: string;
+    thumbnailUrl?: string; // API response field
     isActive: boolean;
     isListed: boolean;
     isPopular: boolean;
     enrollmentCount: number;
     ratingAverage: number;
     ratingCount: number;
-    createdBy: string;
+    createdBy: {
+        _id: string;
+        email: string;
+        firstName: string;
+        lastName: string;
+    } | string;
     createdAt: string;
     updatedAt: string;
     __v?: number;
@@ -77,5 +83,17 @@ export interface CourseStats {
 export interface SyncTeachableResponse {
     synced: number;
     errors: number;
+}
+
+export interface CoursesListResponse {
+    courses: Course[];
+    pagination: {
+        page: string;
+        limit: string;
+        total: number;
+        totalPages: number;
+        hasNext: boolean;
+        hasPrev: boolean;
+    };
 }
 

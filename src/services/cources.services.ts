@@ -8,6 +8,7 @@ import type {
     CourseEnrollment,
     CourseStats,
     SyncTeachableResponse,
+    CoursesListResponse,
 } from "@/types/course";
 import type { ApiResponse, PaginatedData } from "@/types/subscription";
 
@@ -15,7 +16,7 @@ class CoursesService extends ApiService {
     /**
      * Get all courses with filters (Admin only)
      */
-    async getAllCourses(filters: CourseFilters = {}): Promise<PaginatedData<Course>> {
+    async getAllCourses(filters: CourseFilters = {}): Promise<CoursesListResponse> {
         const params = new URLSearchParams();
         
         if (filters.page) params.append("page", String(filters.page));
@@ -28,7 +29,7 @@ class CoursesService extends ApiService {
         const queryString = params.toString();
         const endpoint = `/admin/courses${queryString ? `?${queryString}` : ""}`;
         
-        const response = await this.get<ApiResponse<PaginatedData<Course>>>(endpoint, true);
+        const response = await this.get<ApiResponse<CoursesListResponse>>(endpoint, true);
         return response.data;
     }
 
