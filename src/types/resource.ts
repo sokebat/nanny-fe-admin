@@ -55,10 +55,12 @@ export interface ResourcesListResponse {
 }
 
 export interface ResourceStatsBase {
-    totalResources: number;
-    byType: Record<string, number>;
-    byCategory: Record<string, number>;
-    popularCount: number;
-    activeCount: number;
-    listedCount: number;
+    resources: {
+        total: number;
+        listed: number;
+        popular: number;
+    };
+    views: {
+        total: number;
+    };
 }

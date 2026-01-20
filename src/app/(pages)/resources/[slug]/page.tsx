@@ -128,21 +128,21 @@ export default function ResourceDetailPage() {
     };
 
     return (
-        <main className="flex-1 p-8 overflow-auto bg-white">
-            <div className="max-w-6xl mx-auto space-y-8">
+        <main className="flex-1 p-4 md:p-8 overflow-auto bg-white">
+            <div className="max-w-6xl mx-auto space-y-6 md:space-y-8">
                 {/* Navigation & Actions */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div>
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                    <div className="space-y-1">
                         <Button
                             variant="ghost"
                             onClick={() => router.push("/resources")}
-                            className="p-0 hover:bg-transparent text-muted-foreground hover:text-brand-navy mb-4 transition-colors"
+                            className="p-0 h-auto hover:bg-transparent text-muted-foreground hover:text-brand-navy mb-2 md:mb-4 transition-colors text-sm"
                         >
                             <ArrowLeft className="w-4 h-4 mr-2" />
                             Back to Library
                         </Button>
                         <div className="flex flex-wrap items-center gap-3">
-                            <h1 className="text-4xl font-extrabold text-[#1E293B] tracking-tight">
+                            <h1 className="text-3xl md:text-4xl font-extrabold text-[#1E293B] tracking-tight">
                                 {resource.title}
                             </h1>
                             {resource.category && (
@@ -152,10 +152,10 @@ export default function ResourceDetailPage() {
                             )}
                         </div>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-row items-center gap-3">
                         <Button
                             onClick={() => setFormOpen(true)}
-                            className="bg-brand-navy hover:bg-[#203a56] text-white rounded-xl h-11 px-6 shadow-none transition-all"
+                            className="flex-1 sm:flex-initial bg-brand-navy hover:bg-[#203a56] text-white rounded-xl h-11 px-6 shadow-none transition-all font-bold"
                         >
                             Edit Resource
                         </Button>
@@ -163,7 +163,7 @@ export default function ResourceDetailPage() {
                             variant="destructive"
                             onClick={() => setDeleteDialogOpen(true)}
                             disabled={deleteResource.isPending}
-                            className="rounded-xl h-11 px-6 shadow-none"
+                            className="flex-1 sm:flex-initial rounded-xl h-11 px-6 shadow-none font-bold"
                         >
                             <Trash2 className="w-4 h-4 mr-2" />
                             Delete

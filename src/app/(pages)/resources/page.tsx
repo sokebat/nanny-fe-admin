@@ -118,22 +118,22 @@ const ManageResources = () => {
     };
 
     return (
-        <main className="flex-1 p-8 overflow-auto bg-white min-h-screen">
-            <div className="max-w-7xl mx-auto space-y-8">
+        <main className="flex-1 p-4 md:p-8 overflow-auto bg-muted min-h-screen">
+            <div className="max-w-7xl mx-auto space-y-6 md:space-y-8">
                 {/* Header and Actions */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                     <div>
-                        <h2 className="text-[#1E293B] text-4xl font-extrabold tracking-tight">Manage Resources</h2>
-                        <p className="text-muted-foreground mt-1">Library management and curation tools.</p>
+                        <h2 className="text-[#1E293B] text-3xl md:text-4xl font-extrabold tracking-tight">Manage Resources</h2>
+                        <p className="text-muted-foreground mt-1 text-sm md:text-base">Library management and curation tools.</p>
                     </div>
 
-                    <div className="flex items-center gap-3">
-                        <form onSubmit={handleSearch} className="relative">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                        <form onSubmit={handleSearch} className="relative flex-1 sm:flex-initial">
                             <Input
                                 placeholder="Search resources..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-10 pr-10 w-[250px] md:w-[300px] h-11 rounded-xl border-slate-200 focus-visible:ring-brand-navy"
+                                className="pl-10 pr-10 w-full sm:w-[250px] md:w-[300px] h-11 rounded-xl border-slate-200 focus-visible:ring-brand-navy"
                             />
                             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                             {searchQuery && (
@@ -148,7 +148,7 @@ const ManageResources = () => {
                         </form>
                         <Button
                             onClick={handleOpenCreate}
-                            className="bg-brand-navy hover:bg-[#203a56] text-white px-8 h-11 rounded-xl font-bold shadow-none"
+                            className="bg-brand-navy hover:bg-[#203a56] text-white px-4 md:px-8 h-11 rounded-xl font-bold shadow-none whitespace-nowrap"
                         >
                             Upload Resource
                         </Button>

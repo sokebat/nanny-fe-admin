@@ -72,12 +72,16 @@ export interface CourseEnrollment {
 }
 
 export interface CourseStats {
-    totalCourses: number;
-    listedCourses: number;
-    popularCourses: number;
-    totalEnrollments: number;
-    activeEnrollments: number;
-    completedEnrollments: number;
+    courses: {
+        total: number;
+        listed: number;
+        popular: number;
+    };
+    enrollments: {
+        total: number;
+        active: number;
+        completed: number;
+    };
 }
 
 export interface SyncTeachableResponse {
