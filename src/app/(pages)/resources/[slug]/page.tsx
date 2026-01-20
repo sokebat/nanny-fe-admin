@@ -250,18 +250,7 @@ export default function ResourceDetailPage() {
                                             </a>
                                         </Button>
                                     )}
-                                    {resource.url && (
-                                        <Button
-                                            asChild
-                                            variant="outline"
-                                            className="w-full rounded-xl h-12 border-slate-200 hover:border-brand-navy hover:text-brand-navy font-bold"
-                                        >
-                                            <a href={resource.url} target="_blank" rel="noreferrer">
-                                                <ExternalLink className="w-4 h-4 mr-2" />
-                                                Open External Link
-                                            </a>
-                                        </Button>
-                                    )}
+
                                 </div>
 
                                 <div className="pt-6 border-t border-slate-100 flex items-center justify-between">
