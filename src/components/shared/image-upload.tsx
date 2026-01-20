@@ -4,9 +4,10 @@ import { cn } from "@/lib/utils";
 interface ImageUploadProps {
     onUpload?: (file: File) => void;
     className?: string;
+    id?: string;
 }
 
-export function ImageUpload({ onUpload, className }: ImageUploadProps) {
+export function ImageUpload({ onUpload, className, id }: ImageUploadProps) {
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file && onUpload) {
@@ -29,6 +30,7 @@ export function ImageUpload({ onUpload, className }: ImageUploadProps) {
                     </p>
                 </div>
                 <input
+                    id={id}
                     type="file"
                     className="hidden"
                     accept="image/*"

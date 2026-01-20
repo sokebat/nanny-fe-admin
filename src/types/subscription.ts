@@ -29,24 +29,30 @@ export interface Plan {
 }
 
 export interface UserSubscription {
-    id: string;
-    _id?: string;
-    userId: string;
-    user: {
-        name: string;
+    _id: string;
+    userId: {
+        _id: string;
         email: string;
+        firstName: string;
+        lastName: string;
+        role: UserRole;
+        phone?: string;
     };
-    planId: string;
-    plan: Plan;
-    status: SubscriptionStatus;
+    planId: {
+        _id: string;
+        name: string;
+        pricingMonthly: number;
+        pricingYearly: number;
+    };
     billingCycle: BillingCycle;
-    startDate: string;
+    status: SubscriptionStatus;
     currentPeriodStart: string;
     currentPeriodEnd: string;
     cancelAtPeriodEnd: boolean;
     stripeSubscriptionId: string;
     createdAt: string;
     updatedAt: string;
+    cancelledAt?: string;
 }
 
 export interface CreatePlanDto {
@@ -69,13 +75,11 @@ export interface ApiResponse<T> {
     data: T;
 }
 
-export interface PaginatedData<T> {
-    data: T[];
-    meta: {
-        total: number;
-        page: number;
-        limit: number;
-        totalPages: number;
-    };
+export interface PaginatedSubscriptions {
+    subscriptions: UserSubscription[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
 }
 

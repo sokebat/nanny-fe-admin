@@ -1,277 +1,224 @@
 "use client";
 
 import { useState } from "react";
-import { ResourcesTable, ResourceItem } from "@/components/resources";
+import {
+    ResourcesTable,
+    ResourceForm,
+    ResourceStats,
+    ResourcePagination,
+    DeleteResourceDialog,
+} from "@/components/resources";
 import { Button } from "@/components/ui/button";
-import {
-    Sheet,
-    SheetContent,
-    SheetDescription,
-    SheetHeader,
-    SheetTitle,
-    SheetTrigger,
-} from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import { ImageUpload } from "@/components/shared/image-upload";
+import { useResources } from "@/hooks/use-resources";
+import type { CreateResourceDto, UpdateResourceDto, Resource } from "@/types/resource";
+import { Search, Loader2, X } from "lucide-react";
 
 const ManageResources = () => {
-    const [open, setOpen] = useState(false);
+    const [formOpen, setFormOpen] = useState(false);
+    const [editResource, setEditResource] = useState<Resource | null>(null);
+    const [deleteResourceId, setDeleteResourceId] = useState<string | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
+    const limit = 10;
 
-    const resourcesData: ResourceItem[] = [
-        {
-            id: 1,
-            name: "Resource Name",
-            detail: "Course detail is written here",
-            location: "United States",
-            price: "$119/Year",
-            status: "Uploaded",
-        },
-        {
-            id: 2,
-            name: "Resource Name",
-            detail: "Course detail is written here",
-            location: "Canada",
-            price: "$11.9/Month",
-            status: "Uploaded",
-        },
-        {
-            id: 3,
-            name: "Resource Name",
-            detail: "Course detail is written here",
-            location: "Corner street 46 London",
-            price: "$119/Year",
-            status: "Pending",
-        },
-        {
-            id: 4,
-            name: "Resource Name",
-            detail: "Course detail is written here",
-            location: "Corner street 46 London",
-            price: "$119/Year",
-            status: "Uploaded",
-        },
-        {
-            id: 5,
-            name: "Resource Name",
-            detail: "Course detail is written here",
-            location: "Corner street 46 London",
-            price: "$119/Year",
-            status: "Uploaded",
-        },
-        {
-            id: 6,
-            name: "Resource Name",
-            detail: "Course detail is written here",
-            location: "Corner street 46 London",
-            price: "$119/Year",
-            status: "Pending",
-        },
-        {
-            id: 7,
-            name: "Resource Name",
-            detail: "Course detail is written here",
-            location: "Corner street 46 London",
-            price: "$119/Year",
-            status: "Uploaded",
-        },
-        {
-            id: 8,
-            name: "Resource Name",
-            detail: "Course detail is written here",
-            location: "Corner street 46 London",
-            price: "$119/Year",
-            status: "Uploaded",
-        },
-        {
-            id: 9,
-            name: "Resource Name",
-            detail: "Course detail is written here",
-            location: "Corner street 46 London",
-            price: "$119/Year",
-            status: "Uploaded",
-        },
-        {
-            id: 10,
-            name: "Resource Name",
-            detail: "Course detail is written here",
-            location: "Corner street 46 London",
-            price: "$119/Year",
-            status: "Uploaded",
-        },
-    ];
+    // Fetch resources and stats
+    const {
+        getResourcesQuery,
+        getResourceStatsQuery,
+        createResource,
+        updateResource,
+        deleteResource,
+        toggleListing,
+        togglePopular,
+    } = useResources({
+        page: currentPage,
+        limit,
+        search: debouncedSearch,
+    });
 
-    const handleUpload = (file: File) => {
-        console.log("Uploaded file:", file);
+    const resources = getResourcesQuery.data?.resources || [];
+    const total = getResourcesQuery.data?.total || 0;
+    const totalPages = getResourcesQuery.data?.totalPages || 0;
+    const stats = getResourceStatsQuery.data;
+
+    // Handlers
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        setDebouncedSearch(searchQuery);
+        setCurrentPage(1);
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        console.log("Resource submitted");
-        setOpen(false);
+    const clearSearch = () => {
+        setSearchQuery("");
+        setDebouncedSearch("");
+        setCurrentPage(1);
+    };
+
+    const handleOpenCreate = () => {
+        setEditResource(null);
+        setFormOpen(true);
+    };
+
+    const handleEdit = (resourceId: string) => {
+        const resource = resources.find((r) => r._id === resourceId);
+        if (resource) {
+            setEditResource(resource);
+            setFormOpen(true);
+        }
+    };
+
+    const handleCloseForm = () => {
+        setFormOpen(false);
+        setEditResource(null);
+    };
+
+    const handleFormSubmit = async (data: CreateResourceDto) => {
+        try {
+            if (editResource) {
+                await updateResource.mutateAsync({
+                    resourceId: editResource._id,
+                    data: data as UpdateResourceDto,
+                });
+            } else {
+                await createResource.mutateAsync(data);
+            }
+            handleCloseForm();
+        } catch (error) {
+            // Error is handled by the hook
+        }
+    };
+
+    const handleDelete = async () => {
+        if (deleteResourceId) {
+            try {
+                await deleteResource.mutateAsync(deleteResourceId);
+                setDeleteResourceId(null);
+            } catch (error) {
+                // Error is handled by the hook
+            }
+        }
+    };
+
+    const handleToggleListing = async (resourceId: string, isListed: boolean) => {
+        try {
+            await toggleListing.mutateAsync({ resourceId, isListed });
+        } catch (error) {
+            // Error is handled by the hook
+        }
+    };
+
+    const handleTogglePopular = async (resourceId: string, isPopular: boolean) => {
+        try {
+            await togglePopular.mutateAsync({ resourceId, isPopular });
+        } catch (error) {
+            // Error is handled by the hook
+        }
     };
 
     return (
-        <main className="flex-1 p-8 overflow-auto bg-muted">
-            <div className="mb-8">
-                <div className="flex items-center justify-between mb-8">
-                    <h2 className="text-foreground text-4xl font-bold">Manage Resources</h2>
+        <main className="flex-1 p-8 overflow-auto bg-white min-h-screen">
+            <div className="max-w-7xl mx-auto space-y-8">
+                {/* Header and Actions */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div>
+                        <h2 className="text-[#1E293B] text-4xl font-extrabold tracking-tight">Manage Resources</h2>
+                        <p className="text-muted-foreground mt-1">Library management and curation tools.</p>
+                    </div>
 
-                    <Sheet open={open} onOpenChange={setOpen}>
-                        <SheetTrigger asChild>
-                            <Button className="bg-brand-navy hover:bg-[#2d4a6a] text-white px-8 py-2.5 h-auto">
-                                Upload
-                            </Button>
-                        </SheetTrigger>
-                        <SheetContent className="w-full sm:max-w-2xl overflow-y-auto">
-                            <SheetHeader className="pb-6 border-b">
-                                <SheetTitle className="text-2xl font-bold">Upload Resource</SheetTitle>
-                                <SheetDescription className="text-sm">Basic Information</SheetDescription>
-                            </SheetHeader>
-
-                            <form onSubmit={handleSubmit} className="mt-8 space-y-8 px-1">
-                                <div className="space-y-6">
-                                    <div>
-                                        <Label className="text-sm font-semibold">Profile Picture</Label>
-                                        <ImageUpload onUpload={handleUpload} className="mt-3" />
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <Label htmlFor="resourceName" className="text-sm font-medium">
-                                                Name of Resource
-                                            </Label>
-                                            <Input
-                                                id="resourceName"
-                                                placeholder="Enter resource name"
-                                                className="mt-2"
-                                            />
-                                        </div>
-                                        <div>
-                                            <Label htmlFor="totalSales" className="text-sm font-medium">
-                                                Total Sales
-                                            </Label>
-                                            <Input
-                                                id="totalSales"
-                                                placeholder="Enter total sales"
-                                                className="mt-2"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <Label htmlFor="startDate" className="text-sm font-medium">
-                                                Starting date
-                                            </Label>
-                                            <Input id="startDate" type="date" className="mt-2" />
-                                        </div>
-                                        <div>
-                                            <Label htmlFor="endDate" className="text-sm font-medium">
-                                                Ending date
-                                            </Label>
-                                            <Input id="endDate" type="date" className="mt-2" />
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <Label htmlFor="accessDays" className="text-sm font-medium">
-                                                No. of Access Days
-                                            </Label>
-                                            <Select>
-                                                <SelectTrigger className="mt-2 w-full">
-                                                    <SelectValue placeholder="Select..." />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="30">30 Days</SelectItem>
-                                                    <SelectItem value="60">60 Days</SelectItem>
-                                                    <SelectItem value="90">90 Days</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div>
-                                            <Label htmlFor="duration" className="text-sm font-medium">
-                                                Duration
-                                            </Label>
-                                            <Select>
-                                                <SelectTrigger className="mt-2 w-full">
-                                                    <SelectValue placeholder="Select..." />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="1week">1 Week</SelectItem>
-                                                    <SelectItem value="2weeks">2 Weeks</SelectItem>
-                                                    <SelectItem value="1month">1 Month</SelectItem>
-                                                    <SelectItem value="3months">3 Months</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <Label htmlFor="lessons" className="text-sm font-medium">
-                                                No. of Lessons
-                                            </Label>
-                                            <Select>
-                                                <SelectTrigger className="mt-2 w-full">
-                                                    <SelectValue placeholder="Select..." />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="5">5 Lessons</SelectItem>
-                                                    <SelectItem value="10">10 Lessons</SelectItem>
-                                                    <SelectItem value="15">15 Lessons</SelectItem>
-                                                    <SelectItem value="20">20 Lessons</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div>
-                                            <Label htmlFor="price" className="text-sm font-medium">
-                                                Price
-                                            </Label>
-                                            <Input
-                                                id="price"
-                                                placeholder="Enter price"
-                                                type="number"
-                                                className="mt-2"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <Label htmlFor="description" className="text-sm font-semibold">
-                                            Description
-                                        </Label>
-                                        <Textarea
-                                            id="description"
-                                            placeholder="Write details of your resource..."
-                                            className="mt-3 min-h-[120px]"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="py-8 border-t">
-                                    <Button
-                                        type="submit"
-                                        className="w-full bg-brand-navy hover:bg-[#2d4a6a] text-white h-11"
-                                    >
-                                        Upload
-                                    </Button>
-                                </div>
-                            </form>
-                        </SheetContent>
-                    </Sheet>
+                    <div className="flex items-center gap-3">
+                        <form onSubmit={handleSearch} className="relative">
+                            <Input
+                                placeholder="Search resources..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="pl-10 pr-10 w-[250px] md:w-[300px] h-11 rounded-xl border-slate-200 focus-visible:ring-brand-navy"
+                            />
+                            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            {searchQuery && (
+                                <button
+                                    type="button"
+                                    onClick={clearSearch}
+                                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                            )}
+                        </form>
+                        <Button
+                            onClick={handleOpenCreate}
+                            className="bg-brand-navy hover:bg-[#203a56] text-white px-8 h-11 rounded-xl font-bold shadow-none"
+                        >
+                            Upload Resource
+                        </Button>
+                    </div>
                 </div>
 
-                <ResourcesTable resources={resourcesData} />
+                {/* Statistics */}
+                {stats && <ResourceStats stats={stats} />}
+
+                {/* Table Section */}
+                <div className="space-y-4">
+                    {getResourcesQuery.isLoading ? (
+                        <div className="flex flex-col items-center justify-center py-24 bg-white rounded-2xl border border-dashed border-slate-200">
+                            <Loader2 className="w-10 h-10 animate-spin text-brand-navy mb-4 opacity-20" />
+                            <p className="text-muted-foreground font-medium animate-pulse">Syncing library...</p>
+                        </div>
+                    ) : getResourcesQuery.isError ? (
+                        <div className="text-center py-24 bg-white rounded-2xl border border-red-100">
+                            <p className="text-destructive font-bold mb-4">
+                                {getResourcesQuery.error instanceof Error
+                                    ? getResourcesQuery.error.message
+                                    : "Failed to load resources"}
+                            </p>
+                            <Button
+                                variant="outline"
+                                className="rounded-xl px-6"
+                                onClick={() => getResourcesQuery.refetch()}
+                            >
+                                Retry Connection
+                            </Button>
+                        </div>
+                    ) : (
+                        <div className="space-y-6">
+                            <ResourcesTable
+                                resources={resources}
+                                onEdit={handleEdit}
+                                onDelete={setDeleteResourceId}
+                                onToggleListing={handleToggleListing}
+                                onTogglePopular={handleTogglePopular}
+                                isDeleting={deleteResource.isPending}
+                            />
+
+                            <ResourcePagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                total={total}
+                                currentCount={resources.length}
+                                onPageChange={setCurrentPage}
+                                hasNext={currentPage < totalPages}
+                                hasPrev={currentPage > 1}
+                            />
+                        </div>
+                    )}
+                </div>
+
+                {/* Forms and Dialogs */}
+                <ResourceForm
+                    open={formOpen}
+                    onOpenChange={setFormOpen}
+                    resource={editResource}
+                    onSubmit={handleFormSubmit}
+                    isSubmitting={createResource.isPending || updateResource.isPending}
+                />
+
+                <DeleteResourceDialog
+                    open={!!deleteResourceId}
+                    onOpenChange={(open: boolean) => !open && setDeleteResourceId(null)}
+                    onConfirm={handleDelete}
+                    isDeleting={deleteResource.isPending}
+                />
             </div>
         </main>
     );

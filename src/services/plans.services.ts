@@ -4,7 +4,7 @@ import {
     CreatePlanDto,
     UpdatePlanDto,
     UserSubscription,
-    PaginatedData,
+    PaginatedSubscriptions,
     UserRole,
     SubscriptionStatus,
     ApiResponse
@@ -55,7 +55,7 @@ class PlansService extends ApiService {
         role?: UserRole;
         status?: SubscriptionStatus;
         planId?: string;
-    }): Promise<PaginatedData<UserSubscription>> {
+    }): Promise<PaginatedSubscriptions> {
         const queryParams = new URLSearchParams();
         if (params.page) queryParams.append("page", String(params.page));
         if (params.limit) queryParams.append("limit", String(params.limit));
@@ -63,7 +63,7 @@ class PlansService extends ApiService {
         if (params.status) queryParams.append("status", params.status);
         if (params.planId) queryParams.append("planId", params.planId);
 
-        const response = await this.get<ApiResponse<PaginatedData<UserSubscription>>>(
+        const response = await this.get<ApiResponse<PaginatedSubscriptions>>(
             `/admin/subscriptions/users?${queryParams.toString()}`,
             true
         );
