@@ -101,3 +101,15 @@ export interface CoursesListResponse {
     };
 }
 
+export interface PaginatedData<T> {
+    data: T[];
+    pagination: {
+        page: string;
+        limit: string;
+        total: number;
+        totalPages: number;
+        hasNext: boolean;
+        hasPrev: boolean;
+    };
+}
+

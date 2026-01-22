@@ -102,7 +102,7 @@ export default function ResourceDetailPage() {
 
     if (resourceQuery?.isError || !resource) {
         return (
-            <main className="flex-1 p-8 bg-white min-h-screen">
+            <main className="flex-1 p-8 bg-muted min-h-screen">
                 <div className="max-w-4xl mx-auto flex flex-col items-center justify-center py-24">
                     <div className="bg-white p-8 rounded-2xl border text-center">
                         <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-20" />
@@ -128,7 +128,7 @@ export default function ResourceDetailPage() {
     };
 
     return (
-        <main className="flex-1 p-4 md:p-8 overflow-auto bg-white">
+        <main className="flex-1 p-4 md:p-8 overflow-auto bg-muted">
             <div className="max-w-6xl mx-auto space-y-6 md:space-y-8">
                 {/* Navigation & Actions */}
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
@@ -315,13 +315,7 @@ export default function ResourceDetailPage() {
 
                         {/* Metadata */}
                         <div className="px-4 space-y-4">
-                            <div className="flex items-center gap-4 text-slate-400">
-                                <Calendar className="w-4 h-4" />
-                                <div className="text-xs space-y-1">
-                                    <p>First published on <span className="text-slate-600 font-bold">{format(new Date(resource.createdAt), "MMMM dd, yyyy")}</span></p>
-                                    <p>Last modified on <span className="text-slate-600 font-bold">{format(new Date(resource.updatedAt), "MMMM dd, yyyy")}</span></p>
-                                </div>
-                            </div>
+                       
                             {resource.teachableResourceId && (
                                 <div className="bg-slate-100 p-3 rounded-lg border border-slate-200">
                                     <p className="text-[10px] uppercase font-bold text-slate-400 mb-1">Teachable External ID</p>

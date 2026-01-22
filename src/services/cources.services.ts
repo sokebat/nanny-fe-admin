@@ -9,8 +9,10 @@ import type {
     CourseStats,
     SyncTeachableResponse,
     CoursesListResponse,
+    PaginatedData,
 } from "@/types/course";
-import type { ApiResponse, PaginatedData } from "@/types/subscription";
+import type { ApiResponse } from "@/types/subscription"; 
+ 
 
 class CoursesService extends ApiService {
     /**
