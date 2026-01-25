@@ -1,3 +1,5 @@
+export type TargetAudience = 'caregiver' | 'parent' | 'vendor';
+
 export interface Course {
     _id: string;
     title: string;
@@ -11,6 +13,7 @@ export interface Course {
     isActive: boolean;
     isListed: boolean;
     isPopular: boolean;
+    targetAudience?: TargetAudience[];
     enrollmentCount: number;
     ratingAverage: number;
     ratingCount: number;
@@ -34,6 +37,7 @@ export interface CreateCourseDto {
     teachableCourseId?: string;
     isListed?: boolean;
     isPopular?: boolean;
+    targetAudience?: TargetAudience[];
     thumbnail?: File;
 }
 
@@ -46,6 +50,7 @@ export interface UpdateCourseDto {
     teachableCourseId?: string;
     isListed?: boolean;
     isPopular?: boolean;
+    targetAudience?: TargetAudience[];
     thumbnail?: File;
 }
 
@@ -56,6 +61,7 @@ export interface CourseFilters {
     search?: string;
     minPrice?: number;
     maxPrice?: number;
+    targetAudience?: TargetAudience;
 }
 
 export interface CourseEnrollment {

@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { CourseForm, DeleteCourseDialog } from "@/components/courses";
 import { useCourses } from "@/hooks/use-course";
 import type { CreateCourseDto, UpdateCourseDto } from "@/types/course";
-import { ArrowLeft, Loader2, Calendar, DollarSign, User, Star, Trash2 } from "lucide-react";
+import { ArrowLeft, Loader2, Calendar, DollarSign, User, Star, Trash2, Users } from "lucide-react";
 import { format } from "date-fns";
 
 export default function CourseDetailPage() {
@@ -301,6 +301,26 @@ export default function CourseDetailPage() {
                                                     <span className="text-sm text-muted-foreground">
                                                         ({course.ratingCount} reviews)
                                                     </span>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {course.targetAudience && course.targetAudience.length > 0 && (
+                                            <div className="flex items-start justify-between">
+                                                <div className="flex items-center gap-2 text-muted-foreground">
+                                                    <Users className="w-4 h-4" />
+                                                    <span>Target Audience</span>
+                                                </div>
+                                                <div className="flex flex-wrap gap-2 justify-end">
+                                                    {course.targetAudience.map((audience) => (
+                                                        <Badge
+                                                            key={audience}
+                                                            variant="secondary"
+                                                            className="text-xs capitalize"
+                                                        >
+                                                            {audience}
+                                                        </Badge>
+                                                    ))}
                                                 </div>
                                             </div>
                                         )}

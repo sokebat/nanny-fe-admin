@@ -27,6 +27,7 @@ class CoursesService extends ApiService {
         if (filters.search) params.append("search", filters.search);
         if (filters.minPrice) params.append("minPrice", String(filters.minPrice));
         if (filters.maxPrice) params.append("maxPrice", String(filters.maxPrice));
+        if (filters.targetAudience) params.append("targetAudience", filters.targetAudience);
 
         const queryString = params.toString();
         const endpoint = `/admin/courses${queryString ? `?${queryString}` : ""}`;
@@ -62,6 +63,7 @@ class CoursesService extends ApiService {
         if (data.teachableCourseId) formData.append("teachableCourseId", data.teachableCourseId);
         if (data.isListed !== undefined) formData.append("isListed", String(data.isListed));
         if (data.isPopular !== undefined) formData.append("isPopular", String(data.isPopular));
+        if (data.targetAudience) formData.append("targetAudience", JSON.stringify(data.targetAudience));
         if (data.thumbnail) formData.append("thumbnail", data.thumbnail);
 
         const config: AxiosRequestConfig = {
@@ -94,6 +96,7 @@ class CoursesService extends ApiService {
         if (data.teachableCourseId) formData.append("teachableCourseId", data.teachableCourseId);
         if (data.isListed !== undefined) formData.append("isListed", String(data.isListed));
         if (data.isPopular !== undefined) formData.append("isPopular", String(data.isPopular));
+        if (data.targetAudience !== undefined) formData.append("targetAudience", JSON.stringify(data.targetAudience));
         if (data.thumbnail) formData.append("thumbnail", data.thumbnail);
 
         const config: AxiosRequestConfig = {

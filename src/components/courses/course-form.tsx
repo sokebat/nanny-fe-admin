@@ -22,9 +22,9 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { ImageUpload } from "@/components/shared/image-upload";
-import type { CreateCourseDto, UpdateCourseDto, Course } from "@/types/course";
+import type { CreateCourseDto, UpdateCourseDto, Course, TargetAudience } from "@/types/course";
 import { cn } from "@/lib/utils";
-import { Loader2 } from "lucide-react";
+import { Loader2, Check } from "lucide-react";
 
 interface CourseFormProps {
     open: boolean;
@@ -58,11 +58,13 @@ export function CourseForm({
             teachableCourseId: "",
             isListed: true,
             isPopular: false,
+            targetAudience: [],
         },
     });
 
     const isListedValue = watch("isListed");
     const isPopularValue = watch("isPopular");
+    const watchTargetAudience = watch("targetAudience") || [];
     const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
     const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
 
@@ -95,6 +97,7 @@ export function CourseForm({
             setValue("teachableCourseId", course.teachableCourseId || "");
             setValue("isListed", course.isListed);
             setValue("isPopular", course.isPopular);
+            setValue("targetAudience", course.targetAudience || []);
         } else {
             reset();
         }
@@ -128,6 +131,21 @@ export function CourseForm({
         if (!course) {
             reset();
             setThumbnailFile(null);
+        }
+    };
+
+    const audiences: { label: string; value: TargetAudience }[] = [
+        { label: "Caregiver", value: "caregiver" },
+        { label: "Parent", value: "parent" },
+        { label: "Vendor", value: "vendor" },
+    ];
+
+    const toggleAudience = (value: TargetAudience) => {
+        const current = [...watchTargetAudience];
+        if (current.includes(value)) {
+            setValue("targetAudience", current.filter((v) => v !== value));
+        } else {
+            setValue("targetAudience", [...current, value]);
         }
     };
 
@@ -347,6 +365,31 @@ export function CourseForm({
                                     <SelectItem value="not-popular">Not Popular</SelectItem>
                                 </SelectContent>
                             </Select>
+                        </div>
+
+                        <div className="space-y-4">
+                            <Label className="text-sm font-semibold">Target Audience</Label>
+                            <div className="flex flex-wrap gap-4">
+                                {audiences.map((audience) => {
+                                    const isSelected = watchTargetAudience.includes(audience.value);
+                                    return (
+                                        <button
+                                            key={audience.value}
+                                            type="button"
+                                            onClick={() => toggleAudience(audience.value)}
+                                            className={cn(
+                                                "flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-medium transition-all",
+                                                isSelected
+                                                    ? "bg-brand-navy text-white border-brand-navy shadow-sm"
+                                                    : "bg-white text-muted-foreground border-gray-200 hover:border-brand-navy hover:text-brand-navy"
+                                            )}
+                                        >
+                                            {isSelected && <Check className="w-3.5 h-3.5" />}
+                                            {audience.label}
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
 
                         <div>
