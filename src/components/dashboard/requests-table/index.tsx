@@ -39,8 +39,8 @@ export default function RequestsTable() {
     return (
         <div className="bg-card border border-border rounded-lg">
             {/* Header */}
-            <div className="p-6 border-b border-border">
-                <h2 className="text-foreground text-4xl tracking-wider" style={{ fontFamily: "Righteous, sans-serif" }}>
+            <div className="p-4 md:p-6 border-b border-border">
+                <h2 className="text-foreground text-2xl md:text-3xl lg:text-4xl tracking-wider" style={{ fontFamily: "Righteous, sans-serif" }}>
                     Product & Service Listing Request
                 </h2>
             </div>

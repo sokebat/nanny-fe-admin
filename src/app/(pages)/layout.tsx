@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
-
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
-
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -15,9 +13,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-
-    <main className=" bg-muted">
-
+    <main className="bg-muted min-h-screen">
       <SidebarProvider
         style={
           {
@@ -28,11 +24,20 @@ export default function RootLayout({
       >
         <AppSidebar variant="floating" />
         <SidebarInset>
-
+          <header className="flex h-16 shrink-0 items-center gap-2 px-4 md:hidden border-b bg-card">
+            <SidebarTrigger />
+            <div className="flex items-center gap-2">
+              <div className="size-6 bg-orange-500 rounded flex items-center justify-center text-white font-bold text-sm shadow-sm">
+                N
+              </div>
+              <span className="text-slate-900 font-bold tracking-tight text-sm">
+                Nanny Plug <span className="text-orange-500 text-xs text-nowrap">Admin</span>
+              </span>
+            </div>
+          </header>
           <div className="flex flex-1 flex-col">{children}</div>
         </SidebarInset>
       </SidebarProvider>
     </main>
-
   );
 }

@@ -43,15 +43,15 @@ const ManageCourse = () => {
     const coursesData: CourseItem[] =
         getCoursesQuery.data?.courses
             ? getCoursesQuery.data.courses.map((course, index) => ({
-                  id: index + 1,
-                  _id: course._id,
-                  name: course.title,
-                  detail: course.description || "No description",
-                  location: course.category || "Uncategorized",
-                  price: `$${course.price}`,
-                  isPopular: course.isPopular,
-                  isListed: course.isListed,
-              }))
+                id: index + 1,
+                _id: course._id,
+                name: course.title,
+                detail: course.description || "No description",
+                location: course.category || "Uncategorized",
+                price: `$${course.price}`,
+                isPopular: course.isPopular,
+                isListed: course.isListed,
+            }))
             : [];
 
     const originalCourses = getCoursesQuery.data?.courses || [];
@@ -123,17 +123,20 @@ const ManageCourse = () => {
     };
 
     return (
-        <main className="flex-1 p-8 overflow-auto bg-muted">
-            <div className="mb-8">
+        <main className="flex-1 p-4 md:p-8 overflow-auto bg-muted">
+            <div className="mb-8 max-w-7xl mx-auto space-y-6 md:space-y-8">
                 {/* Header with Actions */}
-                <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-foreground text-4xl font-bold">Manage Courses</h2>
-                    <div className="flex items-center gap-3">
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                    <div>
+                        <h2 className="text-foreground text-3xl md:text-4xl font-bold">Manage Courses</h2>
+                        <p className="text-muted-foreground mt-1 text-sm md:text-base">Course management and Teachable integration.</p>
+                    </div>
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                         <Button
                             variant="outline"
                             onClick={handleSyncTeachable}
                             disabled={syncFromTeachable.isPending}
-                            className="gap-2"
+                            className="gap-2 h-11 rounded-xl"
                         >
                             {syncFromTeachable.isPending ? (
                                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -144,7 +147,7 @@ const ManageCourse = () => {
                         </Button>
                         <Button
                             onClick={handleOpenCreate}
-                            className="bg-brand-navy hover:bg-[#2d4a6a] text-white px-8 py-2.5 h-auto"
+                            className="bg-brand-navy hover:bg-[#203a56] text-white px-4 md:px-8 h-11 rounded-xl font-bold shadow-none whitespace-nowrap"
                         >
                             Upload Course
                         </Button>

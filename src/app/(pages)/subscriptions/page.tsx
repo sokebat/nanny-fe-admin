@@ -10,8 +10,8 @@ export default function SubscriptionsPage() {
 
     return (
         <main className="flex-1 p-4 md:p-8 overflow-auto bg-muted">
-            <div className="mb-8">
-                <h2 className="text-[#333] text-4xl mb-4 font-bold">
+            <div className="mb-8 max-w-7xl mx-auto">
+                <h2 className="text-[#333] text-3xl md:text-4xl mb-4 font-bold">
                     Subscriptions
                 </h2>
 

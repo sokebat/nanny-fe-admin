@@ -64,8 +64,8 @@ const Page = () => {
     return (
         <main className="flex-1 p-4 md:p-8 overflow-auto bg-muted">
             {/* Page Title */}
-            <div className="mb-8">
-                <h2 className="text-[#333] text-4xl" style={{ fontFamily: 'Righteous, sans-serif' }}>
+            <div className="mb-8 max-w-7xl mx-auto">
+                <h2 className="text-[#333] text-3xl md:text-4xl" style={{ fontFamily: 'Righteous, sans-serif' }}>
                     Analytics
                 </h2>
                 <p className="text-muted-foreground mt-2">Comprehensive overview of your platform's performance.</p>
@@ -118,7 +118,7 @@ const Page = () => {
                                         top: `${location.lat}%`,
                                     }}
                                 >
-                                    <MapPin className="w-6 h-6 text-[#1f344e] fill-[#1f344e] drop-shadow-md" />
+                                    <MapPin className="w-6 h-6 text-brand-navy fill-brand-navy drop-shadow-md" />
                                 </div>
                             ))}
                         </div>
@@ -206,7 +206,7 @@ const Page = () => {
                         <TabsList className="grid w-full grid-cols-3 h-9">
                             <TabsTrigger value="weekly" className="text-xs">Weekly</TabsTrigger>
                             <TabsTrigger value="monthly" className="text-xs">Monthly</TabsTrigger>
-                            <TabsTrigger value="today" className="text-xs data-[state=active]:bg-[#f97d61] data-[state=active]:text-white">Today</TabsTrigger>
+                            <TabsTrigger value="today" className="text-xs data-[state=active]:bg-brand-orange data-[state=active]:text-white">Today</TabsTrigger>
                         </TabsList>
                     </Tabs>
                 </CardHeader>
