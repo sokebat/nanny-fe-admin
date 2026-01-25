@@ -2,8 +2,8 @@ import { Metadata } from "next";
 import Image from "next/image";
 
 export const metadata: Metadata = {
-  title: "Auth",
-  description: "Auth",
+  title: "Authentication",
+  description: "Sign in to access the Nanny Plug Admin portal.",
 };
 
 export default function AuthLayout({
