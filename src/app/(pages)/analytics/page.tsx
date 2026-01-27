@@ -9,6 +9,7 @@ import { adminAnalyticsService } from "@/services/admin-analytics.service";
 import { toast } from "react-hot-toast";
 import TopPerforming from "@/components/dashboard/top-performing";
 import RevenueBreakdown from "@/components/dashboard/revenue-breakdown";
+import { Skeleton } from "@/components/ui/skeleton";
 
 
 export default function AnalyticsPage() {
@@ -64,30 +65,47 @@ export default function AnalyticsPage() {
 
             {/* Overview Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <OverviewCard
-                    title="Total Revenue"
-                    value={`$${(overview?.totalRevenue?.total || 0).toLocaleString()}`}
-                    subValue={overview?.totalRevenue?.monthly ? `Monthly: $${overview.totalRevenue.monthly.toLocaleString()}` : 'No monthly data'}
-                    icon={DollarSign}
-                />
-                <OverviewCard
-                    title="Active Users"
-                    value={(overview?.totalUsers?.total || 0).toLocaleString()}
-                    subValue={`Parents: ${overview?.totalUsers?.parents || 0}, Nannies: ${overview?.totalUsers?.nannies || 0}`}
-                    icon={Users}
-                />
-                <OverviewCard
-                    title="Active Subscriptions"
-                    value={(overview?.subscriptionStats?.active || 0).toLocaleString()}
-                    subValue={`Revenue: $${(overview?.subscriptionStats?.revenue || 0).toLocaleString()}`}
-                    icon={Activity}
-                />
-                <OverviewCard
-                    title="Total Jobs"
-                    value={(overview?.totalJobs?.total || 0).toLocaleString()}
-                    subValue={`Active: ${overview?.totalJobs?.active || 0}`}
-                    icon={TrendingUp}
-                />
+                {(!overview) ? (
+                    Array(4).fill(0).map((_, i) => (
+                        <div key={i} className="p-6 bg-card border rounded-xl shadow-sm">
+                            <div className="flex items-center justify-between mb-4">
+                                <Skeleton className="h-4 w-24" />
+                                <Skeleton className="h-4 w-4 rounded-full" />
+                            </div>
+                            <div className="flex flex-col gap-2">
+                                <Skeleton className="h-8 w-32" />
+                                <Skeleton className="h-3 w-40" />
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <>
+                        <OverviewCard
+                            title="Total Revenue"
+                            value={`$${(overview?.totalRevenue?.total || 0).toLocaleString()}`}
+                            subValue={overview?.totalRevenue?.monthly ? `Monthly: $${overview.totalRevenue.monthly.toLocaleString()}` : 'No monthly data'}
+                            icon={DollarSign}
+                        />
+                        <OverviewCard
+                            title="Active Users"
+                            value={(overview?.totalUsers?.total || 0).toLocaleString()}
+                            subValue={`Parents: ${overview?.totalUsers?.parents || 0}, Nannies: ${overview?.totalUsers?.nannies || 0}`}
+                            icon={Users}
+                        />
+                        <OverviewCard
+                            title="Active Subscriptions"
+                            value={(overview?.subscriptionStats?.active || 0).toLocaleString()}
+                            subValue={`Revenue: $${(overview?.subscriptionStats?.revenue || 0).toLocaleString()}`}
+                            icon={Activity}
+                        />
+                        <OverviewCard
+                            title="Total Jobs"
+                            value={(overview?.totalJobs?.total || 0).toLocaleString()}
+                            subValue={`Active: ${overview?.totalJobs?.active || 0}`}
+                            icon={TrendingUp}
+                        />
+                    </>
+                )}
             </div>
 
             <Tabs defaultValue="overview" className="space-y-6">

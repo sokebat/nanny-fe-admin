@@ -1,6 +1,8 @@
 "use client";
 import { useDashboardOverview, useEngagementMetrics } from "@/hooks/use-admin-analytics";
 
+import { Skeleton } from "@/components/ui/skeleton";
+
 export default function StatsCards() {
     const { data: overview, isLoading: isLoadingOverview } = useDashboardOverview();
     const { data: engagement, isLoading: isLoadingEngagement } = useEngagementMetrics();
@@ -8,9 +10,19 @@ export default function StatsCards() {
     const isLoading = isLoadingOverview || isLoadingEngagement;
 
     if (isLoading) {
-        return <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
-            {[1, 2, 3].map(i => <div key={i} className="h-32 bg-gray-100 rounded-lg"></div>)}
-        </div>;
+        return (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[1, 2, 3].map((i) => (
+                    <div key={i} className="bg-card border rounded-lg p-5 flex items-center justify-between">
+                        <div className="space-y-2">
+                            <Skeleton className="h-8 w-24" />
+                            <Skeleton className="h-4 w-16" />
+                        </div>
+                        <Skeleton className="h-12 w-12 rounded" />
+                    </div>
+                ))}
+            </div>
+        );
     }
 
     return (

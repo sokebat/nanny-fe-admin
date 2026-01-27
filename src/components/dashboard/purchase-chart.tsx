@@ -3,6 +3,7 @@ import { useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import ViewToggle from "./view-toggle";
 import { useSalesAnalytics } from "@/hooks/use-admin-analytics";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type ViewType = "weekly" | "monthly" | "yearly";
 
@@ -65,7 +66,16 @@ export default function PurchaseChart() {
             {/* Chart */}
             <div className="h-[250px]">
                 {isLoading ? (
-                    <div className="h-full flex items-center justify-center text-sm text-gray-500">Loading purchase data...</div>
+                    <div className="w-full h-full flex flex-col gap-4 pt-4">
+                        <Skeleton className="w-[80%] h-4" />
+                        <div className="flex-1 flex items-end gap-2">
+                            <Skeleton className="w-full h-[60%]" />
+                            <Skeleton className="w-full h-[80%]" />
+                            <Skeleton className="w-full h-[40%]" />
+                            <Skeleton className="w-full h-[90%]" />
+                            <Skeleton className="w-full h-[50%]" />
+                        </div>
+                    </div>
                 ) : (
                     <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={chartData}>

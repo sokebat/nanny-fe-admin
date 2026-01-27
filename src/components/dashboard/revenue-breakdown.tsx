@@ -2,12 +2,24 @@
 
 import { useRevenueAnalytics } from "@/hooks/use-admin-analytics";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
+import { Skeleton } from "../ui/skeleton";
 
 export default function RevenueBreakdown() {
     const { data: revenueData, isLoading } = useRevenueAnalytics({ groupBy: "month" });
 
     if (isLoading || !revenueData) {
-        return <div className="h-64 flex items-center justify-center text-muted-foreground">Loading breakdown...</div>;
+        return (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {[1, 2].map((i) => (
+                    <div key={i} className="p-6 bg-card border rounded-lg h-[300px] flex flex-col">
+                        <Skeleton className="h-6 w-48 mb-6" />
+                        <div className="flex-1 flex items-center justify-center">
+                            <Skeleton className="h-40 w-40 rounded-full" />
+                        </div>
+                    </div>
+                ))}
+            </div>
+        );
     }
 
     const sourceData = [
