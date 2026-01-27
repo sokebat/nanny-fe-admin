@@ -1,9 +1,23 @@
+"use client";
+import { useDashboardOverview, useEngagementMetrics } from "@/hooks/use-admin-analytics";
+
 export default function StatsCards() {
+    const { data: overview, isLoading: isLoadingOverview } = useDashboardOverview();
+    const { data: engagement, isLoading: isLoadingEngagement } = useEngagementMetrics();
+
+    const isLoading = isLoadingOverview || isLoadingEngagement;
+
+    if (isLoading) {
+        return <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
+            {[1, 2, 3].map(i => <div key={i} className="h-32 bg-gray-100 rounded-lg"></div>)}
+        </div>;
+    }
+
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="bg-[#daeceb] rounded-lg p-5 flex items-center justify-between">
                 <div>
-                    <p className="text-2xl font-semibold text-[#18191c] mb-1">88</p>
+                    <p className="text-2xl font-semibold text-[#18191c] mb-1">{overview?.totalJobs || 0}</p>
                     <p className="text-sm text-[#18191c]/80">Active Jobs</p>
                 </div>
                 <div className="bg-white p-4 rounded">
@@ -19,7 +33,7 @@ export default function StatsCards() {
 
             <div className="bg-[#f4faf9] rounded-lg p-5 flex items-center justify-between">
                 <div>
-                    <p className="text-2xl font-semibold text-[#18191c] mb-1">528</p>
+                    <p className="text-2xl font-semibold text-[#18191c] mb-1">{overview?.totalUsers || 0}</p>
                     <p className="text-sm text-[#18191c]/80">Active Users</p>
                 </div>
                 <div className="bg-white p-4 rounded">
@@ -34,8 +48,8 @@ export default function StatsCards() {
 
             <div className="bg-[rgba(218,236,235,0.3)] rounded-lg p-5 flex items-center justify-between">
                 <div>
-                    <p className="text-2xl font-semibold text-[#18191c] mb-1">47</p>
-                    <p className="text-sm text-[#18191c]/80">Flag Messages</p>
+                    <p className="text-2xl font-semibold text-[#18191c] mb-1">{engagement?.messagesExchanged || 0}</p>
+                    <p className="text-sm text-[#18191c]/80">Total Messages</p>
                 </div>
                 <div className="bg-white p-4 rounded">
                     <div className="w-8 h-8 text-[#daeceb]">

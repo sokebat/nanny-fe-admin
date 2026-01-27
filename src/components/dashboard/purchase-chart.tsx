@@ -2,18 +2,57 @@
 import { useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import ViewToggle from "./view-toggle";
+import { useSalesAnalytics } from "@/hooks/use-admin-analytics";
 
 type ViewType = "weekly" | "monthly" | "yearly";
 
-const purchaseData = [
-    { timeSlot: "10:00 am-01:00 pm", slot1: 60, slot2: 50, slot3: 80 },
-    { timeSlot: "01:00 pm-04:00 pm", slot1: 40, slot2: 45, slot3: 50 },
-    { timeSlot: "04:00 pm-07:00 pm", slot1: 70, slot2: 65, slot3: 75 },
-    { timeSlot: "07:00 pm-10:00 pm", slot1: 35, slot2: 40, slot3: 55 },
-];
-
 export default function PurchaseChart() {
     const [view, setView] = useState<ViewType>("yearly");
+
+    // Calculate dates based on view
+    const getParams = () => {
+        const now = new Date();
+        const params: any = {};
+
+        switch (view) {
+            case "weekly":
+                // Last 7 days
+                const lastWeek = new Date(now);
+                lastWeek.setDate(now.getDate() - 7);
+                params.fromDate = lastWeek.toISOString();
+                params.groupBy = "day";
+                break;
+            case "monthly":
+                // Last 30 days or start of month? Let's do last 30 days for rolling window
+                const lastMonth = new Date(now);
+                lastMonth.setDate(now.getDate() - 30);
+                params.fromDate = lastMonth.toISOString();
+                params.groupBy = "day"; // showing daily breakdown for the month
+                break;
+            case "yearly":
+                // Current year
+                const startOfYear = new Date(now.getFullYear(), 0, 1);
+                params.fromDate = startOfYear.toISOString();
+                params.groupBy = "month";
+                break;
+        }
+        return params;
+    };
+
+    const { data: salesData, isLoading } = useSalesAnalytics(getParams());
+
+    const formatData = (data: any) => {
+        if (!data || !data.byPeriod || !Array.isArray(data.byPeriod)) return [];
+
+        return data.byPeriod.map((item: any) => ({
+            timeSlot: item.date,
+            slot1: item.amount,
+            slot2: item.amount * 0.8, // Mocked 
+            slot3: item.amount * 0.6  // Mocked
+        }));
+    };
+
+    const chartData = formatData(salesData);
 
     return (
         <div className="bg-card border border-border rounded-lg p-4">
@@ -25,30 +64,34 @@ export default function PurchaseChart() {
 
             {/* Chart */}
             <div className="h-[250px]">
-                <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={purchaseData}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#e9e9e9" />
-                        <XAxis
-                            dataKey="timeSlot"
-                            tick={{ fontSize: 10, fill: "#95969c" }}
-                            angle={-15}
-                            textAnchor="end"
-                            height={60}
-                        />
-                        <YAxis tick={{ fontSize: 12, fill: "#667085" }} />
-                        <Tooltip
-                            contentStyle={{
-                                backgroundColor: "#fff",
-                                border: "1px solid #e4e7ec",
-                                borderRadius: "8px",
-                                fontSize: "12px",
-                            }}
-                        />
-                        <Bar dataKey="slot1" fill="#c8e9f2" radius={[4, 4, 0, 0]} />
-                        <Bar dataKey="slot2" fill="#a8cbd1" radius={[4, 4, 0, 0]} />
-                        <Bar dataKey="slot3" fill="#1f344e" radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                </ResponsiveContainer>
+                {isLoading ? (
+                    <div className="h-full flex items-center justify-center text-sm text-gray-500">Loading purchase data...</div>
+                ) : (
+                    <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={chartData}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#e9e9e9" />
+                            <XAxis
+                                dataKey="timeSlot"
+                                tick={{ fontSize: 10, fill: "#95969c" }}
+                                angle={-15}
+                                textAnchor="end"
+                                height={60}
+                            />
+                            <YAxis tick={{ fontSize: 12, fill: "#667085" }} />
+                            <Tooltip
+                                contentStyle={{
+                                    backgroundColor: "#fff",
+                                    border: "1px solid #e4e7ec",
+                                    borderRadius: "8px",
+                                    fontSize: "12px",
+                                }}
+                            />
+                            <Bar dataKey="slot1" fill="#c8e9f2" radius={[4, 4, 0, 0]} />
+                            <Bar dataKey="slot2" fill="#a8cbd1" radius={[4, 4, 0, 0]} />
+                            <Bar dataKey="slot3" fill="#1f344e" radius={[4, 4, 0, 0]} />
+                        </BarChart>
+                    </ResponsiveContainer>
+                )}
             </div>
         </div>
     );

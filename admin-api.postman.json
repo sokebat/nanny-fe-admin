@@ -1,0 +1,847 @@
+{
+  "info": {
+    "_postman_id": "admin-apis-collection",
+    "name": "NannyPlug - Admin APIs",
+    "description": "Complete collection of Admin APIs for NannyPlug platform",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{admin_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000/api",
+      "type": "string"
+    },
+    {
+      "key": "admin_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Admin Users",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/users?page=1&limit=20&role=&search=&isActive=&phoneVerified=&emailVerified=&sortBy=createdAt&sortOrder=desc",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "users"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number"
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Items per page"
+                },
+                {
+                  "key": "role",
+                  "value": "",
+                  "description": "Filter by role: nanny, parent, vendor",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search in email, firstName, lastName",
+                  "disabled": true
+                },
+                {
+                  "key": "isActive",
+                  "value": "",
+                  "description": "Filter by active status: true/false",
+                  "disabled": true
+                },
+                {
+                  "key": "phoneVerified",
+                  "value": "",
+                  "description": "Filter by phone verification: true/false",
+                  "disabled": true
+                },
+                {
+                  "key": "emailVerified",
+                  "value": "",
+                  "description": "Filter by email verification: true/false",
+                  "disabled": true
+                },
+                {
+                  "key": "sortBy",
+                  "value": "createdAt",
+                  "description": "Sort field: createdAt, email, firstName, lastName"
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "desc",
+                  "description": "Sort order: asc, desc"
+                }
+              ]
+            },
+            "description": "Get all users with filters and pagination"
+          }
+        },
+        {
+          "name": "Get All Nannies",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/users/nannies?page=1&limit=20&search=&isActive=&phoneVerified=&sortBy=createdAt&sortOrder=desc",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "users", "nannies"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "isActive",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "phoneVerified",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "sortBy",
+                  "value": "createdAt"
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "desc"
+                }
+              ]
+            },
+            "description": "Get all nannies with filters and pagination"
+          }
+        },
+        {
+          "name": "Get All Vendors",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/users/vendors?page=1&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "users", "vendors"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Get all vendors with filters and pagination"
+          }
+        },
+        {
+          "name": "Get All Parents",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/users/parents?page=1&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "users", "parents"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Get all parents with filters and pagination"
+          }
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/users/:id",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "users", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "USER_ID_HERE",
+                  "description": "User ID"
+                }
+              ]
+            },
+            "description": "Get user details with profile and stats"
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"role\": \"nanny\",\n  \"isActive\": true,\n  \"emailVerified\": true,\n  \"phoneVerified\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/users/:id",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "users", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "USER_ID_HERE",
+                  "description": "User ID"
+                }
+              ]
+            },
+            "description": "Update user information (all fields optional)"
+          }
+        },
+        {
+          "name": "Get User Subscriptions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/users/:id/subscriptions",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "users", ":id", "subscriptions"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "USER_ID_HERE",
+                  "description": "User ID"
+                }
+              ]
+            },
+            "description": "Get user's subscriptions"
+          }
+        },
+        {
+          "name": "Get User Invoices",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/users/:id/invoices?page=1&limit=20&status=",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "users", ":id", "invoices"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "status",
+                  "value": "",
+                  "description": "Filter by status: pending, paid, failed, cancelled",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "USER_ID_HERE",
+                  "description": "User ID"
+                }
+              ]
+            },
+            "description": "Get user's invoices with pagination"
+          }
+        },
+        {
+          "name": "Get User Courses",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/users/:id/courses?page=1&limit=20&status=",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "users", ":id", "courses"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "status",
+                  "value": "",
+                  "description": "Filter by status: active, completed, cancelled",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "USER_ID_HERE",
+                  "description": "User ID"
+                }
+              ]
+            },
+            "description": "Get user's course enrollments"
+          }
+        },
+        {
+          "name": "Get User Jobs/Applications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/users/:id/jobs?page=1&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "users", ":id", "jobs"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "USER_ID_HERE",
+                  "description": "User ID"
+                }
+              ]
+            },
+            "description": "Get user's jobs (for parents) or applications (for nannies)"
+          }
+        }
+      ],
+      "description": "Admin User Management APIs"
+    },
+    {
+      "name": "Admin Analytics",
+      "item": [
+        {
+          "name": "Get Sales Analytics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/analytics/sales?fromDate=&toDate=&groupBy=day&source=",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "analytics", "sales"],
+              "query": [
+                {
+                  "key": "fromDate",
+                  "value": "",
+                  "description": "Start date (ISO format: YYYY-MM-DD)",
+                  "disabled": true
+                },
+                {
+                  "key": "toDate",
+                  "value": "",
+                  "description": "End date (ISO format: YYYY-MM-DD)",
+                  "disabled": true
+                },
+                {
+                  "key": "groupBy",
+                  "value": "day",
+                  "description": "Group by: day, week, month"
+                },
+                {
+                  "key": "source",
+                  "value": "",
+                  "description": "Filter by source: subscriptions, courses, invoices",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get sales analytics with trends and breakdowns"
+          }
+        },
+        {
+          "name": "Get Revenue Analytics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/analytics/revenue?fromDate=&toDate=&groupBy=day",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "analytics", "revenue"],
+              "query": [
+                {
+                  "key": "fromDate",
+                  "value": "",
+                  "description": "Start date (ISO format: YYYY-MM-DD)",
+                  "disabled": true
+                },
+                {
+                  "key": "toDate",
+                  "value": "",
+                  "description": "End date (ISO format: YYYY-MM-DD)",
+                  "disabled": true
+                },
+                {
+                  "key": "groupBy",
+                  "value": "day",
+                  "description": "Group by: day, week, month"
+                }
+              ]
+            },
+            "description": "Get revenue analytics with breakdown by source and role"
+          }
+        },
+        {
+          "name": "Get Invoice Analytics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/analytics/invoices?fromDate=&toDate=&status=",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "analytics", "invoices"],
+              "query": [
+                {
+                  "key": "fromDate",
+                  "value": "",
+                  "description": "Start date (ISO format: YYYY-MM-DD)",
+                  "disabled": true
+                },
+                {
+                  "key": "toDate",
+                  "value": "",
+                  "description": "End date (ISO format: YYYY-MM-DD)",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "",
+                  "description": "Filter by status: pending, paid, failed, cancelled",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get invoice analytics with status breakdown and monthly trends"
+          }
+        }
+      ],
+      "description": "Admin Analytics APIs"
+    },
+    {
+      "name": "Admin Reports",
+      "item": [
+        {
+          "name": "Generate Sales Report (JSON)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/reports/sales?fromDate=&toDate=&format=json&includeDetails=true",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "reports", "sales"],
+              "query": [
+                {
+                  "key": "fromDate",
+                  "value": "",
+                  "description": "Start date (ISO format: YYYY-MM-DD)",
+                  "disabled": true
+                },
+                {
+                  "key": "toDate",
+                  "value": "",
+                  "description": "End date (ISO format: YYYY-MM-DD)",
+                  "disabled": true
+                },
+                {
+                  "key": "format",
+                  "value": "json",
+                  "description": "Report format: json, csv"
+                },
+                {
+                  "key": "includeDetails",
+                  "value": "true",
+                  "description": "Include detailed transaction list"
+                }
+              ]
+            },
+            "description": "Generate sales report in JSON format with optional details"
+          }
+        },
+        {
+          "name": "Generate Sales Report (CSV)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/reports/sales?fromDate=&toDate=&format=csv&includeDetails=true",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "reports", "sales"],
+              "query": [
+                {
+                  "key": "fromDate",
+                  "value": "",
+                  "description": "Start date (ISO format: YYYY-MM-DD)",
+                  "disabled": true
+                },
+                {
+                  "key": "toDate",
+                  "value": "",
+                  "description": "End date (ISO format: YYYY-MM-DD)",
+                  "disabled": true
+                },
+                {
+                  "key": "format",
+                  "value": "csv",
+                  "description": "Report format: json, csv"
+                },
+                {
+                  "key": "includeDetails",
+                  "value": "true",
+                  "description": "Include detailed transaction list"
+                }
+              ]
+            },
+            "description": "Generate sales report in CSV format (downloads as file)"
+          }
+        },
+        {
+          "name": "Generate Revenue Report (JSON)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/reports/revenue?fromDate=&toDate=&format=json&groupBy=",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "reports", "revenue"],
+              "query": [
+                {
+                  "key": "fromDate",
+                  "value": "",
+                  "description": "Start date (ISO format: YYYY-MM-DD)",
+                  "disabled": true
+                },
+                {
+                  "key": "toDate",
+                  "value": "",
+                  "description": "End date (ISO format: YYYY-MM-DD)",
+                  "disabled": true
+                },
+                {
+                  "key": "format",
+                  "value": "json",
+                  "description": "Report format: json, csv"
+                },
+                {
+                  "key": "groupBy",
+                  "value": "",
+                  "description": "Group by: source, role, month",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Generate revenue report in JSON format"
+          }
+        },
+        {
+          "name": "Generate Revenue Report (CSV)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/reports/revenue?fromDate=&toDate=&format=csv&groupBy=source",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "reports", "revenue"],
+              "query": [
+                {
+                  "key": "fromDate",
+                  "value": "",
+                  "description": "Start date (ISO format: YYYY-MM-DD)",
+                  "disabled": true
+                },
+                {
+                  "key": "toDate",
+                  "value": "",
+                  "description": "End date (ISO format: YYYY-MM-DD)",
+                  "disabled": true
+                },
+                {
+                  "key": "format",
+                  "value": "csv",
+                  "description": "Report format: json, csv"
+                },
+                {
+                  "key": "groupBy",
+                  "value": "source",
+                  "description": "Group by: source, role, month"
+                }
+              ]
+            },
+            "description": "Generate revenue report in CSV format (downloads as file)"
+          }
+        }
+      ],
+      "description": "Admin Reports APIs with CSV export support"
+    },
+    {
+      "name": "Admin Metrics",
+      "item": [
+        {
+          "name": "Get Dashboard Overview",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/metrics/overview?fromDate=&toDate=",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "metrics", "overview"],
+              "query": [
+                {
+                  "key": "fromDate",
+                  "value": "",
+                  "description": "Start date (ISO format: YYYY-MM-DD)",
+                  "disabled": true
+                },
+                {
+                  "key": "toDate",
+                  "value": "",
+                  "description": "End date (ISO format: YYYY-MM-DD)",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get comprehensive dashboard overview with all key metrics"
+          }
+        },
+        {
+          "name": "Get User Growth Metrics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/metrics/users?fromDate=&toDate=&groupBy=day",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "metrics", "users"],
+              "query": [
+                {
+                  "key": "fromDate",
+                  "value": "",
+                  "description": "Start date (ISO format: YYYY-MM-DD)",
+                  "disabled": true
+                },
+                {
+                  "key": "toDate",
+                  "value": "",
+                  "description": "End date (ISO format: YYYY-MM-DD)",
+                  "disabled": true
+                },
+                {
+                  "key": "groupBy",
+                  "value": "day",
+                  "description": "Group by: day, week, month"
+                }
+              ]
+            },
+            "description": "Get user growth metrics by role with trends"
+          }
+        },
+        {
+          "name": "Get Engagement Metrics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/metrics/engagement?fromDate=&toDate=",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "metrics", "engagement"],
+              "query": [
+                {
+                  "key": "fromDate",
+                  "value": "",
+                  "description": "Start date (ISO format: YYYY-MM-DD)",
+                  "disabled": true
+                },
+                {
+                  "key": "toDate",
+                  "value": "",
+                  "description": "End date (ISO format: YYYY-MM-DD)",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get engagement metrics (active users, job postings, applications, etc.)"
+          }
+        }
+      ],
+      "description": "Admin Dashboard Metrics APIs"
+    }
+  ]
+}
