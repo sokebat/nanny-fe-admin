@@ -1,10 +1,9 @@
 "use client";
-import { useState } from "react";
 import StatsCards from "@/components/dashboard/stats-cards";
-import PerkNotification from "@/components/dashboard/perk-notification";
-import RevenueChart from "@/components/dashboard/revenue-chart";
+import { useState } from "react";
+
 import PurchaseChart from "@/components/dashboard/purchase-chart";
-import RequestsTable from "@/components/dashboard/requests-table";
+import RevenueChart from "@/components/dashboard/revenue-chart";
 
 export default function Home() {
   const [showPerkNotification, setShowPerkNotification] = useState(true);
@@ -21,11 +20,7 @@ export default function Home() {
             </p>
           </div>
 
-          {showPerkNotification && (
-            <div className="w-full md:w-auto">
-              <PerkNotification onClose={() => setShowPerkNotification(false)} />
-            </div>
-          )}
+
         </div>
 
         {/* Stats Cards */}
@@ -39,7 +34,7 @@ export default function Home() {
       </div>
 
       {/* Product & Service Listing Request Table */}
-      <RequestsTable />
+      {/* <RequestsTable /> */}
     </main>
   );
 }

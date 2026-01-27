@@ -82,8 +82,29 @@ export interface DashboardOverview {
         revenue: number;
     };
     topPerforming: {
-        courses: Array<any>;
-        resources: Array<any>;
+        courses: Array<{
+            _id: string;
+            title: string;
+            description: string;
+            category: string;
+            price: number;
+            thumbnailUrl: string;
+            videoUrl: string;
+            enrollmentCount: number;
+            ratingAverage: number;
+            ratingCount: number;
+            [key: string]: any;
+        }>;
+        resources: Array<{
+            _id: string;
+            title: string;
+            category: string;
+            type: string;
+            fileUrl: string;
+            thumbnailUrl: string;
+            viewCount: number;
+            [key: string]: any;
+        }>;
     };
 }
 
@@ -98,13 +119,12 @@ export interface UserGrowthData {
 export interface EngagementMetrics {
     activeUsers: number;
     jobPostings: number;
-    jobApplications: number;
-    messagesExchanged: number;
-    // Trends
-    activeUsersTrend: number;
-    jobPostingsTrend: number;
-    jobApplicationsTrend: number;
-    messagesTrend: number;
+    applications: number;
+    messages: number;
+    courseEnrollments: number;
+    resourceViews: number;
+    retentionRate: number;
+    averageSessionDuration: number;
 }
 
 export interface InvoiceAnalyticsData {

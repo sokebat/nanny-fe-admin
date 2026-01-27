@@ -17,7 +17,7 @@ export default function StatsCards() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="bg-[#daeceb] rounded-lg p-5 flex items-center justify-between">
                 <div>
-                    <p className="text-2xl font-semibold text-[#18191c] mb-1">{overview?.totalJobs || 0}</p>
+                    <p className="text-2xl font-semibold text-[#18191c] mb-1">{(overview?.totalJobs?.total || 0).toLocaleString()}</p>
                     <p className="text-sm text-[#18191c]/80">Active Jobs</p>
                 </div>
                 <div className="bg-white p-4 rounded">
@@ -33,7 +33,7 @@ export default function StatsCards() {
 
             <div className="bg-[#f4faf9] rounded-lg p-5 flex items-center justify-between">
                 <div>
-                    <p className="text-2xl font-semibold text-[#18191c] mb-1">{overview?.totalUsers || 0}</p>
+                    <p className="text-2xl font-semibold text-[#18191c] mb-1">{(overview?.totalUsers?.total || 0).toLocaleString()}</p>
                     <p className="text-sm text-[#18191c]/80">Active Users</p>
                 </div>
                 <div className="bg-white p-4 rounded">
@@ -48,7 +48,7 @@ export default function StatsCards() {
 
             <div className="bg-[rgba(218,236,235,0.3)] rounded-lg p-5 flex items-center justify-between">
                 <div>
-                    <p className="text-2xl font-semibold text-[#18191c] mb-1">{engagement?.messagesExchanged || 0}</p>
+                    <p className="text-2xl font-semibold text-[#18191c] mb-1">{(engagement?.messages || 0).toLocaleString()}</p>
                     <p className="text-sm text-[#18191c]/80">Total Messages</p>
                 </div>
                 <div className="bg-white p-4 rounded">

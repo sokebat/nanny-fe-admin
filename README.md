@@ -1,4 +1,2 @@
-{
-"email": "admin@nannyplug.com",
-"password": "SecurePassword123!"
-}
+SecurePassword123!
+admin@nannyplug.com

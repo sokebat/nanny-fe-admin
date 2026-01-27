@@ -10,6 +10,7 @@ import { toast } from "react-hot-toast";
 import TopPerforming from "@/components/dashboard/top-performing";
 import RevenueBreakdown from "@/components/dashboard/revenue-breakdown";
 
+
 export default function AnalyticsPage() {
     const { data: overview } = useDashboardOverview();
 
@@ -35,7 +36,7 @@ export default function AnalyticsPage() {
     };
 
     return (
-        <main className="flex-1 p-4 md:p-8 overflow-auto bg-muted/20">
+        <main className="flex-1 p-4 md:p-8 overflow-auto bg-muted ">
             <div className="flex items-center justify-between mb-8">
                 <div>
                     <h2 className="text-2xl font-bold tracking-tight">Analytics Dashboard</h2>
@@ -65,25 +66,25 @@ export default function AnalyticsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <OverviewCard
                     title="Total Revenue"
-                    value={`$${overview?.totalRevenue?.total?.toLocaleString() || '0'}`}
-                    subValue={`${overview?.totalRevenue?.monthly ? 'Monthly: $' + overview.totalRevenue.monthly.toLocaleString() : 'No monthly data'}`}
+                    value={`$${(overview?.totalRevenue?.total || 0).toLocaleString()}`}
+                    subValue={overview?.totalRevenue?.monthly ? `Monthly: $${overview.totalRevenue.monthly.toLocaleString()}` : 'No monthly data'}
                     icon={DollarSign}
                 />
                 <OverviewCard
                     title="Active Users"
-                    value={overview?.totalUsers?.total?.toString() || '0'}
+                    value={(overview?.totalUsers?.total || 0).toLocaleString()}
                     subValue={`Parents: ${overview?.totalUsers?.parents || 0}, Nannies: ${overview?.totalUsers?.nannies || 0}`}
                     icon={Users}
                 />
                 <OverviewCard
                     title="Active Subscriptions"
-                    value={overview?.subscriptionStats?.active?.toString() || '0'}
-                    subValue={`Revenue: $${overview?.subscriptionStats?.revenue?.toLocaleString() || 0}`}
+                    value={(overview?.subscriptionStats?.active || 0).toLocaleString()}
+                    subValue={`Revenue: $${(overview?.subscriptionStats?.revenue || 0).toLocaleString()}`}
                     icon={Activity}
                 />
                 <OverviewCard
                     title="Total Jobs"
-                    value={overview?.totalJobs?.total?.toString() || '0'}
+                    value={(overview?.totalJobs?.total || 0).toLocaleString()}
                     subValue={`Active: ${overview?.totalJobs?.active || 0}`}
                     icon={TrendingUp}
                 />
@@ -126,7 +127,7 @@ export default function AnalyticsPage() {
     );
 }
 
-function OverviewCard({ title, value, subValue, icon: Icon }: { title: string, value: string, subValue: string, icon: any }) {
+function OverviewCard({ title, value, subValue, icon: Icon }: { title: string, value: string | number, subValue: React.ReactNode, icon: any }) {
     return (
         <div className="p-6 bg-card border rounded-xl shadow-sm">
             <div className="flex items-center justify-between mb-4">
