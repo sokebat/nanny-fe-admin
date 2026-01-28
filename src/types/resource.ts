@@ -1,4 +1,15 @@
 export type ResourceType = 'pdf' | 'video' | 'audio' | 'article' | 'link' | 'other';
+
+/** Display options for filter/forms — only these six types. */
+export const RESOURCE_TYPE_OPTIONS: { value: ResourceType; label: string }[] = [
+    { value: 'pdf', label: 'PDF' },
+    { value: 'video', label: 'Video' },
+    { value: 'audio', label: 'Audio' },
+    { value: 'article', label: 'Article' },
+    { value: 'link', label: 'Link' },
+    { value: 'other', label: 'Other' },
+];
+
 export type TargetAudience = 'caregiver' | 'parent' | 'vendor';
 
 export interface Resource {
@@ -11,6 +22,7 @@ export interface Resource {
     isActive: boolean;
     isListed: boolean;
     isPopular: boolean;
+    free?: boolean;
     targetAudience: TargetAudience[];
     teachableResourceId?: string;
     fileUrl?: string; // S3 URL
@@ -29,6 +41,7 @@ export interface CreateResourceDto {
     isActive?: boolean;
     isListed?: boolean;
     isPopular?: boolean;
+    free?: boolean;
     targetAudience?: TargetAudience[];
     teachableResourceId?: string;
     file?: File;

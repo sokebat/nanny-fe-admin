@@ -10,8 +10,16 @@ import {
 } from "@/components/resources";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { useResources } from "@/hooks/use-resources";
-import type { CreateResourceDto, UpdateResourceDto, Resource } from "@/types/resource";
+import type { CreateResourceDto, UpdateResourceDto, Resource, ResourceType } from "@/types/resource";
+import { RESOURCE_TYPE_OPTIONS } from "@/types/resource";
 import { Search, Loader2, X } from "lucide-react";
 
 const ManageResources = () => {
@@ -21,6 +29,7 @@ const ManageResources = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [searchQuery, setSearchQuery] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
+    const [typeFilter, setTypeFilter] = useState<ResourceType | "">("");
     const limit = 10;
 
     // Fetch resources and stats
@@ -36,6 +45,7 @@ const ManageResources = () => {
         page: currentPage,
         limit,
         search: debouncedSearch,
+        type: typeFilter || undefined,
     });
 
     const resources = getResourcesQuery.data?.resources || [];
@@ -53,6 +63,11 @@ const ManageResources = () => {
     const clearSearch = () => {
         setSearchQuery("");
         setDebouncedSearch("");
+        setCurrentPage(1);
+    };
+
+    const handleTypeChange = (value: string) => {
+        setTypeFilter(value === "all" ? "" : (value as ResourceType));
         setCurrentPage(1);
     };
 
@@ -127,7 +142,7 @@ const ManageResources = () => {
                         <p className="text-muted-foreground mt-1 text-sm md:text-base">Library management and curation tools.</p>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-wrap">
                         <form onSubmit={handleSearch} className="relative flex-1 sm:flex-initial">
                             <Input
                                 placeholder="Search resources..."
@@ -146,6 +161,22 @@ const ManageResources = () => {
                                 </button>
                             )}
                         </form>
+                        <Select
+                            value={typeFilter || "all"}
+                            onValueChange={handleTypeChange}
+                        >
+                            <SelectTrigger className="h-11 w-full sm:w-[160px] rounded-xl border-slate-200 focus:ring-brand-navy text-sm font-medium">
+                                <SelectValue placeholder="Filter by type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All types</SelectItem>
+                                {RESOURCE_TYPE_OPTIONS.map((opt) => (
+                                    <SelectItem key={opt.value} value={opt.value}>
+                                        {opt.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                         <Button
                             onClick={handleOpenCreate}
                             className="bg-brand-navy hover:bg-[#203a56] text-white px-4 md:px-8 h-11 rounded-xl font-bold shadow-none whitespace-nowrap"

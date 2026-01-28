@@ -59,6 +59,7 @@ class ResourcesService extends ApiService {
         if (data.isActive !== undefined) formData.append("isActive", String(data.isActive));
         if (data.isListed !== undefined) formData.append("isListed", String(data.isListed));
         if (data.isPopular !== undefined) formData.append("isPopular", String(data.isPopular));
+        if (data.free !== undefined) formData.append("free", String(data.free));
         if (data.targetAudience) formData.append("targetAudience", JSON.stringify(data.targetAudience));
 
         if (data.file) formData.append("file", data.file);
@@ -95,6 +96,7 @@ class ResourcesService extends ApiService {
         if (data.isActive !== undefined) formData.append("isActive", String(data.isActive));
         if (data.isListed !== undefined) formData.append("isListed", String(data.isListed));
         if (data.isPopular !== undefined) formData.append("isPopular", String(data.isPopular));
+        if (data.free !== undefined) formData.append("free", String(data.free));
         if (data.targetAudience) formData.append("targetAudience", JSON.stringify(data.targetAudience));
 
         if (data.file) formData.append("file", data.file);

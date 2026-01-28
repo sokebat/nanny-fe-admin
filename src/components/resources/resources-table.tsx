@@ -21,6 +21,7 @@ import {
     Pencil
 } from "lucide-react";
 import type { Resource, ResourceType } from "@/types/resource";
+import { RESOURCE_TYPE_OPTIONS } from "@/types/resource";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
@@ -70,6 +71,7 @@ export function ResourcesTable({
                         <TableHead className="py-4 font-semibold text-brand-navy">Resource</TableHead>
                         <TableHead className="py-4 font-semibold text-brand-navy">Type</TableHead>
                         <TableHead className="py-4 font-semibold text-brand-navy">Category</TableHead>
+                        <TableHead className="py-4 font-semibold text-brand-navy text-center">Free</TableHead>
                         <TableHead className="py-4 font-semibold text-brand-navy text-center">Popular</TableHead>
                         <TableHead className="py-4 font-semibold text-brand-navy text-center">Listed</TableHead>
                         <TableHead className="py-4 font-semibold text-brand-navy">Views</TableHead>
@@ -97,13 +99,24 @@ export function ResourcesTable({
                             <TableCell className="py-4">
                                 <div className="flex items-center gap-2">
                                     <TypeIcon type={resource.type} />
-                                    <span className="capitalize text-sm font-medium">{resource.type}</span>
+                                    <span className="text-sm font-medium">
+                                        {RESOURCE_TYPE_OPTIONS.find((o) => o.value === resource.type)?.label ?? resource.type}
+                                    </span>
                                 </div>
                             </TableCell>
                             <TableCell className="py-4 text-sm font-medium">
                                 <span className="bg-gray-100 px-2.5 py-1 rounded-md text-[10px] uppercase tracking-wider text-muted-foreground">
                                     {resource.category || "Uncategorized"}
                                 </span>
+                            </TableCell>
+                            <TableCell className="py-4 text-center">
+                                {resource.free ? (
+                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                        Free
+                                    </span>
+                                ) : (
+                                    <span className="text-muted-foreground text-xs">—</span>
+                                )}
                             </TableCell>
                             <TableCell className="py-4 text-center">
                                 <Button

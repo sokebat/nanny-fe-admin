@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import { ImageUpload } from "@/components/shared/image-upload";
 import type { Resource, CreateResourceDto, ResourceType, TargetAudience } from "@/types/resource";
+import { RESOURCE_TYPE_OPTIONS } from "@/types/resource";
 import { Loader2, FileText, X, Check, UploadCloud } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -62,6 +63,7 @@ export function ResourceForm({
             isActive: true,
             isListed: true,
             isPopular: false,
+            free: false,
             targetAudience: [],
         },
     });
@@ -70,6 +72,7 @@ export function ResourceForm({
     const watchIsActive = watch("isActive");
     const watchIsListed = watch("isListed");
     const watchIsPopular = watch("isPopular");
+    const watchFree = watch("free");
     const watchTargetAudience = watch("targetAudience") || [];
 
     // Helper to get thumbnail URL
@@ -92,6 +95,7 @@ export function ResourceForm({
                 isActive: resource.isActive,
                 isListed: resource.isListed,
                 isPopular: resource.isPopular,
+                free: resource.free ?? false,
                 targetAudience: resource.targetAudience,
             });
             setThumbnailPreview(getThumbnailUrl(resource.thumbnailUrl) || null);
@@ -106,6 +110,7 @@ export function ResourceForm({
                 isActive: true,
                 isListed: true,
                 isPopular: false,
+                free: false,
                 targetAudience: [],
             });
             setFile(null);
@@ -195,12 +200,11 @@ export function ResourceForm({
                                         <SelectValue placeholder="Select type" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="pdf">PDF Document</SelectItem>
-                                        <SelectItem value="video">Video Content</SelectItem>
-                                        <SelectItem value="audio">Audio Resource</SelectItem>
-                                        <SelectItem value="article">Article/Post</SelectItem>
-                                        <SelectItem value="link">External Link</SelectItem>
-                                        <SelectItem value="other">Other</SelectItem>
+                                        {RESOURCE_TYPE_OPTIONS.map((opt) => (
+                                            <SelectItem key={opt.value} value={opt.value}>
+                                                {opt.label}
+                                            </SelectItem>
+                                        ))}
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -266,11 +270,12 @@ export function ResourceForm({
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                             {[
                                 { id: "isActive", label: "Active", watched: watchIsActive },
                                 { id: "isListed", label: "Listed", watched: watchIsListed },
-                                { id: "isPopular", label: "Popular", watched: watchIsPopular }
+                                { id: "isPopular", label: "Popular", watched: watchIsPopular },
+                                { id: "free", label: "Free", watched: watchFree }
                             ].map((toggle) => (
                                 <button
                                     key={toggle.id}

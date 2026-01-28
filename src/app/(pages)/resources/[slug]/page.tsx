@@ -310,6 +310,25 @@ export default function ResourceDetailPage() {
                                         <div className={cn("w-2 h-2 rounded-full", resource.isPopular ? "bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)]" : "bg-slate-300")} />
                                     )}
                                 </button>
+
+                                <div
+                                    className={cn(
+                                        "w-full flex items-center justify-between p-4 rounded-xl border transition-all",
+                                        resource.free
+                                            ? "bg-emerald-50/50 border-emerald-200 text-emerald-700"
+                                            : "bg-slate-50 border-transparent text-slate-400"
+                                    )}
+                                >
+                                    <div className="flex items-center gap-3 font-bold text-sm">
+                                        Free resource
+                                    </div>
+                                    <span className={cn(
+                                        "text-xs font-semibold px-2.5 py-1 rounded-full",
+                                        resource.free ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-500"
+                                    )}>
+                                        {resource.free ? "Yes" : "No"}
+                                    </span>
+                                </div>
                             </CardContent>
                         </Card>
 
