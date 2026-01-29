@@ -12,13 +12,12 @@ import {
 } from "@/components/ui/sidebar";
 import {
   BarChart3,
-  Building2,
+  CreditCard,
   Layers,
   LayoutGrid,
   NotebookTabs,
   Receipt,
-  SlidersHorizontal,
-  UserRound
+  Users
 } from "lucide-react";
 import { NavMain } from "./nav-main";
 import { NavUser } from "./nav-user";
@@ -32,14 +31,14 @@ const data = {
       icon: LayoutGrid,
     },
     {
-      title: "Manage Perks",
-      url: "/perks",
-      icon: Building2,
+      title: "Analytics",
+      url: "/analytics",
+      icon: BarChart3,
     },
     {
-      title: "Manage Listing",
-      url: "/listings",
-      icon: SlidersHorizontal,
+      title: "Manage Users",
+      url: "/users",
+      icon: Users,
     },
     {
       title: "Manage Courses",
@@ -52,20 +51,9 @@ const data = {
       icon: Layers,
     },
     {
-      title: "Purchase Request",
-      url: "/purchase-requests",
-      icon: UserRound,
-    },
-    {
       title: "Subscriptions",
       url: "/subscriptions",
-      icon: BarChart3,
-    },
-
-    {
-      title: "Analytics",
-      url: "/analytics",
-      icon: BarChart3,
+      icon: CreditCard,
     },
     {
       title: "Invoices",

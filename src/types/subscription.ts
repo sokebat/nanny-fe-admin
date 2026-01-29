@@ -1,4 +1,4 @@
-export type UserRole = "caregiver" | "parent" | "vendor";
+export type UserRole = "nanny" | "caregiver" | "parent" | "vendor" | "admin";
 export type SubscriptionStatus = "active" | "cancelled" | "expired" | "past_due";
 export type BillingCycle = "monthly" | "yearly";
 

@@ -14,6 +14,8 @@ export interface AdminUser {
     updatedAt: string;
     phone?: string;
     avatar?: string;
+    lastLogin?: string;
+    googleId?: string;
 }
 
 export interface AdminUserFilters {
@@ -91,4 +93,16 @@ export interface PaginatedResponse<T> {
     hasNextPage: boolean;
     prevPage: number | null;
     nextPage: number | null;
+}
+
+export interface UserPagination {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+}
+
+export interface PaginatedUsersResponse {
+    users: AdminUser[];
+    pagination: UserPagination;
 }

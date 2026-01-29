@@ -17,10 +17,10 @@ export default function UsersPage() {
         limit: pagination.pageSize,
     });
 
-    const pageCount = data ? Math.ceil(data.totalDocs / data.limit) : 0;
+    const pageCount = data?.pagination?.totalPages || 0;
 
     return (
-        <main className="flex-1 p-4 md:p-8 overflow-auto bg-muted/20">
+        <main className="flex-1 p-4 md:p-8 overflow-auto bg-muted ">
             <div className="flex items-center justify-between mb-6">
                 <div>
                     <h2 className="text-2xl font-bold tracking-tight">Users</h2>
@@ -41,7 +41,7 @@ export default function UsersPage() {
             ) : (
                 <UsersTable
                     columns={columns}
-                    data={data?.docs || []}
+                    data={data?.users || []}
                     pageCount={pageCount}
                     pagination={pagination}
                     onPaginationChange={setPagination}

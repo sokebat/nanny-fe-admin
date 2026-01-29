@@ -8,11 +8,12 @@ import {
     AdminUserInvoice,
     AdminUserCourse,
     UserJob,
+    PaginatedUsersResponse,
 } from "@/types/admin-users";
 import { ApiResponse } from "@/types/subscription";
 
 class AdminUsersService extends ApiService {
-    async getAllUsers(filters: AdminUserFilters = {}): Promise<PaginatedResponse<AdminUser>> {
+    async getAllUsers(filters: AdminUserFilters = {}): Promise<PaginatedUsersResponse> {
         const params = new URLSearchParams();
         Object.entries(filters).forEach(([key, value]) => {
             if (value !== undefined && value !== "") {
@@ -20,15 +21,15 @@ class AdminUsersService extends ApiService {
             }
         });
 
-        const response = await this.get<ApiResponse<PaginatedResponse<AdminUser>>>(
+        const response = await this.get<ApiResponse<PaginatedUsersResponse>>(
             `/admin/users?${params.toString()}`,
             true
         );
         return response.data;
     }
 
-    async getUsersByRole(role: "nannies" | "vendors" | "parents", page = 1, limit = 20): Promise<PaginatedResponse<AdminUser>> {
-        const response = await this.get<ApiResponse<PaginatedResponse<AdminUser>>>(
+    async getUsersByRole(role: "nannies" | "vendors" | "parents", page = 1, limit = 20): Promise<PaginatedUsersResponse> {
+        const response = await this.get<ApiResponse<PaginatedUsersResponse>>(
             `/admin/users/${role}?page=${page}&limit=${limit}`,
             true
         );
