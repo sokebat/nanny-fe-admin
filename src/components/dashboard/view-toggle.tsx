@@ -1,3 +1,7 @@
+"use client";
+
+import { cn } from "@/lib/utils";
+
 type ViewType = "weekly" | "monthly" | "yearly";
 
 interface ViewToggleProps {
@@ -9,17 +13,19 @@ export default function ViewToggle({ currentView, onViewChange }: ViewToggleProp
     const views: ViewType[] = ["weekly", "monthly", "yearly"];
 
     return (
-        <div className="flex gap-2">
+        <div className="flex p-1 bg-muted/50 rounded-xl border border-border/50">
             {views.map((view) => (
                 <button
                     key={view}
                     onClick={() => onViewChange(view)}
-                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${currentView === view
-                        ? "bg-[rgba(31,52,78,0.23)] text-brand-navy"
-                        : "bg-muted text-muted-foreground"
-                        }`}
+                    className={cn(
+                        "px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 uppercase tracking-tight",
+                        currentView === view
+                            ? "bg-brand-navy text-white shadow-sm"
+                            : "text-muted-foreground hover:text-brand-navy hover:bg-white/50"
+                    )}
                 >
-                    {view.charAt(0).toUpperCase() + view.slice(1)}
+                    {view}
                 </button>
             ))}
         </div>

@@ -56,10 +56,13 @@ export default function PurchaseChart() {
     const chartData = formatData(salesData);
 
     return (
-        <div className="bg-card border border-border rounded-lg p-4">
+        <div className="bg-white border border-border rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
             {/* Header */}
-            <div className="flex items-center justify-between mb-3">
-                <h3 className="font-medium">Purchase Summary</h3>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                <div>
+                    <h3 className="text-lg font-bold text-brand-navy">Purchase Summary</h3>
+                    <p className="text-sm text-muted-foreground mt-0.5">Distribution of service requests</p>
+                </div>
                 <ViewToggle currentView={view} onViewChange={setView} />
             </div>
 

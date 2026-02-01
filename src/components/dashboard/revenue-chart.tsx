@@ -53,26 +53,29 @@ export default function RevenueChart() {
     const chartData = formatData(revenueData);
 
     return (
-        <div className="bg-card border border-border rounded-lg p-4">
+        <div className="bg-white border border-border rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
             {/* Header */}
-            <div className="flex items-center justify-between mb-3">
-                <h3 className="font-medium">Revenue</h3>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                <div>
+                    <h3 className="text-lg font-bold text-brand-navy">Revenue Analytics</h3>
+                    <p className="text-sm text-muted-foreground mt-0.5">Performance tracking over time</p>
+                </div>
                 <ViewToggle currentView={view} onViewChange={setView} />
             </div>
 
             {/* Legend */}
-            <div className="flex items-center gap-4 mb-4 text-sm">
+            <div className="flex flex-wrap items-center gap-6 mb-6 px-1">
                 <div className="flex items-center gap-2">
-                    <div className="w-3.5 h-3.5 bg-brand-navy rounded-sm" />
-                    <span className="text-foreground">This Year</span>
+                    <div className="w-2.5 h-2.5 bg-brand-navy rounded-full shadow-[0_0_8px_rgba(31,52,78,0.3)]" />
+                    <span className="text-xs font-semibold text-foreground/70 uppercase">This Year</span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <div className="w-3.5 h-3.5 bg-brand-orange rounded-sm" />
-                    <span className="text-foreground">Previous Year</span>
+                    <div className="w-2.5 h-2.5 bg-brand-orange rounded-full shadow-[0_0_8px_rgba(249,125,97,0.3)]" />
+                    <span className="text-xs font-semibold text-foreground/70 uppercase">Previous Year</span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <div className="w-3.5 h-3.5 bg-[#a8cbd1] rounded-sm" />
-                    <span className="text-foreground">Local Average</span>
+                    <div className="w-2.5 h-2.5 bg-[#a8cbd1] rounded-full shadow-[0_0_8px_rgba(168,203,209,0.3)]" />
+                    <span className="text-xs font-semibold text-foreground/70 uppercase">Local Average</span>
                 </div>
             </div>
 

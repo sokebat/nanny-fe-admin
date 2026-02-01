@@ -1,7 +1,7 @@
 "use client";
 import { useDashboardOverview, useEngagementMetrics } from "@/hooks/use-admin-analytics";
-
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 export default function StatsCards() {
     const { data: overview, isLoading: isLoadingOverview } = useDashboardOverview();
@@ -13,64 +13,74 @@ export default function StatsCards() {
         return (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[1, 2, 3].map((i) => (
-                    <div key={i} className="bg-card border rounded-lg p-5 flex items-center justify-between">
-                        <div className="space-y-2">
-                            <Skeleton className="h-8 w-24" />
-                            <Skeleton className="h-4 w-16" />
+                    <div key={i} className="bg-white border border-border rounded-2xl p-6 flex items-center justify-between shadow-sm animate-pulse">
+                        <div className="space-y-3">
+                            <Skeleton className="h-4 w-24 bg-muted" />
+                            <Skeleton className="h-8 w-16 bg-muted/60" />
                         </div>
-                        <Skeleton className="h-12 w-12 rounded" />
+                        <Skeleton className="h-14 w-14 rounded-xl bg-muted/40" />
                     </div>
                 ))}
             </div>
         );
     }
 
+    const cards = [
+        {
+            title: "Active Jobs",
+            value: (overview?.totalJobs?.total || 0).toLocaleString(),
+            icon: (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 7V17C21 18.1046 20.1046 19 19 19H5C3.89543 19 3 18.1046 3 17V7C3 5.89543 3.89543 5 5 5H9.5L11.5 3H12.5L14.5 5H19C20.1046 5 21 5.89543 21 7Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M12 11V15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M10 13H14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+            ),
+            bg: "bg-brand-navy/5",
+            textColor: "text-brand-navy"
+        },
+        {
+            title: "Active Users",
+            value: (overview?.totalUsers?.total || 0).toLocaleString(),
+            icon: (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M9 11C11.2091 11 13 9.20914 13 7C13 4.79086 11.2091 3 9 3C6.79086 3 5 4.79086 5 7C5 9.20914 6.79086 11 9 11Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+            ),
+            bg: "bg-brand-orange/10",
+            textColor: "text-brand-orange"
+        },
+        {
+            title: "Total Messages",
+            value: (engagement?.messages || 0).toLocaleString(),
+            icon: (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 11.5C21 12.3151 20.8504 13.1222 20.5599 13.840c-0.2905 0.7378 -0.7378 1.403 -1.2721 1.9373l-1.9373 1.9373c-0.5342 0.5343 -1.1995 0.9816 -1.9373 1.2721 -0.7178 0.2905 -1.5249 0.4401 -2.34 0.4401H5L3 21V11.5C3 10.6849 3.1495 9.87784 3.4401 9.14002c0.2905 -0.7378 0.7378 -1.403 1.2721 -1.9373L6.6495 5.26538c0.5342 -0.5342 1.1995 -0.9815 1.9373 -1.2721C9.3046 3.70278 10.1117 3.55325 10.9268 3.55325h6.5332c0.8151 0 1.6222 0.1495 2.34 0.4401 0.7378 0.2905 1.403 0.7378 1.9373 1.2721l1.9373 1.9373c0.5342 0.5342 0.9815 1.1995 1.2721 1.9373z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+            ),
+            bg: "bg-brand-navy/5",
+            textColor: "text-brand-navy"
+        }
+    ];
+
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-[#daeceb] rounded-lg p-5 flex items-center justify-between">
-                <div>
-                    <p className="text-2xl font-semibold text-[#18191c] mb-1">{(overview?.totalJobs?.total || 0).toLocaleString()}</p>
-                    <p className="text-sm text-[#18191c]/80">Active Jobs</p>
-                </div>
-                <div className="bg-white p-4 rounded">
-                    <div className="w-8 h-8 text-[#a8cbd1]">
-                        <svg viewBox="0 0 32 32" fill="none">
-                            <rect x="11" y="5" width="10" height="4" rx="1" stroke="currentColor" strokeWidth="1.5" />
-                            <rect x="4" y="9" width="24" height="18" rx="1" stroke="currentColor" strokeWidth="1.5" />
-                            <line x1="14.5" y1="15" x2="17.5" y2="15" stroke="currentColor" strokeWidth="1.5" />
-                        </svg>
+            {cards.map((card, idx) => (
+                <div key={idx} className="group bg-white rounded-2xl p-6 flex items-center justify-between border border-border shadow-sm hover:shadow-md hover:border-brand-orange/20 transition-all duration-300 cursor-default">
+                    <div>
+                        <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-1 group-hover:text-brand-navy transition-colors">{card.title}</p>
+                        <h3 className="text-3xl font-bold text-brand-navy tracking-tight">{card.value}</h3>
+                        <div className="mt-2 flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                            <span className="text-[10px] font-bold text-green-600 uppercase">Live Update</span>
+                        </div>
+                    </div>
+                    <div className={cn("p-4 rounded-xl transition-all duration-300 group-hover:scale-110 shadow-inner", card.bg, card.textColor)}>
+                        {card.icon}
                     </div>
                 </div>
-            </div>
-
-            <div className="bg-[#f4faf9] rounded-lg p-5 flex items-center justify-between">
-                <div>
-                    <p className="text-2xl font-semibold text-[#18191c] mb-1">{(overview?.totalUsers?.total || 0).toLocaleString()}</p>
-                    <p className="text-sm text-[#18191c]/80">Active Users</p>
-                </div>
-                <div className="bg-white p-4 rounded">
-                    <div className="w-8 h-8 text-[#a8cbd1]">
-                        <svg viewBox="0 0 32 32" fill="currentColor">
-                            <circle cx="16" cy="10" r="5" />
-                            <path d="M7 27c0-5 4-9 9-9s9 4 9 9" />
-                        </svg>
-                    </div>
-                </div>
-            </div>
-
-            <div className="bg-[rgba(218,236,235,0.3)] rounded-lg p-5 flex items-center justify-between">
-                <div>
-                    <p className="text-2xl font-semibold text-[#18191c] mb-1">{(engagement?.messages || 0).toLocaleString()}</p>
-                    <p className="text-sm text-[#18191c]/80">Total Messages</p>
-                </div>
-                <div className="bg-white p-4 rounded">
-                    <div className="w-8 h-8 text-[#daeceb]">
-                        <svg viewBox="0 0 32 32" fill="currentColor">
-                            <path d="M6 6h20a2 2 0 012 2v12a2 2 0 01-2 2h-14l-6 6V8a2 2 0 012-2z" />
-                        </svg>
-                    </div>
-                </div>
-            </div>
+            ))}
         </div>
     );
 }
