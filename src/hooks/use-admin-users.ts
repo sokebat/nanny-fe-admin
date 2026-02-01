@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { adminUsersService } from "@/services/admin-users.service";
-import { AdminUserFilters, UpdateAdminUserDto } from "@/types/admin-users";
+import { AdminUserFilters, UpdateAdminUserDto, AdminUserDetails } from "@/types/admin-users";
 import { toast } from "react-hot-toast";
 
 export const ADMIN_USERS_KEYS = {

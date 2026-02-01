@@ -9,6 +9,7 @@ import {
     AdminUserCourse,
     UserJob,
     PaginatedUsersResponse,
+    AdminUserDetails,
 } from "@/types/admin-users";
 import { ApiResponse } from "@/types/subscription";
 
@@ -36,8 +37,8 @@ class AdminUsersService extends ApiService {
         return response.data;
     }
 
-    async getUserById(id: string): Promise<AdminUser> {
-        const response = await this.get<ApiResponse<AdminUser>>(`/admin/users/${id}`, true);
+    async getUserById(id: string): Promise<AdminUserDetails> {
+        const response = await this.get<ApiResponse<AdminUserDetails>>(`/admin/users/${id}`, true);
         return response.data;
     }
 

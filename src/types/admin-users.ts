@@ -18,6 +18,61 @@ export interface AdminUser {
     googleId?: string;
 }
 
+export interface UserAddress {
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
+}
+
+export interface NannyProfile {
+    _id: string;
+    address?: UserAddress;
+    bio?: string;
+    experience?: number;
+    hourlyRate?: number;
+    availability?: Record<string, { start: string; end: string; available: boolean }>;
+    languages?: string[];
+    certifications?: string[];
+    skills?: string[];
+    backgroundCheckStatus?: string;
+    isProfileComplete: boolean;
+}
+
+export interface ParentProfile {
+    _id: string;
+    address?: UserAddress;
+    numberOfChildren?: number;
+    childrenAges?: number[];
+    preferredSchedule?: string;
+    profileImageUrl?: string;
+    bio?: string;
+    isProfileComplete: boolean;
+}
+
+export interface VendorProfile {
+    _id: string;
+    businessName?: string;
+    businessType?: string;
+    address?: UserAddress;
+    bio?: string;
+    isProfileComplete: boolean;
+}
+
+export interface AdminUserStats {
+    jobsCount: number;
+    applicationsCount: number;
+    invoicesCount: number;
+    coursesCount: number;
+    subscriptionsCount: number;
+}
+
+export interface AdminUserDetails {
+    user: AdminUser;
+    profile: NannyProfile | ParentProfile | VendorProfile | null;
+    stats: AdminUserStats;
+}
+
 export interface AdminUserFilters {
     page?: number;
     limit?: number;
@@ -59,18 +114,28 @@ export interface UserApplication {
 // Re-export or define simpler versions if specific to admin view
 export interface AdminUserSubscription {
     _id: string;
-    planName: string;
+    planId: {
+        _id: string;
+        name: string;
+        pricingMonthly: number;
+        pricingYearly: number;
+        description?: string;
+        features?: string[];
+    };
+    billingCycle: "monthly" | "yearly";
     status: string;
-    amount: number;
-    interval: "month" | "year";
     createdAt: string;
 }
 
 export interface AdminUserInvoice {
     _id: string;
+    invoiceNumber: string;
     amount: number;
+    total: number;
+    currency: string;
     status: "paid" | "pending" | "failed" | "cancelled";
-    date: string;
+    issuedAt: string;
+    description?: string;
     invoiceUrl?: string;
 }
 

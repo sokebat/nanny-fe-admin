@@ -17,6 +17,7 @@ import {
   LayoutGrid,
   NotebookTabs,
   Receipt,
+  Star,
   Users
 } from "lucide-react";
 import { NavMain } from "./nav-main";
@@ -60,6 +61,12 @@ const data = {
       url: "/invoices",
       icon: Receipt,
     },
+
+    {
+      title: "Reviews",
+      url: "/reviews",
+      icon: Star,
+    }
   ],
 };
 
