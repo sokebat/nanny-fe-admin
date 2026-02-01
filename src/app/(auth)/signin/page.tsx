@@ -47,17 +47,12 @@ export default function Login() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-2rem)] py-8 px-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden border border-border">
+      <div className="w-full max-w-md bg-white rounded-2xl  overflow-hidden border border-border">
         {/* Header Section - Navy Background */}
         <div className="bg-brand-navy p-8 text-center relative overflow-hidden">
-          {/* Decorative background element */}
-          <div className="absolute top-0 right-0 -mt-4 -mr-4 bg-white/5 w-24 h-24 rounded-full blur-2xl" />
-          <div className="absolute bottom-0 left-0 -mb-4 -ml-4 bg-brand-orange/10 w-32 h-32 rounded-full blur-2xl" />
 
           <div className="relative inline-flex items-center justify-center p-3 mb-6 bg-white/10 rounded-xl backdrop-blur-sm border border-white/20">
-            <span className="bg-brand-orange text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider absolute -top-2 -right-2 shadow-lg">
-              Admin
-            </span>
+
             <div className="bg-brand-orange rounded-lg p-2.5 shadow-inner">
               <svg
                 width="24"
@@ -196,14 +191,7 @@ export default function Login() {
             </Button>
           </form>
 
-          <div className="pt-4 text-center">
-            <p className="text-sm text-muted-foreground">
-              Need help? Contact{" "}
-              <Link href="mailto:support@nannyplug.com" className="font-semibold text-brand-navy hover:underline">
-                Technical Support
-              </Link>
-            </p>
-          </div>
+
         </div>
       </div>
     </div>
