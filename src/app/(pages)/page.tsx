@@ -48,8 +48,8 @@ export default function Home() {
         </div>
 
         {/* Decorative background glow */}
-        <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-64 h-64 bg-brand-orange/5 rounded-full blur-3xl -z-0" />
-        <div className="absolute bottom-0 right-1/4 w-32 h-32 bg-brand-navy/5 rounded-full blur-2xl -z-0" />
+        <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-64 h-64 bg-brand-orange/5 rounded-full blur-3xl z-0" />
+        <div className="absolute bottom-0 right-1/4 w-32 h-32 bg-brand-navy/5 rounded-full blur-2xl z-0" />
       </div>
 
       <div className="mb-10">

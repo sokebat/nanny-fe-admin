@@ -3,7 +3,7 @@
 import { createColumnHelper, type ColumnDef } from "@tanstack/react-table";
 import { AdminUser } from "@/types/admin-users";
 import { format } from "date-fns";
-import { MoreHorizontal, Eye, Edit, Trash } from "lucide-react";
+import { MoreHorizontal, Eye, Trash } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -72,10 +72,6 @@ export const columns: ColumnDef<AdminUser, any>[] = [
                             <Link href={`/users/${user._id || user.id}`} className="flex items-center">
                                 <Eye className="mr-2 h-4 w-4" /> View Details
                             </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>
-                            <Edit className="mr-2 h-4 w-4" /> Edit User
                         </DropdownMenuItem>
                         {/* Add delete or other actions here */}
                     </DropdownMenuContent>
