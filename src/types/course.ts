@@ -4,7 +4,6 @@ export interface Course {
     _id: string;
     title: string;
     description?: string;
-    category?: string;
     price: number;
     videoUrl?: string;
     teachableCourseId?: string;
@@ -31,7 +30,6 @@ export interface Course {
 export interface CreateCourseDto {
     title: string;
     description?: string;
-    category?: string;
     price: number;
     videoUrl?: string;
     teachableCourseId?: string;
@@ -44,7 +42,6 @@ export interface CreateCourseDto {
 export interface UpdateCourseDto {
     title?: string;
     description?: string;
-    category?: string;
     price?: number;
     videoUrl?: string;
     teachableCourseId?: string;
@@ -57,7 +54,6 @@ export interface UpdateCourseDto {
 export interface CourseFilters {
     page?: number;
     limit?: number;
-    category?: string;
     search?: string;
     minPrice?: number;
     maxPrice?: number;

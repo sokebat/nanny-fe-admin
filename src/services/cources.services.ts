@@ -23,7 +23,6 @@ class CoursesService extends ApiService {
         
         if (filters.page) params.append("page", String(filters.page));
         if (filters.limit) params.append("limit", String(filters.limit));
-        if (filters.category) params.append("category", filters.category);
         if (filters.search) params.append("search", filters.search);
         if (filters.minPrice) params.append("minPrice", String(filters.minPrice));
         if (filters.maxPrice) params.append("maxPrice", String(filters.maxPrice));
@@ -58,7 +57,7 @@ class CoursesService extends ApiService {
         formData.append("price", String(data.price));
         
         if (data.description) formData.append("description", data.description);
-        if (data.category) formData.append("category", data.category);
+  
         if (data.videoUrl) formData.append("videoUrl", data.videoUrl);
         if (data.teachableCourseId) formData.append("teachableCourseId", data.teachableCourseId);
         if (data.isListed !== undefined) formData.append("isListed", String(data.isListed));
@@ -90,7 +89,7 @@ class CoursesService extends ApiService {
         
         if (data.title) formData.append("title", data.title);
         if (data.description !== undefined) formData.append("description", data.description);
-        if (data.category) formData.append("category", data.category);
+   
         if (data.price !== undefined) formData.append("price", String(data.price));
         if (data.videoUrl) formData.append("videoUrl", data.videoUrl);
         if (data.teachableCourseId) formData.append("teachableCourseId", data.teachableCourseId);

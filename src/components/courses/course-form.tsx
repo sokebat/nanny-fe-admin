@@ -52,7 +52,6 @@ export function CourseForm({
         defaultValues: {
             title: "",
             description: "",
-            category: "",
             price: 0,
             videoUrl: "",
             teachableCourseId: "",
@@ -91,7 +90,6 @@ export function CourseForm({
         if (course) {
             setValue("title", course.title);
             setValue("description", course.description || "");
-            setValue("category", course.category || "");
             setValue("price", course.price);
             setValue("videoUrl", course.videoUrl || "");
             setValue("teachableCourseId", course.teachableCourseId || "");
@@ -246,37 +244,24 @@ export function CourseForm({
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <Label htmlFor="title" className="text-sm font-medium">
-                                    Course Title <span className="text-destructive">*</span>
-                                </Label>
-                                <Input
-                                    id="title"
-                                    placeholder="Enter course title"
-                                    className={cn(
-                                        "mt-2",
-                                        errors.title && "border-destructive focus-visible:ring-destructive"
-                                    )}
-                                    {...register("title", {
-                                        required: "Course title is required",
-                                    })}
-                                />
-                                {errors.title && (
-                                    <p className="mt-1 text-xs text-destructive">{errors.title.message}</p>
+                        <div>
+                            <Label htmlFor="title" className="text-sm font-medium">
+                                Course Title <span className="text-destructive">*</span>
+                            </Label>
+                            <Input
+                                id="title"
+                                placeholder="Enter course title"
+                                className={cn(
+                                    "mt-2",
+                                    errors.title && "border-destructive focus-visible:ring-destructive"
                                 )}
-                            </div>
-                            <div>
-                                <Label htmlFor="category" className="text-sm font-medium">
-                                    Category
-                                </Label>
-                                <Input
-                                    id="category"
-                                    placeholder="Enter category"
-                                    className="mt-2"
-                                    {...register("category")}
-                                />
-                            </div>
+                                {...register("title", {
+                                    required: "Course title is required",
+                                })}
+                            />
+                            {errors.title && (
+                                <p className="mt-1 text-xs text-destructive">{errors.title.message}</p>
+                            )}
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">

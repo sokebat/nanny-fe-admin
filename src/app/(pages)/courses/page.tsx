@@ -47,7 +47,6 @@ const ManageCourse = () => {
                 _id: course._id,
                 name: course.title,
                 detail: course.description || "No description",
-                location: course.category || "Uncategorized",
                 price: `$${course.price}`,
                 isPopular: course.isPopular,
                 isListed: course.isListed,
@@ -179,6 +178,7 @@ const ManageCourse = () => {
                             }}
                             onDelete={setDeleteCourseId}
                             isDeleting={deleteCourse.isPending}
+                            deletingCourseId={deleteCourseId}
                         />
                         {pagination && (
                             <CoursePagination

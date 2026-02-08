@@ -13,7 +13,6 @@ export interface CourseItem {
     id: number;
     name: string;
     detail: string;
-    location: string;
     price: string;
     _id?: string;
     isPopular?: boolean;
@@ -25,6 +24,8 @@ interface CoursesTableProps {
     onView?: (courseId: string) => void;
     onDelete?: (courseId: string) => void;
     isDeleting?: boolean;
+    /** When set, only the delete button for this course shows a loading spinner. */
+    deletingCourseId?: string | null;
 }
 
 export function CoursesTable({
@@ -32,6 +33,7 @@ export function CoursesTable({
     onView,
     onDelete,
     isDeleting = false,
+    deletingCourseId = null,
 }: CoursesTableProps) {
     if (courses.length === 0) {
         return (
@@ -48,7 +50,6 @@ export function CoursesTable({
                     <TableRow>
                         <TableHead>Course Title</TableHead>
                         <TableHead>Description</TableHead>
-                        <TableHead>Category</TableHead>
                         <TableHead>Price</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
@@ -68,7 +69,6 @@ export function CoursesTable({
                                 <TableCell className="text-muted-foreground max-w-md truncate">
                                     {course.detail}
                                 </TableCell>
-                                <TableCell className="text-foreground">{course.location}</TableCell>
                                 <TableCell className="text-foreground font-semibold">
                                     {course.price}
                                 </TableCell>
@@ -95,7 +95,7 @@ export function CoursesTable({
                                                 disabled={isDeleting}
                                                 className="text-red-500 hover:text-red-600 hover:bg-red-50"
                                             >
-                                                {isDeleting ? (
+                                                {(isDeleting && deletingCourseId === course._id) ? (
                                                     <Loader2 className="w-4 h-4 animate-spin" />
                                                 ) : (
                                                     <Trash2 className="w-4 h-4" />

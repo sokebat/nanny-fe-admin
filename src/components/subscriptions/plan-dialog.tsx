@@ -17,6 +17,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Loader2 } from "lucide-react";
 import { Plan, CreatePlanDto, UpdatePlanDto, UserRole } from "@/types/subscription";
 
 interface PlanDialogProps {
@@ -24,9 +25,10 @@ interface PlanDialogProps {
     onOpenChange: (open: boolean) => void;
     onSave: (data: CreatePlanDto | UpdatePlanDto) => void;
     plan?: Plan;
+    isSubmitting?: boolean;
 }
 
-export function PlanDialog({ open, onOpenChange, onSave, plan }: PlanDialogProps) {
+export function PlanDialog({ open, onOpenChange, onSave, plan, isSubmitting = false }: PlanDialogProps) {
     const [formData, setFormData] = useState<Partial<CreatePlanDto>>({
         name: "",
         role: "caregiver",
@@ -177,11 +179,29 @@ export function PlanDialog({ open, onOpenChange, onSave, plan }: PlanDialogProps
                     </div>
                 </form>
                 <DialogFooter>
-                    <Button variant="outline" onClick={() => onOpenChange(false)}>
+                    <Button
+                        variant="outline"
+                        onClick={() => onOpenChange(false)}
+                        disabled={isSubmitting}
+                    >
                         Cancel
                     </Button>
-                    <Button onClick={handleSubmit} className="bg-brand-orange hover:bg-brand-orange-hover text-white">
-                        {plan ? "Save Changes" : "Create Plan"}
+                    <Button
+                        type="submit"
+                        onClick={handleSubmit}
+                        disabled={isSubmitting}
+                        className="bg-brand-orange hover:bg-brand-orange-hover text-white"
+                    >
+                        {isSubmitting ? (
+                            <>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                {plan ? "Saving..." : "Creating..."}
+                            </>
+                        ) : plan ? (
+                            "Save Changes"
+                        ) : (
+                            "Create Plan"
+                        )}
                     </Button>
                 </DialogFooter>
             </DialogContent>

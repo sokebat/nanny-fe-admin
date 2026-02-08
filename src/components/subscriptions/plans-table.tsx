@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Plus, Edit2, Trash2, CreditCard, Loader2 } from "lucide-react";
 import { PlanDialog } from "./plan-dialog";
+import { DeletePlanDialog } from "./delete-plan-dialog";
 import { useSubscriptionPlans } from "@/hooks/use-plans";
 import { Plan, CreatePlanDto, UpdatePlanDto } from "@/types/subscription";
 
@@ -27,7 +28,7 @@ export function PlansTable() {
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingPlan, setEditingPlan] = useState<Plan | undefined>(undefined);
-
+    const [deletePlanId, setDeletePlanId] = useState<string | null>(null);
 
     const handleCreate = () => {
         setEditingPlan(undefined);
@@ -39,9 +40,17 @@ export function PlansTable() {
         setIsDialogOpen(true);
     };
 
-    const handleDelete = async (id: string) => {
-        if (confirm("Are you sure you want to delete this plan?")) {
-            await deletePlanMutation.mutateAsync(id);
+    const handleDeleteClick = (id: string) => {
+        setDeletePlanId(id);
+    };
+
+    const handleDeleteConfirm = async () => {
+        if (!deletePlanId) return;
+        try {
+            await deletePlanMutation.mutateAsync(deletePlanId);
+            setDeletePlanId(null);
+        } catch {
+            // Error handled by hook
         }
     };
 
@@ -156,7 +165,7 @@ export function PlansTable() {
                                                     variant="ghost"
                                                     size="icon"
                                                     title="Delete Plan"
-                                                    onClick={() => handleDelete(plan._id || plan.id)}
+                                                    onClick={() => handleDeleteClick(plan._id || plan.id)}
                                                     className="text-red-500 hover:text-red-600 hover:bg-red-50"
                                                     disabled={deletePlanMutation.isPending}
                                                 >
@@ -184,6 +193,14 @@ export function PlansTable() {
                 onOpenChange={setIsDialogOpen}
                 onSave={handleSave}
                 plan={editingPlan}
+                isSubmitting={createPlanMutation.isPending || updatePlanMutation.isPending}
+            />
+
+            <DeletePlanDialog
+                open={!!deletePlanId}
+                onOpenChange={(open) => !open && setDeletePlanId(null)}
+                onConfirm={handleDeleteConfirm}
+                isDeleting={deletePlanMutation.isPending}
             />
         </div>
     );

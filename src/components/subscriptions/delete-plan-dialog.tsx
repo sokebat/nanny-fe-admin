@@ -9,32 +9,32 @@ import {
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 
-interface DeleteCourseDialogProps {
+interface DeletePlanDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     onConfirm: () => void;
     isDeleting: boolean;
 }
 
-export function DeleteCourseDialog({
+export function DeletePlanDialog({
     open,
     onOpenChange,
     onConfirm,
     isDeleting,
-}: DeleteCourseDialogProps) {
+}: DeletePlanDialogProps) {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle>Delete Course</DialogTitle>
+                    <DialogTitle>Delete Plan</DialogTitle>
                     <DialogDescription className="min-h-10 text-left">
-                        Are you sure you want to delete this course? This action cannot be undone.
+                        Are you sure you want to delete this plan? This action cannot be undone.
                     </DialogDescription>
                 </DialogHeader>
                 {isDeleting && (
                     <div className="flex items-center gap-2 text-sm text-muted-foreground py-1">
                         <Loader2 className="w-4 h-4 shrink-0 animate-spin" />
-                        <span>Deleting course…</span>
+                        <span>Deleting plan…</span>
                     </div>
                 )}
                 <DialogFooter className="gap-2 sm:gap-0">
@@ -56,4 +56,3 @@ export function DeleteCourseDialog({
         </Dialog>
     );
 }
-

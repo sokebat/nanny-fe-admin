@@ -179,11 +179,6 @@ export default function CourseDetailPage() {
                             <h1 className="text-4xl font-bold text-foreground mb-2">
                                 {course.title}
                             </h1>
-                            {course.category && (
-                                <Badge variant="secondary" className="text-sm">
-                                    {course.category}
-                                </Badge>
-                            )}
                         </div>
                         <div className="flex items-center gap-2">
                             <Button
