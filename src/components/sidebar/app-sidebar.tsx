@@ -15,6 +15,7 @@ import {
   CreditCard,
   Layers,
   LayoutGrid,
+  List,
   NotebookTabs,
   Receipt,
   Star,
@@ -61,7 +62,16 @@ const data = {
       url: "/invoices",
       icon: Receipt,
     },
-
+    // {
+    //   title: "Listing Requests",
+    //   url: "/listing",
+    //   icon: List,
+    // },
+    // {
+    //   title: "Perks & Benefits",
+    //   url: "/perks",
+    //   icon: Star,
+    // },
     {
       title: "Reviews",
       url: "/reviews",

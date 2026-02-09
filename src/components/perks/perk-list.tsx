@@ -1,4 +1,4 @@
-import { PerkCard, PerkItem } from "./perk-card";
+import { PerkCard, PerkItem } from "./perks-card";
 
 interface PerksListProps {
     perks: PerkItem[];
@@ -9,6 +9,7 @@ export function PerksList({ perks, onEdit }: PerksListProps) {
     if (perks.length === 0) {
         return (
             <div className="text-center py-12">
+                
                 <p className="text-muted-foreground">No perks available</p>
             </div>
         );

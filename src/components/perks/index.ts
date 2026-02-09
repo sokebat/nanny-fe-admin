@@ -1,3 +1,3 @@
-export { PerkCard } from "./perk-card";
-export { PerksList } from "./perks-list";
-export type { PerkItem } from "./perk-card";
+export { PerkCard } from "./perks-card";
+export { PerksList } from "./perk-list";
+export type { PerkItem } from "./perks-card";
