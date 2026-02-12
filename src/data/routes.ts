@@ -15,7 +15,8 @@ const protectedRoutes = {
   subscriptions: '/subscriptions',
   analytics: '/analytics',
   invoices: '/invoices',
-  
+  team: '/team',
+
 };
 
 export { publicRoutes, protectedRoutes };

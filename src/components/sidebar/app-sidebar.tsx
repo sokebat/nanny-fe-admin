@@ -19,7 +19,8 @@ import {
   NotebookTabs,
   Receipt,
   Star,
-  Users
+  Users,
+  UsersRound
 } from "lucide-react";
 import { NavMain } from "./nav-main";
 import { NavUser } from "./nav-user";
@@ -41,6 +42,11 @@ const data = {
       title: "Manage Users",
       url: "/users",
       icon: Users,
+    },
+    {
+      title: "Team",
+      url: "/team",
+      icon: UsersRound,
     },
     {
       title: "Manage Courses",
