@@ -29,30 +29,49 @@ export const authOptions: NextAuthOptions = {
   providers: [
     ...(googleClientId && googleClientSecret
       ? [
-          GoogleProvider({
-            clientId: googleClientId,
-            clientSecret: googleClientSecret,
-            authorization: {
-              params: {
-                prompt: "consent",
-                access_type: "offline",
-                response_type: "code",
-              },
+        GoogleProvider({
+          clientId: googleClientId,
+          clientSecret: googleClientSecret,
+          authorization: {
+            params: {
+              prompt: "consent",
+              access_type: "offline",
+              response_type: "code",
             },
-          }),
-        ]
+          },
+        }),
+      ]
       : []),
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: {
-          label: "Email",
-          type: "email",
-          placeholder: "user@example.com",
-        },
+        email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
+        accessToken: { type: "text" },
+        refreshToken: { type: "text" },
+        isAdminLogin: { type: "text" },
+        userId: { type: "text" },
+        firstName: { type: "text" },
+        lastName: { type: "text" },
+        role: { type: "text" },
       },
       async authorize(credentials) {
+        // If this is an admin login after OTP verification, we already have tokens
+        if (credentials?.isAdminLogin === "true" && credentials.accessToken) {
+          return {
+            id: credentials.userId || "admin",
+            email: credentials.email || "",
+            name: `${credentials.firstName || ""} ${credentials.lastName || ""}`.trim(),
+            firstName: credentials.firstName || "",
+            lastName: credentials.lastName || "",
+            role: credentials.role || "admin",
+            emailVerified: true,
+            phoneVerified: true,
+            accessToken: credentials.accessToken,
+            refreshToken: credentials.refreshToken,
+          };
+        }
+
         if (!credentials?.email || !credentials?.password) {
           throw new Error("Missing email or password");
         }

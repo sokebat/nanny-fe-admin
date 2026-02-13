@@ -33,7 +33,7 @@ function CompleteInviteForm() {
         firstName,
         lastName,
       });
-      router.push("/signin");
+      router.push("/admin/login");
       router.refresh();
     } catch {
       // toast handled in hook
@@ -49,7 +49,7 @@ function CompleteInviteForm() {
             Use the link from your invite email to set your password and activate your account.
           </p>
           <Button asChild variant="outline">
-            <Link href="/signin">Back to sign in</Link>
+            <Link href="/admin/login">Back to sign in</Link>
           </Button>
         </div>
       </div>
@@ -138,7 +138,7 @@ function CompleteInviteForm() {
             )}
           </Button>
           <p className="text-center text-sm text-muted-foreground">
-            <Link href="/signin" className="text-brand-navy hover:underline">
+            <Link href="/admin/login" className="text-brand-navy hover:underline">
               Back to sign in
             </Link>
           </p>

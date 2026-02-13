@@ -191,7 +191,17 @@ export default function Login() {
             </Button>
           </form>
 
-
+          <div className="text-center">
+            <p className="text-sm text-muted-foreground">
+              Internal team?{" "}
+              <Link
+                href="/admin/login"
+                className="font-semibold text-brand-navy hover:text-brand-orange transition-colors"
+              >
+                Sign in to Admin Portal
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>

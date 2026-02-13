@@ -1,6 +1,9 @@
 const publicRoutes = {
   auth: {
     login: "/signin",
+    adminLogin: "/admin/login",
+    onboarding: "/admin/onboarding",
+    completeInvite: "/admin/complete-invite",
   },
 };
 
