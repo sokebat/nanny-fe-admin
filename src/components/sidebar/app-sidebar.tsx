@@ -44,7 +44,7 @@ const data = {
       icon: Users,
     },
     {
-      title: "Team",
+      title: "Team Management",
       url: "/team",
       icon: UsersRound,
     },
