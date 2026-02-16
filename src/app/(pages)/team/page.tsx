@@ -406,8 +406,6 @@ export default function TeamPage() {
             </form>
           </CardContent>
         </Card>
-
-
       </div>
     </main>
   );
