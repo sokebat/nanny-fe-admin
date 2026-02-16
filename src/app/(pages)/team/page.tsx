@@ -407,40 +407,7 @@ export default function TeamPage() {
           </CardContent>
         </Card>
 
-        <Card className="border border-slate-200 bg-white shadow-none">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <UserMinus className="w-5 h-5" />
-              Deactivate team member
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleDeactivate} className="flex flex-wrap items-end gap-4">
-              <div className="flex-1 min-w-[200px] space-y-2">
-                <Label htmlFor="deactivate-userId">User ID</Label>
-                <Input
-                  id="deactivate-userId"
-                  value={deactivateUserId}
-                  onChange={(e) => setDeactivateUserId(e.target.value)}
-                  placeholder="USER_ID_OF_TEAM_MEMBER"
-                  className="rounded-xl font-mono text-sm"
-                />
-              </div>
-              <Button
-                type="submit"
-                disabled={deactivate.isPending || !deactivateUserId.trim()}
-                variant="destructive"
-                className="rounded-xl"
-              >
-                {deactivate.isPending ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  "Deactivate"
-                )}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+
       </div>
     </main>
   );
