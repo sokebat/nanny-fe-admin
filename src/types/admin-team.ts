@@ -47,12 +47,51 @@ export interface InviteTeamMemberDto {
   lastName: string;
 }
 
+export interface TeamMember {
+  _id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: string | InternalRole;
+  emailVerified: boolean;
+  phoneVerified: boolean;
+  isActive: boolean;
+  isInternal: boolean;
+  twoFactorRequired: boolean;
+  invitedBy?: {
+    _id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+  lastLogin?: string;
+  inviteToken?: string;
+  inviteTokenExpiresAt?: string;
+  teachableUserId?: string;
+}
+
 export interface ResendInviteDto {
   email: string;
 }
 
 export interface DeactivateTeamMemberDto {
   userId: string;
+}
+
+export interface ReactivateTeamMemberDto {
+  userId: string;
+}
+
+export interface GetTeamMembersResponse {
+  members: TeamMember[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
 }
 
 // API response wrapper (if your API uses { data, message, status })

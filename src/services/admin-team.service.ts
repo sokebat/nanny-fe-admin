@@ -3,6 +3,8 @@ import type {
   InviteTeamMemberDto,
   ResendInviteDto,
   DeactivateTeamMemberDto,
+  ReactivateTeamMemberDto,
+  GetTeamMembersResponse,
 } from "@/types/admin-team";
 import type { ApiResponse } from "@/types/subscription";
 
@@ -46,6 +48,25 @@ class AdminTeamService extends ApiService {
       return (res as ApiResponse<void>).data as void;
     }
     return undefined as void;
+  }
+
+  /** GET /admin/team */
+  async getMembers(page: number = 1, limit: number = 10): Promise<GetTeamMembersResponse> {
+    const res = await this.get<ApiResponse<GetTeamMembersResponse>>(
+      `/admin/team?page=${page}&limit=${limit}`,
+      true
+    );
+    return res.data!;
+  }
+
+  /** POST /admin/team/reactivate */
+  async reactivate(data: ReactivateTeamMemberDto): Promise<void> {
+    await this.post<ApiResponse<void>>("/admin/team/reactivate", data, true);
+  }
+
+  /** DELETE /admin/team/:userId */
+  async deleteMember(userId: string): Promise<void> {
+    await this.delete<ApiResponse<void>>(`/admin/team/${userId}`, true);
   }
 }
 
