@@ -11,13 +11,17 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus, Edit2, Trash2, CreditCard, Loader2 } from "lucide-react";
+import { Plus, Edit2, Trash2, CreditCard, Loader2, Eye } from "lucide-react";
 import { PlanDialog } from "./plan-dialog";
 import { DeletePlanDialog } from "./delete-plan-dialog";
 import { useSubscriptionPlans } from "@/hooks/use-plans";
 import { Plan, CreatePlanDto, UpdatePlanDto } from "@/types/subscription";
 
-export function PlansTable() {
+type PlansTableProps = {
+    canEdit?: boolean;
+};
+
+export function PlansTable({ canEdit = true }: PlansTableProps) {
     const {
         getPlansQuery: { data: plans, isLoading },
         createPlan: createPlanMutation,
@@ -31,6 +35,7 @@ export function PlansTable() {
     const [deletePlanId, setDeletePlanId] = useState<string | null>(null);
 
     const handleCreate = () => {
+        if (!canEdit) return;
         setEditingPlan(undefined);
         setIsDialogOpen(true);
     };
@@ -41,11 +46,12 @@ export function PlansTable() {
     };
 
     const handleDeleteClick = (id: string) => {
+        if (!canEdit) return;
         setDeletePlanId(id);
     };
 
     const handleDeleteConfirm = async () => {
-        if (!deletePlanId) return;
+        if (!deletePlanId || !canEdit) return;
         try {
             await deletePlanMutation.mutateAsync(deletePlanId);
             setDeletePlanId(null);
@@ -55,10 +61,12 @@ export function PlansTable() {
     };
 
     const handleStripePrice = async (id: string, billingCycle: "monthly" | "yearly") => {
+        if (!canEdit) return;
         await createStripePriceMutation.mutateAsync({ id, billingCycle });
     };
 
     const handleSave = async (data: any) => {
+        if (!canEdit) return;
         if (editingPlan) {
             await updatePlanMutation.mutateAsync({
                 id: editingPlan._id || editingPlan.id,
@@ -80,12 +88,14 @@ export function PlansTable() {
 
     return (
         <div className="space-y-4">
-            <div className="flex justify-end">
-                <Button onClick={handleCreate} className="bg-brand-orange hover:bg-brand-orange-hover text-white">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Create Plan
-                </Button>
-            </div>
+            {canEdit && (
+                <div className="flex justify-end">
+                    <Button onClick={handleCreate} className="bg-brand-orange hover:bg-brand-orange-hover text-white">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Create Plan
+                    </Button>
+                </div>
+            )}
 
             <Card className="border border-slate-200 overflow-hidden bg-white shadow-none">
                 <CardContent className="p-0">
@@ -117,7 +127,7 @@ export function PlansTable() {
                                                     <span className="text-[10px] bg-green-50 text-green-600 px-1.5 py-0.5 rounded font-mono">
                                                         {plan.stripePriceIdMonthly}
                                                     </span>
-                                                ) : (
+                                                ) : canEdit ? (
                                                     <Button
                                                         variant="link"
                                                         size="sm"
@@ -127,6 +137,10 @@ export function PlansTable() {
                                                     >
                                                         Create Price
                                                     </Button>
+                                                ) : (
+                                                    <span className="text-[10px] text-slate-400">
+                                                        No Stripe price
+                                                    </span>
                                                 )}
                                             </div>
                                         </TableCell>
@@ -137,7 +151,7 @@ export function PlansTable() {
                                                     <span className="text-[10px] bg-green-50 text-green-600 px-1.5 py-0.5 rounded font-mono">
                                                         {plan.stripePriceIdYearly}
                                                     </span>
-                                                ) : (
+                                                ) : canEdit ? (
                                                     <Button
                                                         variant="link"
                                                         size="sm"
@@ -147,30 +161,48 @@ export function PlansTable() {
                                                     >
                                                         Create Price
                                                     </Button>
+                                                ) : (
+                                                    <span className="text-[10px] text-slate-400">
+                                                        No Stripe price
+                                                    </span>
                                                 )}
                                             </div>
                                         </TableCell>
                                         <TableCell className="py-4 text-right">
                                             <div className="flex justify-end gap-2">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    title="Edit Plan"
-                                                    onClick={() => handleEdit(plan)}
-                                                    className="text-brand-navy hover:text-brand-navy/80 hover:bg-slate-100"
-                                                >
-                                                    <Edit2 className="w-4 h-4" />
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    title="Delete Plan"
-                                                    onClick={() => handleDeleteClick(plan._id || plan.id)}
-                                                    className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                                                    disabled={deletePlanMutation.isPending}
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </Button>
+                                                {canEdit ? (
+                                                    <>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            title="Edit Plan"
+                                                            onClick={() => handleEdit(plan)}
+                                                            className="text-brand-navy hover:text-brand-navy/80 hover:bg-slate-100"
+                                                        >
+                                                            <Edit2 className="w-4 h-4" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            title="Delete Plan"
+                                                            onClick={() => handleDeleteClick(plan._id || plan.id)}
+                                                            className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                                                            disabled={deletePlanMutation.isPending}
+                                                        >
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </Button>
+                                                    </>
+                                                ) : (
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        title="View Plan"
+                                                        onClick={() => handleEdit(plan)}
+                                                        className="text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                                                    >
+                                                        <Eye className="w-4 h-4" />
+                                                    </Button>
+                                                )}
                                             </div>
                                         </TableCell>
                                     </TableRow>
@@ -194,14 +226,17 @@ export function PlansTable() {
                 onSave={handleSave}
                 plan={editingPlan}
                 isSubmitting={createPlanMutation.isPending || updatePlanMutation.isPending}
+                readOnly={!canEdit}
             />
 
-            <DeletePlanDialog
-                open={!!deletePlanId}
-                onOpenChange={(open) => !open && setDeletePlanId(null)}
-                onConfirm={handleDeleteConfirm}
-                isDeleting={deletePlanMutation.isPending}
-            />
+            {canEdit && (
+                <DeletePlanDialog
+                    open={!!deletePlanId}
+                    onOpenChange={(open) => !open && setDeletePlanId(null)}
+                    onConfirm={handleDeleteConfirm}
+                    isDeleting={deletePlanMutation.isPending}
+                />
+            )}
         </div>
     );
 }

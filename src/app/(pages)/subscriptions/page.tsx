@@ -4,9 +4,21 @@ import React, { useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { PlansTable } from "@/components/subscriptions/plans-table";
 import { UserSubscriptionsTable } from "@/components/subscriptions/user-subscriptions-table";
+import { useSession } from "next-auth/react";
 
 export default function SubscriptionsPage() {
     const [activeTab, setActiveTab] = useState("plans");
+    const { data: session } = useSession();
+
+    const role = (session as any)?.user?.role as
+        | "parent"
+        | "nanny"
+        | "vendor"
+        | "admin"
+        | "moderator"
+        | undefined;
+
+    const canEditPlans = role === "admin";
 
     return (
         <main className="flex-1 p-4 md:p-8 overflow-auto bg-muted">
@@ -33,7 +45,7 @@ export default function SubscriptionsPage() {
 
                     <div className="mt-8">
                         <TabsContent value="plans" className="mt-0 outline-none">
-                            <PlansTable />
+                            <PlansTable canEdit={canEditPlans} />
                         </TabsContent>
                         <TabsContent value="users" className="mt-0 outline-none">
                             <UserSubscriptionsTable />

@@ -26,9 +26,10 @@ interface PlanDialogProps {
     onSave: (data: CreatePlanDto | UpdatePlanDto) => void;
     plan?: Plan;
     isSubmitting?: boolean;
+    readOnly?: boolean;
 }
 
-export function PlanDialog({ open, onOpenChange, onSave, plan, isSubmitting = false }: PlanDialogProps) {
+export function PlanDialog({ open, onOpenChange, onSave, plan, isSubmitting = false, readOnly = false }: PlanDialogProps) {
     const [formData, setFormData] = useState<Partial<CreatePlanDto>>({
         name: "",
         role: "caregiver",
@@ -72,6 +73,7 @@ export function PlanDialog({ open, onOpenChange, onSave, plan, isSubmitting = fa
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        if (readOnly) return;
         const features = featuresText.split("\n").map(f => f.trim()).filter(f => f !== "");
         onSave({ ...formData, features } as CreatePlanDto);
     };
@@ -80,7 +82,9 @@ export function PlanDialog({ open, onOpenChange, onSave, plan, isSubmitting = fa
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                    <DialogTitle>{plan ? "Edit Plan" : "Create Plan"}</DialogTitle>
+                    <DialogTitle>
+                        {readOnly ? "View Plan" : plan ? "Edit Plan" : "Create Plan"}
+                    </DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4 py-4">
                     <div className="space-y-2">
@@ -91,6 +95,7 @@ export function PlanDialog({ open, onOpenChange, onSave, plan, isSubmitting = fa
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             placeholder="Basic Caregiver Plan"
                             required
+                            disabled={readOnly}
                         />
                     </div>
                     <div className="space-y-2">
@@ -100,6 +105,7 @@ export function PlanDialog({ open, onOpenChange, onSave, plan, isSubmitting = fa
                             onValueChange={(value: UserRole) =>
                                 setFormData({ ...formData, role: value })
                             }
+                            disabled={readOnly}
                         >
                             <SelectTrigger id="role">
                                 <SelectValue placeholder="Select role" />
@@ -119,6 +125,7 @@ export function PlanDialog({ open, onOpenChange, onSave, plan, isSubmitting = fa
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                             placeholder="Brief description of the plan"
                             rows={2}
+                            disabled={readOnly}
                         />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
@@ -131,6 +138,7 @@ export function PlanDialog({ open, onOpenChange, onSave, plan, isSubmitting = fa
                                 value={formData.pricingMonthly}
                                 onChange={(e) => setFormData({ ...formData, pricingMonthly: parseFloat(e.target.value) })}
                                 required
+                                disabled={readOnly}
                             />
                         </div>
                         <div className="space-y-2">
@@ -142,6 +150,7 @@ export function PlanDialog({ open, onOpenChange, onSave, plan, isSubmitting = fa
                                 value={formData.pricingYearly}
                                 onChange={(e) => setFormData({ ...formData, pricingYearly: parseFloat(e.target.value) })}
                                 required
+                                disabled={readOnly}
                             />
                         </div>
                     </div>
@@ -153,6 +162,7 @@ export function PlanDialog({ open, onOpenChange, onSave, plan, isSubmitting = fa
                             onChange={(e) => setFeaturesText(e.target.value)}
                             placeholder="Messaging&#10;Job Applications&#10;Priority Support"
                             rows={4}
+                            disabled={readOnly}
                         />
                     </div>
                     <div className="flex items-center gap-4">
@@ -163,6 +173,7 @@ export function PlanDialog({ open, onOpenChange, onSave, plan, isSubmitting = fa
                                 checked={formData.isPopular}
                                 onChange={(e) => setFormData({ ...formData, isPopular: e.target.checked })}
                                 className="w-4 h-4 text-brand-orange border-slate-300 rounded focus:ring-brand-orange"
+                                disabled={readOnly}
                             />
                             <Label htmlFor="isPopular">Popular Plan</Label>
                         </div>
@@ -173,6 +184,7 @@ export function PlanDialog({ open, onOpenChange, onSave, plan, isSubmitting = fa
                                 checked={formData.isActive}
                                 onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
                                 className="w-4 h-4 text-brand-orange border-slate-300 rounded focus:ring-brand-orange"
+                                disabled={readOnly}
                             />
                             <Label htmlFor="isActive">Active</Label>
                         </div>
@@ -184,25 +196,27 @@ export function PlanDialog({ open, onOpenChange, onSave, plan, isSubmitting = fa
                         onClick={() => onOpenChange(false)}
                         disabled={isSubmitting}
                     >
-                        Cancel
+                        {readOnly ? "Close" : "Cancel"}
                     </Button>
-                    <Button
-                        type="submit"
-                        onClick={handleSubmit}
-                        disabled={isSubmitting}
-                        className="bg-brand-orange hover:bg-brand-orange-hover text-white"
-                    >
-                        {isSubmitting ? (
-                            <>
-                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                {plan ? "Saving..." : "Creating..."}
-                            </>
-                        ) : plan ? (
-                            "Save Changes"
-                        ) : (
-                            "Create Plan"
-                        )}
-                    </Button>
+                    {!readOnly && (
+                        <Button
+                            type="submit"
+                            onClick={handleSubmit}
+                            disabled={isSubmitting}
+                            className="bg-brand-orange hover:bg-brand-orange-hover text-white"
+                        >
+                            {isSubmitting ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                    {plan ? "Saving..." : "Creating..."}
+                                </>
+                            ) : plan ? (
+                                "Save Changes"
+                            ) : (
+                                "Create Plan"
+                            )}
+                        </Button>
+                    )}
                 </DialogFooter>
             </DialogContent>
         </Dialog>
