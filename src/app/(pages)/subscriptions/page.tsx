@@ -35,21 +35,25 @@ export default function SubscriptionsPage() {
                         >
                             Subscription Plans
                         </TabsTrigger>
-                        <TabsTrigger
-                            value="users"
-                            className="rounded-none border-b-2 border-transparent data-[state=active]:border-b-brand-orange data-[state=active]:bg-transparent data-[state=active]:text-brand-orange pb-3 px-8 text-base shadow-none transition-none"
-                        >
-                            User Subscriptions
-                        </TabsTrigger>
+                        {canEditPlans && (
+                            <TabsTrigger
+                                value="users"
+                                className="rounded-none border-b-2 border-transparent data-[state=active]:border-b-brand-orange data-[state=active]:bg-transparent data-[state=active]:text-brand-orange pb-3 px-8 text-base shadow-none transition-none"
+                            >
+                                User Subscriptions
+                            </TabsTrigger>
+                        )}
                     </TabsList>
 
                     <div className="mt-8">
                         <TabsContent value="plans" className="mt-0 outline-none">
                             <PlansTable canEdit={canEditPlans} />
                         </TabsContent>
-                        <TabsContent value="users" className="mt-0 outline-none">
-                            <UserSubscriptionsTable />
-                        </TabsContent>
+                        {canEditPlans && (
+                            <TabsContent value="users" className="mt-0 outline-none">
+                                <UserSubscriptionsTable />
+                            </TabsContent>
+                        )}
                     </div>
                 </Tabs>
             </div>
