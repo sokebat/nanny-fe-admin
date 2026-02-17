@@ -41,6 +41,14 @@ import {
   Users,
 } from "lucide-react";
 import { format } from "date-fns";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export default function TeamPage() {
   const [page, setPage] = useState(1);
@@ -61,7 +69,15 @@ export default function TeamPage() {
   const [inviteFirstName, setInviteFirstName] = useState("");
   const [inviteLastName, setInviteLastName] = useState("");
   const [resendEmail, setResendEmail] = useState("");
-  const [deactivateUserId, setDeactivateUserId] = useState("");
+  const [pendingStatusMember, setPendingStatusMember] = useState<{
+    id: string;
+    isActive: boolean;
+    name: string;
+  } | null>(null);
+  const [pendingDeleteMember, setPendingDeleteMember] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,8 +122,6 @@ export default function TeamPage() {
   };
 
   const handleDelete = async (userId: string) => {
-    if (!window.confirm("Are you sure you want to delete this team member?"))
-      return;
     try {
       await deleteMember.mutateAsync(userId);
     } catch {
@@ -189,7 +203,11 @@ export default function TeamPage() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() =>
-                                  toggleStatus(member._id, member.isActive)
+                                  setPendingStatusMember({
+                                    id: member._id,
+                                    isActive: member.isActive,
+                                    name: `${member.firstName} ${member.lastName}`,
+                                  })
                                 }
                                 disabled={
                                   deactivate.isPending || reactivate.isPending
@@ -208,7 +226,12 @@ export default function TeamPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => handleDelete(member._id)}
+                                onClick={() =>
+                                  setPendingDeleteMember({
+                                    id: member._id,
+                                    name: `${member.firstName} ${member.lastName}`,
+                                  })
+                                }
                                 disabled={deleteMember.isPending}
                                 className="h-8 w-8 p-0"
                                 title="Delete"
@@ -281,6 +304,108 @@ export default function TeamPage() {
             )}
           </CardContent>
         </Card>
+
+        {/* Status change confirmation dialog */}
+        <Dialog
+          open={!!pendingStatusMember}
+          onOpenChange={(open) =>
+            !open && !deactivate.isPending && !reactivate.isPending
+              ? setPendingStatusMember(null)
+              : undefined
+          }
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>
+                {pendingStatusMember?.isActive
+                  ? "Deactivate team member"
+                  : "Reactivate team member"}
+              </DialogTitle>
+              <DialogDescription>
+                {pendingStatusMember?.isActive
+                  ? `This will disable access for ${pendingStatusMember?.name}. They will no longer be able to sign in until reactivated.`
+                  : `This will re-enable access for ${pendingStatusMember?.name}. They will be able to sign in again.`}
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setPendingStatusMember(null)}
+                disabled={deactivate.isPending || reactivate.isPending}
+              >
+                Cancel
+              </Button>
+              <Button
+                className={
+                  pendingStatusMember?.isActive
+                    ? "bg-orange-600 hover:bg-orange-700"
+                    : "bg-emerald-600 hover:bg-emerald-700"
+                }
+                onClick={async () => {
+                  if (!pendingStatusMember) return;
+                  await toggleStatus(
+                    pendingStatusMember.id,
+                    pendingStatusMember.isActive
+                  );
+                  setPendingStatusMember(null);
+                }}
+                disabled={deactivate.isPending || reactivate.isPending}
+              >
+                {pendingStatusMember?.isActive ? "Deactivate" : "Reactivate"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete confirmation dialog */}
+        <Dialog
+          open={!!pendingDeleteMember}
+          onOpenChange={(open) =>
+            !open && !deleteMember.isPending
+              ? setPendingDeleteMember(null)
+              : undefined
+          }
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Delete team member</DialogTitle>
+              <DialogDescription>
+                This action cannot be undone. This will permanently remove{" "}
+                <span className="font-semibold text-foreground">
+                  {pendingDeleteMember?.name}
+                </span>{" "}
+                from your admin team and revoke their access.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setPendingDeleteMember(null)}
+                disabled={deleteMember.isPending}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={async () => {
+                  if (!pendingDeleteMember) return;
+                  await handleDelete(pendingDeleteMember.id);
+                  setPendingDeleteMember(null);
+                }}
+                disabled={deleteMember.isPending}
+              >
+                {deleteMember.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Deleting...
+                  </>
+                ) : (
+                  "Delete member"
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         <Card className="border border-slate-200 bg-white shadow-none">
           <CardHeader>
