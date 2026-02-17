@@ -10,6 +10,7 @@ import {
 import { cn } from "@/lib/utils";
 import { LucideIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 export function NavMain({
   items,
@@ -20,13 +21,30 @@ export function NavMain({
     icon?: LucideIcon
   }[]
 }) {
-  const pathname = usePathname()
+  const pathname = usePathname();
+  const { data: session } = useSession();
+
+  const role = (session as any)?.user?.role as
+    | "parent"
+    | "nanny"
+    | "vendor"
+    | "admin"
+    | "moderator"
+    | undefined;
+  const isAdmin = role === "admin";
+
+  const visibleItems = items.filter((item) => {
+    if (item.url === "/users" || item.url === "/team") {
+      return isAdmin;
+    }
+    return true;
+  });
 
   return (
     <SidebarGroup>
       <SidebarGroupContent>
         <SidebarMenu>
-          {items.map((item) => {
+          {visibleItems.map((item) => {
             const Icon = item.icon
             const isActive = pathname === item.url || (item.url === "/dashboard" && pathname === "/")
 

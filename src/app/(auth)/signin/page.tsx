@@ -130,12 +130,7 @@ export default function Login() {
                   <span className="w-1 h-1 rounded-full bg-brand-orange" />
                   Password
                 </Label>
-                <Link
-                  href="/forgot-password"
-                  className="text-xs font-semibold text-brand-navy hover:text-brand-orange transition-colors"
-                >
-                  Forgot?
-                </Link>
+      
               </div>
               <div
                 className={cn(

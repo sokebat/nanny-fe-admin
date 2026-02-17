@@ -10,6 +10,7 @@ const publicRoutes = {
 const protectedRoutes = {
 
   dashboard: '/',
+  users: '/users',
   perks: '/perks',
   listings: '/listings',
   courses: '/courses',

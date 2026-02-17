@@ -17,7 +17,8 @@ export default async function proxy(request: NextRequest) {
 
     const isAuthenticated = !!token?.accessToken;
     const userRole = (token?.role as UserRole) || undefined;
-    const isAdmin = userRole === "admin" || userRole === "moderator";
+    const isAdmin = userRole === "admin";
+    const isModerator = userRole === "moderator";
 
     // Helper function to check if pathname matches any protected route
     const isProtectedRoute = (path: string): boolean => {
@@ -26,6 +27,17 @@ export default async function proxy(request: NextRequest) {
             // Exact match
             if (cleanPath === route) return true;
             // Check if path starts with the route (for nested routes like /courses/123)
+            if (cleanPath.startsWith(route + "/")) return true;
+            return false;
+        });
+    };
+
+    // Sensitive routes that moderators must not access
+    const isModeratorBlockedRoute = (path: string): boolean => {
+        const cleanPath = path.split("?")[0];
+        const blockedRoutes = ["/users", "/team"];
+        return blockedRoutes.some((route) => {
+            if (cleanPath === route) return true;
             if (cleanPath.startsWith(route + "/")) return true;
             return false;
         });
@@ -48,10 +60,15 @@ export default async function proxy(request: NextRequest) {
 
     // User IS authenticated from here onwards
 
+    // Special case: moderators are blocked from sensitive routes and sent to home
+    if (isModerator && isModeratorBlockedRoute(pathname)) {
+        return NextResponse.redirect(new URL(protectedRoutes.dashboard, request.url));
+    }
+
     // Check if accessing a protected route
     if (isProtectedRoute(pathname)) {
-        // Only admins can access protected routes
-        if (!isAdmin) {
+        // Only admins and moderators can access protected routes (except the sensitive ones above)
+        if (!isAdmin && !isModerator) {
             return NextResponse.redirect(new URL(publicRoutes.auth.login, request.url));
         }
     }

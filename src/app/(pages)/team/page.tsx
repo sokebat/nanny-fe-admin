@@ -91,16 +91,7 @@ export default function TeamPage() {
     }
   };
 
-  const handleDeactivate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!deactivateUserId.trim()) return;
-    try {
-      await deactivate.mutateAsync({ userId: deactivateUserId.trim() });
-      setDeactivateUserId("");
-    } catch {
-      // toast in hook
-    }
-  };
+ 
 
   const toggleStatus = async (userId: string, isActive: boolean) => {
     try {
