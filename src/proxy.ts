@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { protectedRoutes, publicRoutes } from "./data/routes";
 
-type UserRole = "parent" | "nanny" | "vendor" | "admin" | undefined;
+type UserRole = "parent" | "nanny" | "vendor" | "admin" | "moderator" | undefined;
 
 export default async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
@@ -17,7 +17,7 @@ export default async function proxy(request: NextRequest) {
 
     const isAuthenticated = !!token?.accessToken;
     const userRole = (token?.role as UserRole) || undefined;
-    const isAdmin = userRole === "admin";
+    const isAdmin = userRole === "admin" || userRole === "moderator";
 
     // Helper function to check if pathname matches any protected route
     const isProtectedRoute = (path: string): boolean => {
