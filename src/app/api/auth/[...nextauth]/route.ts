@@ -81,6 +81,7 @@ export const authOptions: NextAuthOptions = {
             throw new Error("API base URL is not configured");
           }
 
+
           const res = await axios.post<LoginResponse>(
             `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`,
             {
@@ -88,6 +89,7 @@ export const authOptions: NextAuthOptions = {
               password: credentials.password,
             }
           );
+          console.log(process.env.NEXT_PUBLIC_API_BASE_URL, "api base url from login");
 
           if (res.data.status !== 200 || !res.data.data) {
             throw new Error(res.data.message || "Authentication failed");
