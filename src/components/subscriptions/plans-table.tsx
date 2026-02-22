@@ -16,6 +16,7 @@ import { PlanDialog } from "./plan-dialog";
 import { DeletePlanDialog } from "./delete-plan-dialog";
 import { useSubscriptionPlans } from "@/hooks/use-plans";
 import { Plan, CreatePlanDto, UpdatePlanDto } from "@/types/subscription";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 type PlansTableProps = {
     canEdit?: boolean;
@@ -100,33 +101,54 @@ export function PlansTable({ canEdit = true }: PlansTableProps) {
             <Card className="border border-slate-200 overflow-hidden bg-white shadow-none">
                 <CardContent className="p-0">
                     <div className="overflow-x-auto">
-                        <Table>
+                        <Table className="table-fixed w-full">
                             <TableHeader className="bg-slate-50/50">
                                 <TableRow className="hover:bg-transparent border-slate-100">
-                                    <TableHead className="py-4 font-semibold text-slate-700">Plan Name</TableHead>
-                                    <TableHead className="py-4 font-semibold text-slate-700">Role</TableHead>
-                                    <TableHead className="py-4 font-semibold text-slate-700">Monthly</TableHead>
-                                    <TableHead className="py-4 font-semibold text-slate-700">Yearly</TableHead>
-                                    <TableHead className="py-4 font-semibold text-slate-700 text-right">Actions</TableHead>
+                                    <TableHead className="w-1/4 py-4 font-semibold text-slate-700">Plan Name</TableHead>
+                                    <TableHead className="w-1/6 py-4 font-semibold text-slate-700">Role</TableHead>
+                                    <TableHead className="w-1/5 py-4 font-semibold text-slate-700">Monthly</TableHead>
+                                    <TableHead className="w-1/5 py-4 font-semibold text-slate-700">Yearly</TableHead>
+                                    <TableHead className="w-1/6 py-4 font-semibold text-slate-700 text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {plans?.map((plan: Plan) => (
                                     <TableRow key={plan._id || plan.id} className="border-slate-100 transition-colors">
                                         <TableCell className="py-4 font-medium text-slate-600">
-                                            <div>
-                                                <p className="font-semibold">{plan.name}</p>
-                                                <p className="text-xs text-slate-400">{plan.description}</p>
+                                            <div className="space-y-1">
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <p className="font-semibold truncate text-sm">{plan.name}</p>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        <p>{plan.name}</p>
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <p className="text-xs text-slate-400 truncate">{plan.description}</p>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        <p>{plan.description}</p>
+                                                    </TooltipContent>
+                                                </Tooltip>
                                             </div>
                                         </TableCell>
                                         <TableCell className="py-4 text-slate-600 capitalize">{plan.role}</TableCell>
                                         <TableCell className="py-4 text-slate-600">
-                                            <div>
-                                                <p>${plan.pricingMonthly}</p>
+                                            <div className="space-y-1">
+                                                <p className="font-medium">${plan.pricingMonthly}</p>
                                                 {plan.stripePriceIdMonthly ? (
-                                                    <span className="text-[10px] bg-green-50 text-green-600 px-1.5 py-0.5 rounded font-mono">
-                                                        {plan.stripePriceIdMonthly}
-                                                    </span>
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <span className="text-[10px] bg-green-50 text-green-600 px-1.5 py-0.5 rounded font-mono truncate block max-w-full">
+                                                                {plan.stripePriceIdMonthly}
+                                                            </span>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>
+                                                            <p>{plan.stripePriceIdMonthly}</p>
+                                                        </TooltipContent>
+                                                    </Tooltip>
                                                 ) : canEdit ? (
                                                     <Button
                                                         variant="link"
@@ -145,12 +167,19 @@ export function PlansTable({ canEdit = true }: PlansTableProps) {
                                             </div>
                                         </TableCell>
                                         <TableCell className="py-4 text-slate-600">
-                                            <div>
-                                                <p>${plan.pricingYearly}</p>
+                                            <div className="space-y-1">
+                                                <p className="font-medium">${plan.pricingYearly}</p>
                                                 {plan.stripePriceIdYearly ? (
-                                                    <span className="text-[10px] bg-green-50 text-green-600 px-1.5 py-0.5 rounded font-mono">
-                                                        {plan.stripePriceIdYearly}
-                                                    </span>
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <span className="text-[10px] bg-green-50 text-green-600 px-1.5 py-0.5 rounded font-mono truncate block max-w-full">
+                                                                {plan.stripePriceIdYearly}
+                                                            </span>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>
+                                                            <p>{plan.stripePriceIdYearly}</p>
+                                                        </TooltipContent>
+                                                    </Tooltip>
                                                 ) : canEdit ? (
                                                     <Button
                                                         variant="link"
