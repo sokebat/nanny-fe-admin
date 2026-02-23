@@ -163,7 +163,7 @@ export default function CourseDetailPage() {
 
     return (
         <main className="flex-1 p-8 overflow-auto bg-muted">
-            <div className="max-w-6xl mx-auto">
+            <div className="wrapper mx-auto">
                 {/* Header */}
                 <div className="mb-6">
                     <Button
