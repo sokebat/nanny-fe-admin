@@ -32,7 +32,7 @@ interface PlanDialogProps {
 export function PlanDialog({ open, onOpenChange, onSave, plan, isSubmitting = false, readOnly = false }: PlanDialogProps) {
     const [formData, setFormData] = useState<Partial<CreatePlanDto>>({
         name: "",
-        role: "caregiver",
+        role: "nanny",
         description: "",
         pricingMonthly: 0,
         pricingYearly: 0,
@@ -59,7 +59,7 @@ export function PlanDialog({ open, onOpenChange, onSave, plan, isSubmitting = fa
         } else {
             setFormData({
                 name: "",
-                role: "caregiver",
+                role: "nanny",
                 description: "",
                 pricingMonthly: 0,
                 pricingYearly: 0,
@@ -111,7 +111,7 @@ export function PlanDialog({ open, onOpenChange, onSave, plan, isSubmitting = fa
                                 <SelectValue placeholder="Select role" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="caregiver">Caregiver</SelectItem>
+                                <SelectItem value="nanny">Nanny</SelectItem>
                                 <SelectItem value="parent">Parent</SelectItem>
                                 <SelectItem value="vendor">Vendor</SelectItem>
                             </SelectContent>

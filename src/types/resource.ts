@@ -10,7 +10,7 @@ export const RESOURCE_TYPE_OPTIONS: { value: ResourceType; label: string }[] = [
     { value: 'other', label: 'Other' },
 ];
 
-export type TargetAudience = 'caregiver' | 'family' | 'vendor';
+export type TargetAudience = 'nanny' | 'parent' | 'vendor';
 
 export interface Resource {
     _id: string;

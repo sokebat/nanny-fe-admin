@@ -1,4 +1,4 @@
-export type TargetAudience = 'caregiver' | 'family' | 'vendor';
+export type TargetAudience = 'nanny' | 'parent' | 'vendor';
 
 export interface Course {
     _id: string;
