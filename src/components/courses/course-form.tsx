@@ -138,12 +138,14 @@ export function CourseForm({
         { label: "Vendor", value: "vendor" },
     ];
 
-    const toggleAudience = (value: TargetAudience) => {
-        const current = [...watchTargetAudience];
-        if (current.includes(value)) {
-            setValue("targetAudience", current.filter((v) => v !== value));
+    const selectAudience = (value: TargetAudience) => {
+        // Only allow one selection - if already selected, we could deselect or just keep it
+        // The user said "only allow to select one", which usually means clicking another replaces it.
+        const isSelected = watchTargetAudience.includes(value);
+        if (isSelected) {
+            setValue("targetAudience", []);
         } else {
-            setValue("targetAudience", [...current, value]);
+            setValue("targetAudience", [value]);
         }
     };
 
@@ -353,7 +355,7 @@ export function CourseForm({
                         </div>
 
                         <div className="space-y-4">
-                            <Label className="text-sm font-semibold">Target Audience</Label>
+                            <Label className="text-sm font-semibold text-brand-navy">Target Audience</Label>
                             <div className="flex flex-wrap gap-4">
                                 {audiences.map((audience) => {
                                     const isSelected = watchTargetAudience.includes(audience.value);
@@ -361,15 +363,22 @@ export function CourseForm({
                                         <button
                                             key={audience.value}
                                             type="button"
-                                            onClick={() => toggleAudience(audience.value)}
+                                            onClick={() => selectAudience(audience.value)}
                                             className={cn(
-                                                "flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-medium transition-all",
+                                                "group flex items-center gap-2.5 px-6 py-2.5 rounded-2xl border text-sm font-semibold transition-all duration-300",
                                                 isSelected
-                                                    ? "bg-brand-navy text-white border-brand-navy shadow-sm"
-                                                    : "bg-white text-muted-foreground border-gray-200 hover:border-brand-navy hover:text-brand-navy"
+                                                    ? "bg-brand-navy text-white border-brand-navy shadow-md scale-105"
+                                                    : "bg-white text-brand-navy/60 border-brand-navy/10 hover:border-brand-navy/30 hover:bg-brand-navy/5 hover:text-brand-navy shadow-sm"
                                             )}
                                         >
-                                            {isSelected && <Check className="w-3.5 h-3.5" />}
+                                            <div className={cn(
+                                                "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-300",
+                                                isSelected
+                                                    ? "bg-brand-orange border-brand-orange"
+                                                    : "border-brand-navy/20 group-hover:border-brand-navy/40"
+                                            )}>
+                                                {isSelected && <Check className="w-3.5 h-3.5 text-white" />}
+                                            </div>
                                             {audience.label}
                                         </button>
                                     );
