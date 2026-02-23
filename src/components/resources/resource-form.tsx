@@ -145,7 +145,7 @@ export function ResourceForm({
 
     const audiences: { label: string; value: TargetAudience }[] = [
         { label: "Caregiver", value: "caregiver" },
-        { label: "Parent", value: "parent" },
+        { label: "Family", value: "family" },
         { label: "Vendor", value: "vendor" },
     ];
 

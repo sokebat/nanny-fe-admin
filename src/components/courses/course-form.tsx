@@ -81,8 +81,8 @@ export function CourseForm({
 
     // Check both thumbnail and thumbnailUrl fields (API uses thumbnailUrl)
     const courseThumbnail = course?.thumbnailUrl || course?.thumbnail;
-    const currentThumbnailUrl = courseThumbnail && courseThumbnail.trim() !== "" 
-        ? getThumbnailUrl(courseThumbnail) 
+    const currentThumbnailUrl = courseThumbnail && courseThumbnail.trim() !== ""
+        ? getThumbnailUrl(courseThumbnail)
         : undefined;
 
     // Load edit data when course is selected
@@ -134,7 +134,7 @@ export function CourseForm({
 
     const audiences: { label: string; value: TargetAudience }[] = [
         { label: "Caregiver", value: "caregiver" },
-        { label: "Parent", value: "parent" },
+        { label: "Family", value: "family" },
         { label: "Vendor", value: "vendor" },
     ];
 
@@ -171,7 +171,7 @@ export function CourseForm({
                                         <div>Has Preview: {thumbnailPreview ? "Yes" : "No"}</div>
                                     </div>
                                 )}
-                                
+
                                 {/* Current Image Preview - Show when editing and no new preview */}
                                 {course && currentThumbnailUrl && !thumbnailPreview && (
                                     <div className="space-y-2">
@@ -225,12 +225,12 @@ export function CourseForm({
                                         </div>
                                     </div>
                                 )}
-                                
+
                                 {/* Upload Area */}
                                 <div className={thumbnailPreview || currentThumbnailUrl ? "pt-2" : ""}>
                                     <ImageUpload onUpload={handleUpload} />
                                 </div>
-                                
+
                                 {/* File Info */}
                                 {thumbnailFile && (
                                     <div className="flex items-center gap-2 text-sm">
