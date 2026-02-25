@@ -35,6 +35,7 @@ interface ResourceFormProps {
 }
 
 type ToggleField = "isActive" | "isListed" | "isPopular" | "free";
+type ToggleOption = { id: ToggleField; label: string; watched: boolean | undefined };
 
 const ALLOWED_AUDIENCES: TargetAudience[] = ["nanny", "parent", "vendor"];
 
@@ -210,6 +211,13 @@ export function ResourceForm({
         clearErrors("targetAudience");
     };
 
+    const toggleOptions: ToggleOption[] = [
+        { id: "isActive", label: "Active", watched: watchIsActive },
+        { id: "isListed", label: "Listed", watched: watchIsListed },
+        { id: "isPopular", label: "Popular", watched: watchIsPopular },
+        { id: "free", label: "Free", watched: watchFree },
+    ];
+
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
             <SheetContent className="w-full sm:max-w-2xl overflow-y-auto bg-white p-0">
@@ -326,12 +334,7 @@ export function ResourceForm({
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                            {[
-                                { id: "isActive", label: "Active", watched: watchIsActive },
-                                { id: "isListed", label: "Listed", watched: watchIsListed },
-                                { id: "isPopular", label: "Popular", watched: watchIsPopular },
-                                { id: "free", label: "Free", watched: watchFree }
-                            ].map((toggle: { id: ToggleField; label: string; watched: boolean | undefined }) => (
+                            {toggleOptions.map((toggle) => (
                                 <button
                                     key={toggle.id}
                                     type="button"
