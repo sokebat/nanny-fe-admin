@@ -10,9 +10,54 @@ import type {
     SyncTeachableResponse,
     CoursesListResponse,
     PaginatedData,
+    TargetAudience,
 } from "@/types/course";
 import type { ApiResponse } from "@/types/subscription"; 
  
+const ALLOWED_AUDIENCES: TargetAudience[] = ["nanny", "parent", "vendor"];
+
+const isTargetAudience = (value: string): value is TargetAudience => {
+    return ALLOWED_AUDIENCES.includes(value as TargetAudience);
+};
+
+const normalizeTargetAudience = (value: unknown, depth = 0): TargetAudience[] => {
+    if (!value || depth > 5) return [];
+
+    if (Array.isArray(value)) {
+        for (const item of value) {
+            const normalized = normalizeTargetAudience(item, depth + 1);
+            if (normalized.length > 0) return [normalized[0]];
+        }
+        return [];
+    }
+
+    if (typeof value === "string") {
+        const trimmed = value.trim();
+        if (!trimmed) return [];
+
+        const lower = trimmed.toLowerCase();
+        if (isTargetAudience(lower)) return [lower];
+
+        if (trimmed.includes(",")) {
+            return normalizeTargetAudience(trimmed.split(","), depth + 1);
+        }
+
+        if (trimmed.startsWith("[") || trimmed.startsWith("\"")) {
+            try {
+                return normalizeTargetAudience(JSON.parse(trimmed), depth + 1);
+            } catch {
+                return [];
+            }
+        }
+    }
+
+    return [];
+};
+
+const normalizeCourse = (course: Course): Course => ({
+    ...course,
+    targetAudience: normalizeTargetAudience(course.targetAudience),
+});
 
 class CoursesService extends ApiService {
     /**
@@ -32,7 +77,10 @@ class CoursesService extends ApiService {
         const endpoint = `/admin/courses${queryString ? `?${queryString}` : ""}`;
         
         const response = await this.get<ApiResponse<CoursesListResponse>>(endpoint, true);
-        return response.data;
+        return {
+            ...response.data,
+            courses: response.data.courses.map(normalizeCourse),
+        };
     }
 
     /**
@@ -43,7 +91,7 @@ class CoursesService extends ApiService {
             `/admin/courses/${courseId}`,
             true
         );
-        return response.data.course;
+        return normalizeCourse(response.data.course);
     }
 
     /**
@@ -62,7 +110,10 @@ class CoursesService extends ApiService {
         if (data.teachableCourseId) formData.append("teachableCourseId", data.teachableCourseId);
         if (data.isListed !== undefined) formData.append("isListed", String(data.isListed));
         if (data.isPopular !== undefined) formData.append("isPopular", String(data.isPopular));
-        if (data.targetAudience) formData.append("targetAudience", JSON.stringify(data.targetAudience));
+        const normalizedAudience = normalizeTargetAudience(data.targetAudience);
+        if (normalizedAudience.length > 0) {
+            formData.append("targetAudience", normalizedAudience[0]);
+        }
         if (data.thumbnail) formData.append("thumbnail", data.thumbnail);
 
         const config: AxiosRequestConfig = {
@@ -95,7 +146,10 @@ class CoursesService extends ApiService {
         if (data.teachableCourseId) formData.append("teachableCourseId", data.teachableCourseId);
         if (data.isListed !== undefined) formData.append("isListed", String(data.isListed));
         if (data.isPopular !== undefined) formData.append("isPopular", String(data.isPopular));
-        if (data.targetAudience !== undefined) formData.append("targetAudience", JSON.stringify(data.targetAudience));
+        const normalizedAudience = normalizeTargetAudience(data.targetAudience);
+        if (data.targetAudience !== undefined && normalizedAudience.length > 0) {
+            formData.append("targetAudience", normalizedAudience[0]);
+        }
         if (data.thumbnail) formData.append("thumbnail", data.thumbnail);
 
         const config: AxiosRequestConfig = {
@@ -110,7 +164,7 @@ class CoursesService extends ApiService {
             true,
             config
         );
-        return response.data.course;
+        return normalizeCourse(response.data.course);
     }
 
     /**

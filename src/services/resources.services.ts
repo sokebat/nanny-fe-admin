@@ -7,8 +7,54 @@ import type {
     ResourceFilters,
     ResourcesListResponse,
     ResourceStatsBase,
+    TargetAudience,
 } from "@/types/resource";
 import type { ApiResponse } from "@/types/subscription";
+
+const ALLOWED_AUDIENCES: TargetAudience[] = ["nanny", "parent", "vendor"];
+
+const isTargetAudience = (value: string): value is TargetAudience => {
+    return ALLOWED_AUDIENCES.includes(value as TargetAudience);
+};
+
+const normalizeTargetAudience = (value: unknown, depth = 0): TargetAudience[] => {
+    if (!value || depth > 5) return [];
+
+    if (Array.isArray(value)) {
+        for (const item of value) {
+            const normalized = normalizeTargetAudience(item, depth + 1);
+            if (normalized.length > 0) return [normalized[0]];
+        }
+        return [];
+    }
+
+    if (typeof value === "string") {
+        const trimmed = value.trim();
+        if (!trimmed) return [];
+
+        const lower = trimmed.toLowerCase();
+        if (isTargetAudience(lower)) return [lower];
+
+        if (trimmed.includes(",")) {
+            return normalizeTargetAudience(trimmed.split(","), depth + 1);
+        }
+
+        if (trimmed.startsWith("[") || trimmed.startsWith("\"")) {
+            try {
+                return normalizeTargetAudience(JSON.parse(trimmed), depth + 1);
+            } catch {
+                return [];
+            }
+        }
+    }
+
+    return [];
+};
+
+const normalizeResource = (resource: Resource): Resource => ({
+    ...resource,
+    targetAudience: normalizeTargetAudience(resource.targetAudience),
+});
 
 class ResourcesService extends ApiService {
     /**
@@ -28,7 +74,10 @@ class ResourcesService extends ApiService {
         const endpoint = `/admin/resources${queryString ? `?${queryString}` : ""}`;
 
         const response = await this.get<ApiResponse<ResourcesListResponse>>(endpoint, true);
-        return response.data;
+        return {
+            ...response.data,
+            resources: response.data.resources.map(normalizeResource),
+        };
     }
 
     /**
@@ -39,7 +88,7 @@ class ResourcesService extends ApiService {
             `/admin/resources/${resourceId}`,
             true
         );
-        return response.data.resource;
+        return normalizeResource(response.data.resource);
     }
 
     /**
@@ -60,7 +109,10 @@ class ResourcesService extends ApiService {
         if (data.isListed !== undefined) formData.append("isListed", String(data.isListed));
         if (data.isPopular !== undefined) formData.append("isPopular", String(data.isPopular));
         if (data.free !== undefined) formData.append("free", String(data.free));
-        if (data.targetAudience) formData.append("targetAudience", JSON.stringify(data.targetAudience));
+        const normalizedAudience = normalizeTargetAudience(data.targetAudience);
+        if (normalizedAudience.length > 0) {
+            formData.append("targetAudience", normalizedAudience[0]);
+        }
 
         if (data.file) formData.append("file", data.file);
         if (data.thumbnail) formData.append("thumbnail", data.thumbnail);
@@ -77,7 +129,7 @@ class ResourcesService extends ApiService {
             true,
             config
         );
-        return response.data.resource;
+        return normalizeResource(response.data.resource);
     }
 
     /**
@@ -97,7 +149,10 @@ class ResourcesService extends ApiService {
         if (data.isListed !== undefined) formData.append("isListed", String(data.isListed));
         if (data.isPopular !== undefined) formData.append("isPopular", String(data.isPopular));
         if (data.free !== undefined) formData.append("free", String(data.free));
-        if (data.targetAudience) formData.append("targetAudience", JSON.stringify(data.targetAudience));
+        const normalizedAudience = normalizeTargetAudience(data.targetAudience);
+        if (normalizedAudience.length > 0) {
+            formData.append("targetAudience", normalizedAudience[0]);
+        }
 
         if (data.file) formData.append("file", data.file);
         if (data.thumbnail) formData.append("thumbnail", data.thumbnail);
@@ -114,7 +169,7 @@ class ResourcesService extends ApiService {
             true,
             config
         );
-        return response.data.resource;
+        return normalizeResource(response.data.resource);
     }
 
     /**
@@ -126,7 +181,7 @@ class ResourcesService extends ApiService {
             { isListed },
             true
         );
-        return response.data.resource;
+        return normalizeResource(response.data.resource);
     }
 
     /**
@@ -138,7 +193,7 @@ class ResourcesService extends ApiService {
             { isPopular },
             true
         );
-        return response.data.resource;
+        return normalizeResource(response.data.resource);
     }
 
     /**

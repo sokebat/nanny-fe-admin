@@ -21,8 +21,8 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { ImageUpload } from "@/components/shared/image-upload";
-import type { Resource, CreateResourceDto, ResourceType, TargetAudience } from "@/types/resource";
-import { RESOURCE_TYPE_OPTIONS } from "@/types/resource";
+import type { Resource, CreateResourceDto, TargetAudience } from "@/types/resource";
+import { RESOURCE_TYPE_OPTIONS, ResourceType } from "@/types/resource";
 import { Loader2, FileText, X, Check, UploadCloud } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -33,6 +33,48 @@ interface ResourceFormProps {
     onSubmit: (data: CreateResourceDto) => Promise<void>;
     isSubmitting: boolean;
 }
+
+type ToggleField = "isActive" | "isListed" | "isPopular" | "free";
+
+const ALLOWED_AUDIENCES: TargetAudience[] = ["nanny", "parent", "vendor"];
+
+const isTargetAudience = (value: string): value is TargetAudience => {
+    return ALLOWED_AUDIENCES.includes(value as TargetAudience);
+};
+
+const normalizeTargetAudience = (value: unknown, depth = 0): TargetAudience[] => {
+    if (!value || depth > 5) return [];
+
+    if (Array.isArray(value)) {
+        for (const item of value) {
+            const normalized = normalizeTargetAudience(item, depth + 1);
+            if (normalized.length > 0) return [normalized[0]];
+        }
+        return [];
+    }
+
+    if (typeof value === "string") {
+        const trimmed = value.trim();
+        if (!trimmed) return [];
+
+        const lower = trimmed.toLowerCase();
+        if (isTargetAudience(lower)) return [lower];
+
+        if (trimmed.includes(",")) {
+            return normalizeTargetAudience(trimmed.split(","), depth + 1);
+        }
+
+        if (trimmed.startsWith("[") || trimmed.startsWith("\"")) {
+            try {
+                return normalizeTargetAudience(JSON.parse(trimmed), depth + 1);
+            } catch {
+                return [];
+            }
+        }
+    }
+
+    return [];
+};
 
 export function ResourceForm({
     open,
@@ -51,13 +93,15 @@ export function ResourceForm({
         reset,
         watch,
         setValue,
+        setError,
+        clearErrors,
         formState: { errors },
     } = useForm<CreateResourceDto>({
         defaultValues: {
             title: "",
             description: "",
             category: "",
-            type: "pdf",
+            type: ResourceType.PDF,
             url: "",
             teachableResourceId: "",
             isActive: true,
@@ -73,7 +117,7 @@ export function ResourceForm({
     const watchIsListed = watch("isListed");
     const watchIsPopular = watch("isPopular");
     const watchFree = watch("free");
-    const watchTargetAudience = watch("targetAudience") || [];
+    const watchTargetAudience = normalizeTargetAudience(watch("targetAudience"));
 
     // Helper to get thumbnail URL
     const getThumbnailUrl = (url?: string): string | undefined => {
@@ -96,15 +140,16 @@ export function ResourceForm({
                 isListed: resource.isListed,
                 isPopular: resource.isPopular,
                 free: resource.free ?? false,
-                targetAudience: resource.targetAudience,
+                targetAudience: normalizeTargetAudience(resource.targetAudience),
             });
+            clearErrors("targetAudience");
             setThumbnailPreview(getThumbnailUrl(resource.thumbnailUrl) || null);
         } else {
             reset({
                 title: "",
                 description: "",
                 category: "",
-                type: "pdf",
+                type: ResourceType.PDF,
                 url: "",
                 teachableResourceId: "",
                 isActive: true,
@@ -113,11 +158,12 @@ export function ResourceForm({
                 free: false,
                 targetAudience: [],
             });
+            clearErrors("targetAudience");
             setFile(null);
             setThumbnail(null);
             setThumbnailPreview(null);
         }
-    }, [resource, reset, open]);
+    }, [resource, reset, open, clearErrors]);
 
     // Cleanup preview URL
     useEffect(() => {
@@ -135,8 +181,18 @@ export function ResourceForm({
     };
 
     const handleFormSubmit = async (data: CreateResourceDto) => {
+        const normalizedAudience = normalizeTargetAudience(data.targetAudience);
+        if (normalizedAudience.length === 0) {
+            setError("targetAudience", {
+                type: "manual",
+                message: "Please select one target audience.",
+            });
+            return;
+        }
+
         const payload: CreateResourceDto = {
             ...data,
+            targetAudience: normalizedAudience,
             file: file || undefined,
             thumbnail: thumbnail || undefined,
         };
@@ -149,13 +205,9 @@ export function ResourceForm({
         { label: "Vendor", value: "vendor" },
     ];
 
-    const toggleAudience = (value: TargetAudience) => {
-        const current = [...watchTargetAudience];
-        if (current.includes(value)) {
-            setValue("targetAudience", current.filter((v) => v !== value));
-        } else {
-            setValue("targetAudience", [...current, value]);
-        }
+    const selectAudience = (value: TargetAudience) => {
+        setValue("targetAudience", [value]);
+        clearErrors("targetAudience");
     };
 
     return (
@@ -254,7 +306,7 @@ export function ResourceForm({
                                         <button
                                             key={audience.value}
                                             type="button"
-                                            onClick={() => toggleAudience(audience.value)}
+                                            onClick={() => selectAudience(audience.value)}
                                             className={cn(
                                                 "flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-medium transition-all",
                                                 isSelected
@@ -268,6 +320,9 @@ export function ResourceForm({
                                     );
                                 })}
                             </div>
+                            {errors.targetAudience && (
+                                <p className="text-xs text-red-500">{errors.targetAudience.message}</p>
+                            )}
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
@@ -276,11 +331,11 @@ export function ResourceForm({
                                 { id: "isListed", label: "Listed", watched: watchIsListed },
                                 { id: "isPopular", label: "Popular", watched: watchIsPopular },
                                 { id: "free", label: "Free", watched: watchFree }
-                            ].map((toggle) => (
+                            ].map((toggle: { id: ToggleField; label: string; watched: boolean | undefined }) => (
                                 <button
                                     key={toggle.id}
                                     type="button"
-                                    onClick={() => setValue(toggle.id as any, !toggle.watched)}
+                                    onClick={() => setValue(toggle.id, !toggle.watched)}
                                     className={cn(
                                         "flex items-center justify-between p-4 rounded-xl border transition-all",
                                         toggle.watched

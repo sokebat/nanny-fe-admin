@@ -20,8 +20,8 @@ import {
     MoreHorizontal,
     Pencil
 } from "lucide-react";
-import type { Resource, ResourceType } from "@/types/resource";
-import { RESOURCE_TYPE_OPTIONS } from "@/types/resource";
+import type { Resource } from "@/types/resource";
+import { RESOURCE_TYPE_OPTIONS, ResourceType } from "@/types/resource";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
@@ -33,15 +33,16 @@ interface ResourcesTableProps {
     onToggleListing?: (resourceId: string, isListed: boolean) => void;
     onTogglePopular?: (resourceId: string, isPopular: boolean) => void;
     isDeleting?: boolean;
+    deletingResourceId?: string | null;
 }
 
 const TypeIcon = ({ type }: { type: ResourceType }) => {
     switch (type) {
-        case "pdf": return <FileText className="w-4 h-4 text-orange-500" />;
-        case "video": return <Video className="w-4 h-4 text-blue-500" />;
-        case "audio": return <Volume2 className="w-4 h-4 text-purple-500" />;
-        case "article":
-        case "link": return <LinkIcon className="w-4 h-4 text-green-500" />;
+        case ResourceType.PDF: return <FileText className="w-4 h-4 text-orange-500" />;
+        case ResourceType.VIDEO: return <Video className="w-4 h-4 text-blue-500" />;
+        case ResourceType.AUDIO: return <Volume2 className="w-4 h-4 text-purple-500" />;
+        case ResourceType.ARTICLE:
+        case ResourceType.LINK: return <LinkIcon className="w-4 h-4 text-green-500" />;
         default: return <MoreHorizontal className="w-4 h-4 text-gray-400" />;
     }
 };
@@ -54,6 +55,7 @@ export function ResourcesTable({
     onToggleListing,
     onTogglePopular,
     isDeleting = false,
+    deletingResourceId = null,
 }: ResourcesTableProps) {
     if (resources.length === 0) {
         return (
@@ -79,7 +81,11 @@ export function ResourcesTable({
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {resources.map((resource) => (
+                    {resources.map((resource) => {
+                        const isDeletingThisResource =
+                            isDeleting && deletingResourceId === resource._id;
+
+                        return (
                         <TableRow key={resource._id} className="group transition-colors hover:bg-muted/20">
                             <TableCell className="py-4">
                                 <div className="flex flex-col gap-0.5">
@@ -181,10 +187,10 @@ export function ResourcesTable({
                                             size="icon"
                                             className="h-8 w-8 text-red-400 hover:text-red-500 hover:bg-red-50 transition-all focus:ring-0"
                                             onClick={() => onDelete(resource._id)}
-                                            disabled={isDeleting}
+                                            disabled={isDeletingThisResource}
                                             title="Delete Resource"
                                         >
-                                            {isDeleting ? (
+                                            {isDeletingThisResource ? (
                                                 <Loader2 className="w-3 h-3 animate-spin" />
                                             ) : (
                                                 <Trash2 className="w-4 h-4" />
@@ -194,7 +200,8 @@ export function ResourcesTable({
                                 </div>
                             </TableCell>
                         </TableRow>
-                    ))}
+                        );
+                    })}
                 </TableBody>
             </Table>
         </div>

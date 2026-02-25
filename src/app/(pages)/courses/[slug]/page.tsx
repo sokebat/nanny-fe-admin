@@ -283,7 +283,7 @@ export default function CourseDetailPage() {
                                     </span>
                                 </div>
 
-                                {course.ratingCount > 0 && (
+                                {/* {course.ratingCount > 0 && (
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2 text-muted-foreground">
                                             <Star className="w-4 h-4" />
@@ -298,7 +298,7 @@ export default function CourseDetailPage() {
                                             </span>
                                         </div>
                                     </div>
-                                )}
+                                )} */}
 
                                 {course.targetAudience && course.targetAudience.length > 0 && (
                                     <div className="flex items-start justify-between">

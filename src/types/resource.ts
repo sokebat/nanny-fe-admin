@@ -1,16 +1,22 @@
-export type ResourceType = 'pdf' | 'video' | 'audio' | 'article' | 'link' | 'other';
+export enum ResourceType {
+    PDF = "pdf",
+    VIDEO = "video",
+    AUDIO = "audio",
+    ARTICLE = "article",
+    LINK = "link",
+    OTHER = "other",
+}
 
-/** Display options for filter/forms — only these six types. */
 export const RESOURCE_TYPE_OPTIONS: { value: ResourceType; label: string }[] = [
-    { value: 'pdf', label: 'PDF' },
-    { value: 'video', label: 'Video' },
-    { value: 'audio', label: 'Audio' },
-    { value: 'article', label: 'Article' },
-    { value: 'link', label: 'Link' },
-    { value: 'other', label: 'Other' },
+    { value: ResourceType.PDF, label: "PDF" },
+    { value: ResourceType.VIDEO, label: "Video" },
+    { value: ResourceType.AUDIO, label: "Audio" },
+    { value: ResourceType.ARTICLE, label: "Article" },
+    { value: ResourceType.LINK, label: "Link" },
+    { value: ResourceType.OTHER, label: "Other" },
 ];
 
-export type TargetAudience = 'nanny' | 'parent' | 'vendor';
+export type TargetAudience = "nanny" | "parent" | "vendor";
 
 export interface Resource {
     _id: string;
@@ -25,8 +31,8 @@ export interface Resource {
     free?: boolean;
     targetAudience: TargetAudience[];
     teachableResourceId?: string;
-    fileUrl?: string; // S3 URL
-    thumbnailUrl?: string; // S3 URL
+    fileUrl?: string;
+    thumbnailUrl?: string;
     viewCount: number;
     createdAt: string;
     updatedAt: string;
@@ -48,7 +54,7 @@ export interface CreateResourceDto {
     thumbnail?: File;
 }
 
-export interface UpdateResourceDto extends Partial<CreateResourceDto> { }
+export type UpdateResourceDto = Partial<CreateResourceDto>;
 
 export interface ResourceFilters {
     page?: number;

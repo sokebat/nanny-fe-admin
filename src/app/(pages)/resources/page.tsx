@@ -9,7 +9,6 @@ import {
     DeleteResourceDialog,
 } from "@/components/resources";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
     Select,
     SelectContent,
@@ -20,15 +19,13 @@ import {
 import { useResources } from "@/hooks/use-resources";
 import type { CreateResourceDto, UpdateResourceDto, Resource, ResourceType } from "@/types/resource";
 import { RESOURCE_TYPE_OPTIONS } from "@/types/resource";
-import { Search, Loader2, X } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 const ManageResources = () => {
     const [formOpen, setFormOpen] = useState(false);
     const [editResource, setEditResource] = useState<Resource | null>(null);
     const [deleteResourceId, setDeleteResourceId] = useState<string | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
-    const [searchQuery, setSearchQuery] = useState("");
-    const [debouncedSearch, setDebouncedSearch] = useState("");
     const [typeFilter, setTypeFilter] = useState<ResourceType | "">("");
     const limit = 10;
 
@@ -44,7 +41,6 @@ const ManageResources = () => {
     } = useResources({
         page: currentPage,
         limit,
-        search: debouncedSearch,
         type: typeFilter || undefined,
     });
 
@@ -54,18 +50,6 @@ const ManageResources = () => {
     const stats = getResourceStatsQuery.data;
 
     // Handlers
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault();
-        setDebouncedSearch(searchQuery);
-        setCurrentPage(1);
-    };
-
-    const clearSearch = () => {
-        setSearchQuery("");
-        setDebouncedSearch("");
-        setCurrentPage(1);
-    };
-
     const handleTypeChange = (value: string) => {
         setTypeFilter(value === "all" ? "" : (value as ResourceType));
         setCurrentPage(1);
@@ -143,24 +127,6 @@ const ManageResources = () => {
                     </div>
 
                     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-wrap">
-                        <form onSubmit={handleSearch} className="relative flex-1 sm:flex-initial">
-                            <Input
-                                placeholder="Search resources..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-10 pr-10 w-full sm:w-[250px] md:w-[300px] h-11 rounded-xl border-slate-200 focus-visible:ring-brand-navy"
-                            />
-                            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                            {searchQuery && (
-                                <button
-                                    type="button"
-                                    onClick={clearSearch}
-                                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                                >
-                                    <X className="w-4 h-4" />
-                                </button>
-                            )}
-                        </form>
                         <Select
                             value={typeFilter || "all"}
                             onValueChange={handleTypeChange}
@@ -220,6 +186,7 @@ const ManageResources = () => {
                                 onToggleListing={handleToggleListing}
                                 onTogglePopular={handleTogglePopular}
                                 isDeleting={deleteResource.isPending}
+                                deletingResourceId={deleteResourceId}
                             />
 
                             <ResourcePagination
