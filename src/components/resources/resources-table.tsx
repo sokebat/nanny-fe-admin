@@ -18,7 +18,7 @@ import {
     Volume2,
     Link as LinkIcon,
     MoreHorizontal,
-    Pencil
+    Pencil,
 } from "lucide-react";
 import type { Resource } from "@/types/resource";
 import { RESOURCE_TYPE_OPTIONS, ResourceType } from "@/types/resource";
@@ -38,12 +38,17 @@ interface ResourcesTableProps {
 
 const TypeIcon = ({ type }: { type: ResourceType }) => {
     switch (type) {
-        case ResourceType.PDF: return <FileText className="w-4 h-4 text-orange-500" />;
-        case ResourceType.VIDEO: return <Video className="w-4 h-4 text-blue-500" />;
-        case ResourceType.AUDIO: return <Volume2 className="w-4 h-4 text-purple-500" />;
+        case ResourceType.PDF:
+            return <FileText className="w-4 h-4 text-orange-500" />;
+        case ResourceType.VIDEO:
+            return <Video className="w-4 h-4 text-blue-500" />;
+        case ResourceType.AUDIO:
+            return <Volume2 className="w-4 h-4 text-purple-500" />;
         case ResourceType.ARTICLE:
-        case ResourceType.LINK: return <LinkIcon className="w-4 h-4 text-green-500" />;
-        default: return <MoreHorizontal className="w-4 h-4 text-gray-400" />;
+        case ResourceType.LINK:
+            return <LinkIcon className="w-4 h-4 text-green-500" />;
+        default:
+            return <MoreHorizontal className="w-4 h-4 text-gray-400" />;
     }
 };
 
@@ -82,124 +87,128 @@ export function ResourcesTable({
                 </TableHeader>
                 <TableBody>
                     {resources.map((resource) => {
-                        const isDeletingThisResource =
-                            isDeleting && deletingResourceId === resource._id;
+                        const isDeletingThisResource = isDeleting && deletingResourceId === resource._id;
 
                         return (
-                        <TableRow key={resource._id} className="group transition-colors hover:bg-muted/20">
-                            <TableCell className="py-4">
-                                <div className="flex flex-col gap-0.5">
-                                    <Link
-                                        href={`/resources/${resource._id}`}
-                                        className="font-bold text-foreground group-hover:text-brand-navy transition-colors hover:underline underline-offset-4"
-                                    >
-                                        {resource.title}
-                                    </Link>
-                                    {resource.description && (
-                                        <span className="text-[11px] text-muted-foreground truncate max-w-[240px]">
-                                            {resource.description}
-                                        </span>
-                                    )}
-                                </div>
-                            </TableCell>
-                            <TableCell className="py-4">
-                                <div className="flex items-center gap-2">
-                                    <TypeIcon type={resource.type} />
-                                    <span className="text-sm font-medium">
-                                        {RESOURCE_TYPE_OPTIONS.find((o) => o.value === resource.type)?.label ?? resource.type}
-                                    </span>
-                                </div>
-                            </TableCell>
-                            <TableCell className="py-4 text-sm font-medium">
-                                <span className="bg-gray-100 px-2.5 py-1 rounded-md text-[10px] uppercase tracking-wider text-muted-foreground">
-                                    {resource.category || "Uncategorized"}
-                                </span>
-                            </TableCell>
-                            <TableCell className="py-4 text-center">
-                                {resource.free ? (
-                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                        Free
-                                    </span>
-                                ) : (
-                                    <span className="text-muted-foreground text-xs">—</span>
-                                )}
-                            </TableCell>
-                            <TableCell className="py-4 text-center">
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => onTogglePopular?.(resource._id, !resource.isPopular)}
-                                    className={cn(
-                                        "h-8 w-8 p-0 rounded-full transition-all border",
-                                        resource.isPopular
-                                            ? "text-yellow-600 bg-yellow-50 border-yellow-200 hover:bg-yellow-100 shadow-sm shadow-yellow-500/10"
-                                            : "text-slate-300 border-transparent hover:bg-slate-50 hover:text-slate-400"
-                                    )}
-                                    title={resource.isPopular ? "Popular (Click to remove)" : "Mark as Popular"}
-                                >
-                                    <Star className={cn("w-4 h-4", resource.isPopular && "fill-current")} />
-                                </Button>
-                            </TableCell>
-                            <TableCell className="py-4 text-center">
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => onToggleListing?.(resource._id, !resource.isListed)}
-                                    className={cn(
-                                        "h-8 w-8 p-0 rounded-full transition-all border",
-                                        resource.isListed
-                                            ? "text-green-600 bg-green-50 border-green-200 hover:bg-green-100 shadow-sm shadow-green-500/10"
-                                            : "text-slate-300 border-transparent hover:bg-slate-50 hover:text-slate-400"
-                                    )}
-                                    title={resource.isListed ? "Listed (Click to unlist)" : "List Resource"}
-                                >
-                                    <Globe className="w-4 h-4" />
-                                </Button>
-                            </TableCell>
-                            <TableCell className="py-4 font-mono text-xs">{resource.viewCount.toLocaleString()}</TableCell>
-                            <TableCell className="py-4 text-right">
-                                <div className="flex justify-end gap-1">
-                                    <Button
-                                        asChild
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-8 w-8 text-slate-500 hover:bg-brand-navy/5 hover:text-brand-navy transition-all"
-                                        title="View Details"
-                                    >
-                                        <Link href={`/resources/${resource._id}`}>
-                                            <Eye className="w-4 h-4" />
+                            <TableRow key={resource._id} className="group transition-colors hover:bg-muted/20">
+                                <TableCell className="py-4">
+                                    <div className="flex flex-col gap-0.5">
+                                        <Link
+                                            href={`/resources/${resource._id}`}
+                                            className="font-bold text-foreground group-hover:text-brand-navy transition-colors hover:underline underline-offset-4"
+                                        >
+                                            {resource.title}
                                         </Link>
+                                        {resource.description && (
+                                            <span className="text-[11px] text-muted-foreground truncate max-w-[240px]">
+                                                {resource.description}
+                                            </span>
+                                        )}
+                                    </div>
+                                </TableCell>
+                                <TableCell className="py-4">
+                                    <div className="flex items-center gap-2">
+                                        <TypeIcon type={resource.type} />
+                                        <span className="text-sm font-medium">
+                                            {RESOURCE_TYPE_OPTIONS.find((o) => o.value === resource.type)?.label ??
+                                                resource.type}
+                                        </span>
+                                    </div>
+                                </TableCell>
+                                <TableCell className="py-4 text-sm font-medium">
+                                    <span className="bg-gray-100 px-2.5 py-1 rounded-md text-[10px] uppercase tracking-wider text-muted-foreground">
+                                        {resource.category || "Uncategorized"}
+                                    </span>
+                                </TableCell>
+                                <TableCell className="py-4 text-center">
+                                    {resource.free ? (
+                                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                            Free
+                                        </span>
+                                    ) : (
+                                        <span className="text-muted-foreground text-xs">-</span>
+                                    )}
+                                </TableCell>
+                                <TableCell className="py-4 text-center">
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => onTogglePopular?.(resource._id, !resource.isPopular)}
+                                        className={cn(
+                                            "h-8 w-8 p-0 rounded-full transition-all border",
+                                            resource.isPopular
+                                                ? "text-yellow-600 bg-yellow-50 border-yellow-200 hover:bg-yellow-100 shadow-sm shadow-yellow-500/10"
+                                                : "text-slate-300 border-transparent hover:bg-slate-50 hover:text-slate-400"
+                                        )}
+                                        aria-label={resource.isPopular ? "Remove popular status" : "Mark resource as popular"}
+                                        title={resource.isPopular ? "Popular (Click to remove)" : "Mark as Popular"}
+                                    >
+                                        <Star className={cn("w-4 h-4", resource.isPopular && "fill-current")} />
                                     </Button>
-                                    {onEdit && (
+                                </TableCell>
+                                <TableCell className="py-4 text-center">
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => onToggleListing?.(resource._id, !resource.isListed)}
+                                        className={cn(
+                                            "h-8 w-8 p-0 rounded-full transition-all border",
+                                            resource.isListed
+                                                ? "text-green-600 bg-green-50 border-green-200 hover:bg-green-100 shadow-sm shadow-green-500/10"
+                                                : "text-slate-300 border-transparent hover:bg-slate-50 hover:text-slate-400"
+                                        )}
+                                        aria-label={resource.isListed ? "Unlist resource" : "List resource"}
+                                        title={resource.isListed ? "Listed (Click to unlist)" : "List Resource"}
+                                    >
+                                        <Globe className="w-4 h-4" />
+                                    </Button>
+                                </TableCell>
+                                <TableCell className="py-4 font-mono text-xs">
+                                    {resource.viewCount.toLocaleString()}
+                                </TableCell>
+                                <TableCell className="py-4 text-right">
+                                    <div className="flex justify-end gap-1">
                                         <Button
+                                            asChild
                                             variant="ghost"
                                             size="icon"
                                             className="h-8 w-8 text-slate-500 hover:bg-brand-navy/5 hover:text-brand-navy transition-all"
-                                            onClick={() => onEdit(resource._id)}
-                                            title="Edit Resource"
+                                            title="View Details"
                                         >
-                                            <Pencil className="w-4 h-4" />
+                                            <Link href={`/resources/${resource._id}`}>
+                                                <Eye className="w-4 h-4" />
+                                            </Link>
                                         </Button>
-                                    )}
-                                    {onDelete && (
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="h-8 w-8 text-red-400 hover:text-red-500 hover:bg-red-50 transition-all focus:ring-0"
-                                            onClick={() => onDelete(resource._id)}
-                                            disabled={isDeletingThisResource}
-                                            title="Delete Resource"
-                                        >
-                                            {isDeletingThisResource ? (
-                                                <Loader2 className="w-3 h-3 animate-spin" />
-                                            ) : (
-                                                <Trash2 className="w-4 h-4" />
-                                            )}
-                                        </Button>
-                                    )}
-                                </div>
-                            </TableCell>
-                        </TableRow>
+                                        {onEdit && (
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-8 w-8 text-slate-500 hover:bg-brand-navy/5 hover:text-brand-navy transition-all"
+                                                onClick={() => onEdit(resource._id)}
+                                                title="Edit Resource"
+                                            >
+                                                <Pencil className="w-4 h-4" />
+                                            </Button>
+                                        )}
+                                        {onDelete && (
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-8 w-8 text-red-400 hover:text-red-500 hover:bg-red-50 transition-all focus:ring-0"
+                                                onClick={() => onDelete(resource._id)}
+                                                disabled={isDeletingThisResource}
+                                                title="Delete Resource"
+                                            >
+                                                {isDeletingThisResource ? (
+                                                    <Loader2 className="w-3 h-3 animate-spin" />
+                                                ) : (
+                                                    <Trash2 className="w-4 h-4" />
+                                                )}
+                                            </Button>
+                                        )}
+                                    </div>
+                                </TableCell>
+                            </TableRow>
                         );
                     })}
                 </TableBody>

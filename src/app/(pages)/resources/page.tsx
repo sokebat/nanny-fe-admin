@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     ResourcesTable,
     ResourceForm,
@@ -20,6 +20,8 @@ import { useResources } from "@/hooks/use-resources";
 import type { CreateResourceDto, UpdateResourceDto, Resource, ResourceType } from "@/types/resource";
 import { RESOURCE_TYPE_OPTIONS } from "@/types/resource";
 import { Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const ManageResources = () => {
     const [formOpen, setFormOpen] = useState(false);
@@ -27,7 +29,19 @@ const ManageResources = () => {
     const [deleteResourceId, setDeleteResourceId] = useState<string | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [typeFilter, setTypeFilter] = useState<ResourceType | "">("");
+    const [audienceFilter, setAudienceFilter] = useState<"all" | "nanny" | "parent" | "vendor">("all");
+    const [searchInput, setSearchInput] = useState("");
+    const [searchFilter, setSearchFilter] = useState("");
     const limit = 10;
+
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            setSearchFilter(searchInput.trim());
+            setCurrentPage(1);
+        }, 300);
+
+        return () => clearTimeout(timeoutId);
+    }, [searchInput]);
 
     // Fetch resources and stats
     const {
@@ -42,6 +56,8 @@ const ManageResources = () => {
         page: currentPage,
         limit,
         type: typeFilter || undefined,
+        search: searchFilter || undefined,
+        targetAudience: audienceFilter === "all" ? undefined : audienceFilter,
     });
 
     const resources = getResourcesQuery.data?.resources || [];
@@ -52,6 +68,11 @@ const ManageResources = () => {
     // Handlers
     const handleTypeChange = (value: string) => {
         setTypeFilter(value === "all" ? "" : (value as ResourceType));
+        setCurrentPage(1);
+    };
+
+    const handleAudienceChange = (value: string) => {
+        setAudienceFilter(value as "all" | "nanny" | "parent" | "vendor");
         setCurrentPage(1);
     };
 
@@ -84,7 +105,7 @@ const ManageResources = () => {
                 await createResource.mutateAsync(data);
             }
             handleCloseForm();
-        } catch (error) {
+        } catch {
             // Error is handled by the hook
         }
     };
@@ -94,7 +115,7 @@ const ManageResources = () => {
             try {
                 await deleteResource.mutateAsync(deleteResourceId);
                 setDeleteResourceId(null);
-            } catch (error) {
+            } catch {
                 // Error is handled by the hook
             }
         }
@@ -103,7 +124,7 @@ const ManageResources = () => {
     const handleToggleListing = async (resourceId: string, isListed: boolean) => {
         try {
             await toggleListing.mutateAsync({ resourceId, isListed });
-        } catch (error) {
+        } catch {
             // Error is handled by the hook
         }
     };
@@ -111,7 +132,7 @@ const ManageResources = () => {
     const handleTogglePopular = async (resourceId: string, isPopular: boolean) => {
         try {
             await togglePopular.mutateAsync({ resourceId, isPopular });
-        } catch (error) {
+        } catch {
             // Error is handled by the hook
         }
     };
@@ -127,6 +148,18 @@ const ManageResources = () => {
                     </div>
 
                     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-wrap">
+                        <div className="w-full sm:w-[260px] space-y-1">
+                            <Label htmlFor="resource-search" className="sr-only">
+                                Search resources
+                            </Label>
+                            <Input
+                                id="resource-search"
+                                value={searchInput}
+                                onChange={(e) => setSearchInput(e.target.value)}
+                                placeholder="Search title, category, or description..."
+                                className="h-11 rounded-xl border-slate-200 text-sm"
+                            />
+                        </div>
                         <Select
                             value={typeFilter || "all"}
                             onValueChange={handleTypeChange}
@@ -141,6 +174,20 @@ const ManageResources = () => {
                                         {opt.label}
                                     </SelectItem>
                                 ))}
+                            </SelectContent>
+                        </Select>
+                        <Select
+                            value={audienceFilter}
+                            onValueChange={handleAudienceChange}
+                        >
+                            <SelectTrigger className="h-11 w-full sm:w-[160px] rounded-xl border-slate-200 focus:ring-brand-navy text-sm font-medium">
+                                <SelectValue placeholder="Audience" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All audiences</SelectItem>
+                                <SelectItem value="nanny">Nanny</SelectItem>
+                                <SelectItem value="parent">Parent</SelectItem>
+                                <SelectItem value="vendor">Vendor</SelectItem>
                             </SelectContent>
                         </Select>
                         <Button
@@ -179,6 +226,26 @@ const ManageResources = () => {
                         </div>
                     ) : (
                         <div className="space-y-6">
+                            <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                                <span className="rounded-full bg-slate-100 px-3 py-1">
+                                    {total.toLocaleString()} total resources
+                                </span>
+                                {searchFilter && (
+                                    <span className="rounded-full bg-slate-100 px-3 py-1">
+                                        Search: {searchFilter}
+                                    </span>
+                                )}
+                                {typeFilter && (
+                                    <span className="rounded-full bg-slate-100 px-3 py-1 uppercase">
+                                        Type: {typeFilter}
+                                    </span>
+                                )}
+                                {audienceFilter !== "all" && (
+                                    <span className="rounded-full bg-slate-100 px-3 py-1 capitalize">
+                                        Audience: {audienceFilter}
+                                    </span>
+                                )}
+                            </div>
                             <ResourcesTable
                                 resources={resources}
                                 onEdit={handleEdit}

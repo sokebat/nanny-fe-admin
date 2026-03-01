@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
+
 import {
     Sheet,
     SheetContent,
@@ -87,6 +88,9 @@ export function ResourceForm({
     const [file, setFile] = useState<File | null>(null);
     const [thumbnail, setThumbnail] = useState<File | null>(null);
     const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
+    const [fileError, setFileError] = useState<string | null>(null);
+    const thumbnailUploadId = useId();
+    const fileUploadId = useId();
 
     const {
         register,
@@ -175,10 +179,31 @@ export function ResourceForm({
         };
     }, [thumbnailPreview, thumbnail]);
 
-    const handleThumbnailUpload = (file: File) => {
-        setThumbnail(file);
-        const preview = URL.createObjectURL(file);
+    const handleThumbnailUpload = (nextFile: File) => {
+        setThumbnail((prev) => {
+            if (prev && thumbnailPreview?.startsWith("blob:")) {
+                URL.revokeObjectURL(thumbnailPreview);
+            }
+            return nextFile;
+        });
+        const preview = URL.createObjectURL(nextFile);
         setThumbnailPreview(preview);
+    };
+
+    const handleFileChange = (nextFile: File | null) => {
+        setFile(nextFile);
+        if (nextFile) {
+            setFileError(null);
+        }
+    };
+
+    const allowedAcceptByType: Record<ResourceType, string | undefined> = {
+        [ResourceType.PDF]: ".pdf,application/pdf",
+        [ResourceType.AUDIO]: "audio/*",
+        [ResourceType.VIDEO]: "video/*",
+        [ResourceType.ARTICLE]: undefined,
+        [ResourceType.LINK]: undefined,
+        [ResourceType.OTHER]: undefined,
     };
 
     const handleFormSubmit = async (data: CreateResourceDto) => {
@@ -191,8 +216,35 @@ export function ResourceForm({
             return;
         }
 
+        const trimmedUrl = data.url?.trim() ?? "";
+        const requiresUrl = data.type === ResourceType.LINK || data.type === ResourceType.ARTICLE;
+        const requiresUpload =
+            data.type === ResourceType.PDF ||
+            data.type === ResourceType.AUDIO ||
+            data.type === ResourceType.VIDEO;
+
+        if (requiresUrl && !trimmedUrl) {
+            setError("url", {
+                type: "manual",
+                message: "URL is required for link or article resources.",
+            });
+            return;
+        }
+
+        if (!trimmedUrl) {
+            clearErrors("url");
+        }
+
+        if (requiresUpload && !file && !resource?.fileUrl) {
+            setFileError("Please upload a file for PDF, audio, or video resources.");
+            return;
+        }
+
+        setFileError(null);
+
         const payload: CreateResourceDto = {
             ...data,
+            url: trimmedUrl || undefined,
             targetAudience: normalizedAudience,
             file: file || undefined,
             thumbnail: thumbnail || undefined,
@@ -287,8 +339,12 @@ export function ResourceForm({
                                     id="url"
                                     placeholder="https://example.com/resource"
                                     {...register("url")}
-                                    className="h-11"
+                                    className={cn(
+                                        "h-11",
+                                        errors.url && "border-red-500 focus-visible:ring-red-500"
+                                    )}
                                 />
+                                {errors.url && <p className="text-xs text-red-500">{errors.url.message}</p>}
                             </div>
                         </div>
 
@@ -315,6 +371,7 @@ export function ResourceForm({
                                             key={audience.value}
                                             type="button"
                                             onClick={() => selectAudience(audience.value)}
+                                            aria-pressed={isSelected}
                                             className={cn(
                                                 "flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-medium transition-all",
                                                 isSelected
@@ -339,6 +396,7 @@ export function ResourceForm({
                                     key={toggle.id}
                                     type="button"
                                     onClick={() => setValue(toggle.id, !toggle.watched)}
+                                    aria-pressed={Boolean(toggle.watched)}
                                     className={cn(
                                         "flex items-center justify-between p-4 rounded-xl border transition-all",
                                         toggle.watched
@@ -379,7 +437,7 @@ export function ResourceForm({
                                                 size="sm"
                                                 type="button"
                                                 className="h-8"
-                                                onClick={() => document.getElementById("thumbnail-upload")?.click()}
+                                                onClick={() => document.getElementById(thumbnailUploadId)?.click()}
                                             >
                                                 Change Image
                                             </Button>
@@ -406,7 +464,7 @@ export function ResourceForm({
                                     </div>
                                 ) : (
                                     <div
-                                        onClick={() => document.getElementById("thumbnail-upload")?.click()}
+                                        onClick={() => document.getElementById(thumbnailUploadId)?.click()}
                                         className="h-32 border-2 border-dashed rounded-xl flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-muted/30 transition-colors border-gray-200"
                                     >
                                         <UploadCloud className="w-6 h-6 text-muted-foreground" />
@@ -415,7 +473,7 @@ export function ResourceForm({
                                 )}
                                 <div className="hidden">
                                     <ImageUpload
-                                        id="thumbnail-upload"
+                                        id={thumbnailUploadId}
                                         onUpload={handleThumbnailUpload}
                                     />
                                 </div>
@@ -426,12 +484,13 @@ export function ResourceForm({
                                 <div className="relative h-32">
                                     <input
                                         type="file"
-                                        id="resource-file"
+                                        id={fileUploadId}
                                         className="sr-only"
-                                        onChange={(e) => setFile(e.target.files?.[0] || null)}
+                                        accept={allowedAcceptByType[watchType]}
+                                        onChange={(e) => handleFileChange(e.target.files?.[0] || null)}
                                     />
                                     <label
-                                        htmlFor="resource-file"
+                                        htmlFor={fileUploadId}
                                         className={cn(
                                             "h-full w-full border-2 border-dashed rounded-xl flex flex-col items-center justify-center gap-3 cursor-pointer transition-all p-4",
                                             file
@@ -454,7 +513,7 @@ export function ResourceForm({
                                     {file && (
                                         <button
                                             type="button"
-                                            onClick={() => setFile(null)}
+                                            onClick={() => handleFileChange(null)}
                                             className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600 transition-colors"
                                         >
                                             <X className="w-3 h-3" />
@@ -477,6 +536,7 @@ export function ResourceForm({
                                         </a>
                                     </div>
                                 )}
+                                {fileError && <p className="text-xs text-red-500">{fileError}</p>}
                             </div>
                         </div>
                     </div>
