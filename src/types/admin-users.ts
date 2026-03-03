@@ -233,8 +233,16 @@ export interface RestrictionAppeal {
         firstName?: string;
         lastName?: string;
     };
+    user?: {
+        _id: string;
+        email?: string;
+        role?: AdminUsersRoleFilter;
+        firstName?: string;
+        lastName?: string;
+    };
     status: RestrictionAppealStatus;
     reason?: string;
+    description?: string;
     appealReason?: string;
     adminNote?: string;
     reviewedBy?: string;

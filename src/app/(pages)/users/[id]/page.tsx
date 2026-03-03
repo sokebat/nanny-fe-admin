@@ -151,8 +151,8 @@ export default function UserDetailsPage({ params }: { params: Promise<{ id: stri
     };
 
     return (
-        <main className="flex-1 p-4 md:p-8 overflow-auto bg-muted">
-            <div className="max-w-7xl mx-auto space-y-8">
+        <main className="flex-1 overflow-auto bg-muted p-3 md:p-4">
+            <div className="mx-auto max-w-7xl space-y-4">
                 {/* Header Navigation */}
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <Link href="/users" className="group flex items-center text-sm font-bold text-muted-foreground hover:text-brand-navy transition-colors">
@@ -200,11 +200,11 @@ export default function UserDetailsPage({ params }: { params: Promise<{ id: stri
                 </div>
 
                 {/* Profile Header Card */}
-                <div className="bg-white rounded-[2rem] p-4 md:p-8 border border-border shadow-none flex flex-col md:flex-row gap-5 md:gap-8 items-start md:items-center relative overflow-hidden">
+                <div className="relative flex flex-col items-start gap-3 overflow-hidden rounded-xl border border-border bg-white p-3 md:flex-row md:items-center md:gap-4 md:p-4">
                     <div className="absolute top-0 right-0 size-64 bg-secondary/5 rounded-full translate-x-1/2 -translate-y-1/2 -z-10" />
 
                     <div className="relative">
-                        <div className="size-28 md:size-32 rounded-3xl bg-slate-100 flex items-center justify-center text-4xl font-bold text-slate-400 overflow-hidden border-4 border-white">
+                        <div className="size-20 overflow-hidden rounded-xl border-2 border-white bg-slate-100 text-slate-400 md:size-24">
                             {(user.avatar || (profile as any)?.profileImageUrl) ? (
                                 <img
                                     src={user.avatar || (profile as any)?.profileImageUrl}
@@ -212,40 +212,42 @@ export default function UserDetailsPage({ params }: { params: Promise<{ id: stri
                                     className="size-full object-cover"
                                 />
                             ) : (
-                                <UserIcon className="size-12" />
+                                <div className="flex size-full items-center justify-center">
+                                    <UserIcon className="size-7" />
+                                </div>
                             )}
                         </div>
-                        <div className="absolute -bottom-2 -right-2 bg-primary size-8 rounded-xl border-4 border-white flex items-center justify-center">
-                            <ShieldCheck className="size-4 text-white" />
+                        <div className="absolute -bottom-1 -right-1 flex size-6 items-center justify-center rounded-md border-2 border-white bg-primary">
+                            <ShieldCheck className="size-3 text-white" />
                         </div>
                     </div>
 
-                    <div className="flex-1 space-y-3 text-center md:text-left">
-                        <div className="flex flex-col md:flex-row items-center gap-4">
-                            <h2 className="text-2xl md:text-4xl font-black text-brand-navy font-outfit break-words">{user.firstName} {user.lastName}</h2>
-                            <Badge className="bg-brand-navy text-white font-bold px-4 py-1 rounded-xl uppercase tracking-widest text-[10px]">
+                    <div className="flex-1 space-y-2 text-left">
+                        <div className="flex flex-wrap items-center gap-2">
+                            <h2 className="break-words text-lg font-bold text-brand-navy md:text-xl">{user.firstName} {user.lastName}</h2>
+                            <Badge className="rounded-md bg-brand-navy px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
                                 {user.role}
                             </Badge>
                         </div>
 
-                        <div className="flex flex-wrap items-center justify-center md:justify-start gap-6 text-muted-foreground font-medium text-sm">
-                            <div className="flex items-center gap-2">
-                                <Mail className="size-4 text-secondary/70" />
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                            <div className="flex items-center gap-1.5">
+                                <Mail className="size-3.5 text-secondary/70" />
                                 {user.email}
                             </div>
-                            <div className="flex items-center gap-2">
-                                <Phone className="size-4 text-secondary/70" />
+                            <div className="flex items-center gap-1.5">
+                                <Phone className="size-3.5 text-secondary/70" />
                                 {user.phone || "No phone linked"}
                             </div>
-                            <div className="flex items-center gap-2">
-                                <Calendar className="size-4 text-secondary/70" />
+                            <div className="flex items-center gap-1.5">
+                                <Calendar className="size-3.5 text-secondary/70" />
                                 Joined {safeDate(user.createdAt, "PPP")}
                             </div>
                         </div>
                     </div>
 
                     {/* Quick Stats Grid */}
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full md:w-auto">
+                    <div className="grid w-full grid-cols-2 gap-2 md:w-auto lg:grid-cols-4">
                         <StatItem label="Jobs" value={stats.jobsCount} color="bg-secondary/10 text-secondary" />
                         <StatItem label="Apps" value={stats.applicationsCount} color="bg-primary/10 text-primary" />
                         <StatItem label="Subs" value={stats.subscriptionsCount} color="bg-brand-navy/10 text-brand-navy" />
@@ -253,23 +255,46 @@ export default function UserDetailsPage({ params }: { params: Promise<{ id: stri
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <Card className="rounded-xl border-border shadow-none">
+                    <CardHeader className="pb-2">
+                        <CardTitle className="text-sm font-semibold text-brand-navy">Account Snapshot</CardTitle>
+                    </CardHeader>
+                    <CardContent className="grid grid-cols-1 gap-3 text-xs sm:grid-cols-2 lg:grid-cols-4">
+                        <InfoField label="User ID" value={user._id} breakAll />
+                        <InfoField label="Google ID" value={user.googleId || "N/A"} breakAll />
+                        <InfoField label="Teachable ID" value={user.teachableUserId || "N/A"} />
+                        <InfoField label="Account Status" value={accountStatus} capitalize />
+                        <InfoField label="Email Verified" value={user.emailVerified ? "Yes" : "No"} />
+                        <InfoField label="Phone Verified" value={user.phoneVerified ? "Yes" : "No"} />
+                        <InfoField label="Active" value={user.isActive ? "Yes" : "No"} />
+                        <InfoField label="Internal User" value={user.isInternal ? "Yes" : "No"} />
+                        <InfoField label="2FA Required" value={user.twoFactorRequired ? "Yes" : "No"} />
+                        <InfoField label="Last Login" value={safeDate(user.lastLogin, "PP p")} />
+                        <InfoField label="Updated At" value={safeDate(user.updatedAt, "PP p")} />
+                        <InfoField label="Profile Complete" value={profile?.isProfileComplete ? "Yes" : "No"} />
+                        <InfoField label="Profile Shared" value={(profile as any)?.shareProfile === true ? "Yes" : "No"} />
+                        <InfoField label="Profile Created" value={safeDate((profile as any)?.createdAt, "PP p")} />
+                        <InfoField label="Profile Updated" value={safeDate((profile as any)?.updatedAt, "PP p")} />
+                    </CardContent>
+                </Card>
+
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                     {/* Left Column: Details & Profile */}
-                    <div className="lg:col-span-1 space-y-8">
+                    <div className="space-y-4 lg:col-span-1">
                         {/* Profile Details Card */}
-                        <Card className="rounded-[2rem] border-border shadow-none">
-                            <CardHeader>
-                                <CardTitle className="text-lg font-bold flex items-center gap-2 text-brand-navy">
-                                    <div className="p-2 bg-secondary/10 rounded-lg">
-                                        <Briefcase className="size-4 text-secondary" />
+                        <Card className="rounded-xl border-border shadow-none">
+                            <CardHeader className="pb-2">
+                                <CardTitle className="flex items-center gap-2 text-sm font-semibold text-brand-navy">
+                                    <div className="rounded-md bg-secondary/10 p-1.5">
+                                        <Briefcase className="size-3.5 text-secondary" />
                                     </div>
                                     Profile Information
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="space-y-6">
+                            <CardContent className="space-y-3">
                                 {profile ? (
                                     <>
-                                        <div className="space-y-4">
+                                        <div className="space-y-2">
                                             {user.role === 'nanny' && <NannyProfileDetails profile={profile as NannyProfile} />}
                                             {user.role === 'parent' && <ParentProfileDetails profile={profile as ParentProfile} />}
                                             {user.role === 'vendor' && <VendorProfileDetails profile={profile as VendorProfile} />}
@@ -278,9 +303,9 @@ export default function UserDetailsPage({ params }: { params: Promise<{ id: stri
                                         {profile.bio && (
                                             <>
                                                 <Separator className="bg-border" />
-                                                <div className="space-y-2">
+                                                <div className="space-y-1">
                                                     <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">About</span>
-                                                    <p className="text-sm text-foreground/80 leading-relaxed italic">
+                                                    <p className="text-xs leading-relaxed text-foreground/80">
                                                         "{profile.bio}"
                                                     </p>
                                                 </div>
@@ -288,7 +313,7 @@ export default function UserDetailsPage({ params }: { params: Promise<{ id: stri
                                         )}
                                     </>
                                 ) : (
-                                    <div className="text-center py-8 text-muted-foreground italic text-sm">
+                                    <div className="py-5 text-center text-xs italic text-muted-foreground">
                                         Profile not completed yet.
                                     </div>
                                 )}
@@ -296,11 +321,11 @@ export default function UserDetailsPage({ params }: { params: Promise<{ id: stri
                         </Card>
 
                         {/* Location Card */}
-                        <Card className="rounded-[2rem] border-border shadow-none">
-                            <CardHeader>
-                                <CardTitle className="text-lg font-bold flex items-center gap-2 text-brand-navy">
-                                    <div className="p-2 bg-primary/10 rounded-lg">
-                                        <MapPin className="size-4 text-primary" />
+                        <Card className="rounded-xl border-border shadow-none">
+                            <CardHeader className="pb-2">
+                                <CardTitle className="flex items-center gap-2 text-sm font-semibold text-brand-navy">
+                                    <div className="rounded-md bg-primary/10 p-1.5">
+                                        <MapPin className="size-3.5 text-primary" />
                                     </div>
                                     Location
                                 </CardTitle>
@@ -308,42 +333,42 @@ export default function UserDetailsPage({ params }: { params: Promise<{ id: stri
                             <CardContent>
                                 {profile?.address ? (
                                     <div className="space-y-1">
-                                        <p className="font-bold text-brand-navy">{profile.address.city}, {profile.address.state}</p>
-                                        <p className="text-sm text-muted-foreground">{profile.address.zipCode}, {profile.address.country}</p>
+                                        <p className="text-sm font-semibold text-brand-navy">{profile.address.city}, {profile.address.state}</p>
+                                        <p className="text-xs text-muted-foreground">{profile.address.zipCode}, {profile.address.country}</p>
                                     </div>
                                 ) : (
-                                    <p className="text-sm text-muted-foreground italic">No address provided</p>
+                                    <p className="text-xs italic text-muted-foreground">No address provided</p>
                                 )}
                             </CardContent>
                         </Card>
 
                         {/* Moderation Card */}
-                        <Card className="rounded-[2rem] border-border shadow-none">
-                            <CardHeader>
-                                <CardTitle className="text-lg font-bold flex items-center gap-2 text-brand-navy">
-                                    <div className="p-2 bg-amber-50 rounded-lg">
-                                        <ShieldCheck className="size-4 text-amber-700" />
+                        <Card className="rounded-xl border-border shadow-none">
+                            <CardHeader className="pb-2">
+                                <CardTitle className="flex items-center gap-2 text-sm font-semibold text-brand-navy">
+                                    <div className="rounded-md bg-amber-50 p-1.5">
+                                        <ShieldCheck className="size-3.5 text-amber-700" />
                                     </div>
                                     Moderation
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="grid grid-cols-1 gap-3 text-sm">
+                            <CardContent className="space-y-3">
+                                <div className="grid grid-cols-1 gap-2 text-xs">
                                     <div>
                                         <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Account Status</p>
-                                        <p className="font-semibold capitalize">{accountStatus}</p>
+                                        <p className="font-medium capitalize">{accountStatus}</p>
                                     </div>
                                     <div>
                                         <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Restricted Reason</p>
-                                        <p className="font-medium">{restrictedReason || "N/A"}</p>
+                                        <p className="font-medium text-foreground/90">{restrictedReason || "N/A"}</p>
                                     </div>
                                     <div>
                                         <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Restricted At</p>
-                                        <p className="font-medium">{safeDate(user.restrictedAt, "PPP p")}</p>
+                                        <p className="font-medium text-foreground/90">{safeDate(user.restrictedAt, "PPP p")}</p>
                                     </div>
                                     <div>
                                         <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Restricted By</p>
-                                        <p className="font-medium break-all">{user.restrictedBy || "N/A"}</p>
+                                        <p className="font-medium break-all text-foreground/90">{user.restrictedBy || "N/A"}</p>
                                     </div>
                                 </div>
                                 <Separator className="bg-border" />
@@ -352,21 +377,21 @@ export default function UserDetailsPage({ params }: { params: Promise<{ id: stri
                                         Moderation History
                                     </p>
                                     {moderationHistory.length === 0 ? (
-                                        <p className="text-sm text-muted-foreground italic">No moderation history.</p>
+                                        <p className="text-xs italic text-muted-foreground">No moderation history.</p>
                                     ) : (
-                                        <div className="space-y-2">
+                                        <div className="space-y-1.5">
                                             {moderationHistory.map((entry) => (
-                                                <div key={entry._id} className="rounded-xl border p-3">
+                                                <div key={entry._id} className="rounded-md border p-2">
                                                     <div className="flex items-center justify-between gap-2">
-                                                        <Badge variant="outline" className="capitalize">
+                                                        <Badge variant="outline" className="h-5 px-2 text-[10px] capitalize">
                                                             {entry.action}
                                                         </Badge>
-                                                        <span className="text-xs text-muted-foreground">
+                                                        <span className="text-[11px] text-muted-foreground">
                                                             {safeDate(entry.createdAt, "PP p")}
                                                         </span>
                                                     </div>
-                                                    <p className="mt-2 text-sm text-foreground/80">{entry.reason || "No reason provided"}</p>
-                                                    <p className="mt-1 text-xs text-muted-foreground break-all">
+                                                    <p className="mt-1 text-xs text-foreground/80">{entry.reason || "No reason provided"}</p>
+                                                    <p className="mt-1 text-[11px] text-muted-foreground break-all">
                                                         Admin: {entry.adminId}
                                                     </p>
                                                 </div>
@@ -379,17 +404,17 @@ export default function UserDetailsPage({ params }: { params: Promise<{ id: stri
                     </div>
 
                     {/* Right Column: Dynamic Tabs */}
-                    <div className="lg:col-span-2 space-y-8">
-                        <div className="bg-white rounded-[2rem] p-4 md:p-8 border border-border shadow-none min-h-[500px]">
-                            <Tabs defaultValue="subscriptions" className="space-y-8">
-                                <TabsList className="flex gap-2 md:gap-4 bg-transparent h-auto p-0 overflow-x-auto pb-2">
+                    <div className="space-y-4 lg:col-span-2">
+                        <div className="min-h-[420px] rounded-xl border border-border bg-white p-3 shadow-none md:p-4">
+                            <Tabs defaultValue="subscriptions" className="space-y-4">
+                                <TabsList className="flex h-auto gap-1 overflow-x-auto bg-transparent p-0 pb-1">
                                     <TabTrigger value="subscriptions" label="Subscribed Plans" />
                                     <TabTrigger value="invoices" label="Billing & Invoices" />
                                     <TabTrigger value="courses" label="Learning Progress" />
                                     <TabTrigger value="jobs" label={user.role === 'nanny' ? 'Applications' : 'Platform Activity'} />
                                 </TabsList>
 
-                                <div className="pt-4">
+                                <div className="pt-2">
                                     <TabsContent value="subscriptions" className="m-0 focus-visible:outline-none">
                                         <SubscriptionsTab userId={user._id} />
                                     </TabsContent>
@@ -503,9 +528,9 @@ export default function UserDetailsPage({ params }: { params: Promise<{ id: stri
 
 function StatItem({ label, value, color }: { label: string; value: number; color: string }) {
     return (
-        <div className={`${color} p-3 md:p-4 rounded-2xl flex flex-col items-center justify-center min-w-[72px]`}>
-            <span className="text-2xl font-black">{value}</span>
-            <span className="text-[10px] font-bold uppercase tracking-wider opacity-70">{label}</span>
+        <div className={`${color} min-w-[60px] rounded-md p-2 text-center`}>
+            <span className="block text-sm font-bold leading-none">{value}</span>
+            <span className="text-[10px] font-semibold uppercase tracking-wide opacity-80">{label}</span>
         </div>
     );
 }
@@ -514,7 +539,7 @@ function TabTrigger({ value, label }: { value: string; label: string }) {
     return (
         <TabsTrigger
             value={value}
-            className="data-[state=active]:bg-brand-navy data-[state=active]:text-white rounded-xl px-3 md:px-5 py-2.5 text-xs font-bold transition-all border border-border data-[state=active]:border-brand-navy whitespace-nowrap"
+            className="whitespace-nowrap rounded-md border border-border px-2.5 py-1.5 text-[11px] font-semibold transition-all data-[state=active]:border-brand-navy data-[state=active]:bg-brand-navy data-[state=active]:text-white"
         >
             {label}
         </TabsTrigger>
@@ -523,7 +548,7 @@ function TabTrigger({ value, label }: { value: string; label: string }) {
 
 function NannyProfileDetails({ profile }: { profile: NannyProfile }) {
     return (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-2">
             <DetailItem icon={Clock} label="Experience" value={`${profile.experience || 0} Years`} />
             <DetailItem icon={DollarSign} label="Hourly Rate" value={`$${profile.hourlyRate || 0}/hr`} />
             <div className="col-span-2">
@@ -538,7 +563,7 @@ function NannyProfileDetails({ profile }: { profile: NannyProfile }) {
 
 function ParentProfileDetails({ profile }: { profile: ParentProfile }) {
     return (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-2">
             <DetailItem icon={Baby} label="Children" value={`${profile.numberOfChildren || 0} Kids`} />
             <DetailItem icon={Clock} label="Schedule" value={profile.preferredSchedule || "Flexible"} />
             <div className="col-span-2">
@@ -550,7 +575,7 @@ function ParentProfileDetails({ profile }: { profile: ParentProfile }) {
 
 function VendorProfileDetails({ profile }: { profile: VendorProfile }) {
     return (
-        <div className="space-y-4">
+        <div className="space-y-2">
             <DetailItem icon={Briefcase} label="Business" value={profile.businessName || "Not set"} />
             <DetailItem icon={Star} label="Type" value={profile.businessType || "N/A"} />
         </div>
@@ -559,11 +584,32 @@ function VendorProfileDetails({ profile }: { profile: VendorProfile }) {
 
 function DetailItem({ icon: Icon, label, value }: { icon: any; label: string; value: string }) {
     return (
-        <div className="space-y-1">
-            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1">
+        <div className="space-y-0.5">
+            <span className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
                 <Icon className="size-3 text-secondary" /> {label}
             </span>
-            <p className="text-sm font-bold text-brand-navy truncate">{value}</p>
+            <p className="text-xs font-semibold text-brand-navy break-words">{value}</p>
+        </div>
+    );
+}
+
+function InfoField({
+    label,
+    value,
+    breakAll = false,
+    capitalize = false,
+}: {
+    label: string;
+    value: string;
+    breakAll?: boolean;
+    capitalize?: boolean;
+}) {
+    return (
+        <div className="space-y-0.5">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{label}</p>
+            <p className={`text-xs font-medium text-foreground ${breakAll ? "break-all" : ""} ${capitalize ? "capitalize" : ""}`}>
+                {value}
+            </p>
         </div>
     );
 }
@@ -578,26 +624,26 @@ function SubscriptionsTab({ userId }: { userId: string }) {
     // Filter out records that are missing essential display data
     const validSubs = subscriptions.filter(sub => sub.planId?.name);
 
-    if (isLoading) return <div className="flex justify-center py-12"><Loader2 className="size-8 animate-spin text-slate-300" /></div>;
+    if (isLoading) return <div className="flex justify-center py-8"><Loader2 className="size-6 animate-spin text-slate-300" /></div>;
 
     if (validSubs.length === 0) {
         return <EmptyState message="No active subscriptions found." />;
     }
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
             {validSubs.map((sub) => {
                 const amount = sub.billingCycle === 'yearly' ? sub.planId.pricingYearly : sub.planId.pricingMonthly;
 
                 return (
-                    <div key={sub._id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 md:p-6 bg-primary/5 border border-primary/10 rounded-2xl cursor-default">
+                    <div key={sub._id} className="flex cursor-default flex-col gap-2 rounded-md border border-primary/10 bg-primary/5 p-3 sm:flex-row sm:items-center sm:justify-between">
                         <div>
-                            <p className="font-bold text-brand-navy uppercase tracking-tight">{sub.planId.name}</p>
-                            <p className="text-xs text-muted-foreground font-medium capitalize">{sub.billingCycle ? `${sub.billingCycle} Billing` : 'Billing summary'}</p>
+                            <p className="text-xs font-semibold uppercase tracking-tight text-brand-navy">{sub.planId.name}</p>
+                            <p className="text-[11px] font-medium capitalize text-muted-foreground">{sub.billingCycle ? `${sub.billingCycle} Billing` : 'Billing summary'}</p>
                         </div>
                         <div className="text-right flex flex-col items-end gap-2">
-                            <p className="font-black text-brand-navy text-lg">${amount}</p>
-                            <Badge className={`text-[10px] font-bold uppercase ${sub.status === 'active' ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-200 text-slate-600'}`}>
+                            <p className="text-sm font-bold text-brand-navy">${amount}</p>
+                            <Badge className={`text-[10px] font-semibold uppercase ${sub.status === 'active' ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-200 text-slate-600'}`}>
                                 {sub.status || 'Unknown'}
                             </Badge>
                         </div>
@@ -616,35 +662,35 @@ function InvoicesTab({ userId }: { userId: string }) {
     // Only show invoices with actual amounts and issuance dates
     const invoices = allInvoices.filter(inv => (inv.total || inv.amount) > 0 && inv.issuedAt);
 
-    if (isLoading) return <div className="flex justify-center py-12"><Loader2 className="size-8 animate-spin text-slate-300" /></div>;
+    if (isLoading) return <div className="flex justify-center py-8"><Loader2 className="size-6 animate-spin text-slate-300" /></div>;
 
     if (invoices.length === 0) {
         return <EmptyState message="No billing history found." />;
     }
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-2">
             {invoices.map((invoice) => (
-                <div key={invoice._id} className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-4 md:p-5 bg-white border border-border rounded-2xl">
-                    <div className="flex items-start gap-4">
-                        <div className="bg-secondary/5 p-3 rounded-xl border border-secondary/10">
-                            <Calendar className="size-5 text-secondary" />
+                <div key={invoice._id} className="flex flex-col gap-2 rounded-md border border-border bg-white p-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-start gap-2.5">
+                        <div className="rounded-md border border-secondary/10 bg-secondary/5 p-2">
+                            <Calendar className="size-4 text-secondary" />
                         </div>
                         <div className="flex flex-col">
                             <div className="flex items-center gap-2">
-                                <span className="font-bold text-brand-navy">{safeDate(invoice.issuedAt, "PPP")}</span>
+                                <span className="text-xs font-semibold text-brand-navy">{safeDate(invoice.issuedAt, "PPP")}</span>
                                 <Badge variant="outline" className="text-[9px] uppercase font-black border-slate-200 text-slate-400 py-0 h-4">
                                     {invoice.invoiceNumber}
                                 </Badge>
                             </div>
-                            <span className="text-xs text-muted-foreground line-clamp-1">{invoice.description || "Subscription Payment"}</span>
+                            <span className="line-clamp-1 text-[11px] text-muted-foreground">{invoice.description || "Subscription Payment"}</span>
                         </div>
                     </div>
-                    <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-8">
-                        <span className="text-lg font-black text-brand-navy">
+                    <div className="flex items-center justify-between gap-3 sm:justify-end sm:gap-5">
+                        <span className="text-sm font-bold text-brand-navy">
                             {invoice.currency === 'USD' ? '$' : invoice.currency}{invoice.total || invoice.amount}
                         </span>
-                        <Badge className={`min-w-[80px] justify-center text-[10px] font-bold uppercase transition-transform ${invoice.status === 'paid' ? 'bg-emerald-50 text-emerald-600' :
+                        <Badge className={`min-w-[72px] justify-center text-[10px] font-semibold uppercase transition-transform ${invoice.status === 'paid' ? 'bg-emerald-50 text-emerald-600' :
                             invoice.status === 'pending' ? 'bg-primary/10 text-primary' : 'bg-red-50 text-red-600'
                             }`}>
                             {invoice.status}
@@ -664,24 +710,24 @@ function CoursesTab({ userId }: { userId: string }) {
     // Filter courses with actual titles
     const courses = allCourses.filter(c => c.title);
 
-    if (isLoading) return <div className="flex justify-center py-12"><Loader2 className="size-8 animate-spin text-slate-300" /></div>;
+    if (isLoading) return <div className="flex justify-center py-8"><Loader2 className="size-6 animate-spin text-slate-300" /></div>;
 
     if (courses.length === 0) {
         return <EmptyState message="No learning activity recorded." />;
     }
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
             {courses.map((course) => (
-                <div key={course._id} className="p-6 bg-white border border-border rounded-[2rem] space-y-4">
+                <div key={course._id} className="space-y-2 rounded-md border border-border bg-white p-3">
                     <div className="flex justify-between items-start">
-                        <h4 className="font-black text-brand-navy leading-tight">{course.title}</h4>
-                        <Badge className={`text-[10px] font-bold uppercase ${course.status === 'completed' ? 'bg-emerald-50 text-emerald-600' : 'bg-secondary/10 text-secondary'}`}>
+                        <h4 className="text-xs font-semibold leading-tight text-brand-navy">{course.title}</h4>
+                        <Badge className={`text-[10px] font-semibold uppercase ${course.status === 'completed' ? 'bg-emerald-50 text-emerald-600' : 'bg-secondary/10 text-secondary'}`}>
                             {course.status}
                         </Badge>
                     </div>
                     <div className="space-y-2">
-                        <div className="flex justify-between text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                        <div className="flex justify-between text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
                             <span>Progress</span>
                             <span>{course.progress}%</span>
                         </div>
@@ -703,29 +749,29 @@ function JobsTab({ userId }: { userId: string }) {
     // Only show jobs with titles and descriptions
     const jobs = allJobs.filter(j => j.title && j.description);
 
-    if (isLoading) return <div className="flex justify-center py-12"><Loader2 className="size-8 animate-spin text-slate-300" /></div>;
+    if (isLoading) return <div className="flex justify-center py-8"><Loader2 className="size-6 animate-spin text-slate-300" /></div>;
 
     if (jobs.length === 0) {
         return <EmptyState message="No platform activity recorded." />;
     }
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-2">
             {jobs.map((job) => (
-                <div key={job._id} className="p-4 md:p-6 bg-white border border-border rounded-[2rem]">
+                <div key={job._id} className="rounded-md border border-border bg-white p-3">
                     <div className="flex justify-between items-start gap-4">
-                        <div className="space-y-2">
-                            <h4 className="text-xl font-bold text-brand-navy">{job.title}</h4>
-                            <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">{job.description}</p>
+                        <div className="space-y-1">
+                            <h4 className="text-sm font-semibold text-brand-navy">{job.title}</h4>
+                            <p className="line-clamp-2 text-xs leading-relaxed text-muted-foreground">{job.description}</p>
                         </div>
-                        <Badge className={`whitespace-nowrap min-w-[100px] justify-center text-[10px] font-bold uppercase border-none ${job.status === 'open' ? 'bg-emerald-50 text-emerald-600' :
+                        <Badge className={`min-w-[82px] justify-center whitespace-nowrap border-none text-[10px] font-semibold uppercase ${job.status === 'open' ? 'bg-emerald-50 text-emerald-600' :
                             job.status === 'in_progress' ? 'bg-secondary/10 text-secondary' : 'bg-slate-100 text-muted-foreground'
                             }`}>
                             {job.status.replace('_', ' ')}
                         </Badge>
                     </div>
-                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mt-6 pt-4 border-t border-border">
-                        <div className="flex items-center gap-2 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                    <div className="mt-3 flex flex-col gap-1 border-t border-border pt-2 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
                             <Calendar className="size-3 text-secondary" />
                             Posted {safeDate(job.createdAt, "PP")}
                         </div>
@@ -739,11 +785,11 @@ function JobsTab({ userId }: { userId: string }) {
 
 function EmptyState({ message }: { message: string }) {
     return (
-        <div className="flex flex-col items-center justify-center py-20 bg-primary/5 rounded-[2rem] border-2 border-dashed border-primary/20">
-            <div className="bg-white p-4 rounded-full border border-border mb-4">
-                <Briefcase className="size-8 text-primary/20" />
+        <div className="flex flex-col items-center justify-center rounded-md border border-dashed border-primary/20 bg-primary/5 py-12">
+            <div className="mb-2 rounded-full border border-border bg-white p-2">
+                <Briefcase className="size-5 text-primary/20" />
             </div>
-            <p className="text-brand-navy/60 font-bold italic tracking-tight">{message}</p>
+            <p className="text-xs font-medium text-brand-navy/60">{message}</p>
         </div>
     );
 }

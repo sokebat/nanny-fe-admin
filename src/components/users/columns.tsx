@@ -16,7 +16,15 @@ import Link from "next/link";
 
 const columnHelper = createColumnHelper<AdminUser>();
 
-export const columns: ColumnDef<AdminUser, any>[] = [
+type UserRowActions = {
+    isBusy?: boolean;
+    onRestrict: (user: AdminUser) => void;
+    onUnrestrict: (user: AdminUser) => void;
+    onBan: (user: AdminUser) => void;
+    onUnban: (user: AdminUser) => void;
+};
+
+export const getUserColumns = (actions: UserRowActions): ColumnDef<AdminUser, any>[] => [
     columnHelper.accessor((row) => `${row.firstName || ""} ${row.lastName || ""}`.trim() || "N/A", {
         id: "name",
         header: "Name",
@@ -65,10 +73,19 @@ export const columns: ColumnDef<AdminUser, any>[] = [
         header: "Actions",
         cell: ({ row }) => {
             const user = row.original;
+            const accountStatus = user.accountStatus || (user.isActive ? "active" : "banned");
+            const canRestrict = accountStatus === "active";
+            const canUnrestrict = accountStatus === "restricted";
+            const canBan = accountStatus !== "banned";
+            const canUnban = accountStatus === "banned";
+
             return (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <button className="h-8 w-8 p-0 flex items-center justify-center rounded-md hover:bg-muted">
+                        <button
+                            className="h-8 w-8 p-0 flex items-center justify-center rounded-md hover:bg-muted"
+                            disabled={actions.isBusy}
+                        >
                             <span className="sr-only">Open menu</span>
                             <MoreHorizontal className="h-4 w-4" />
                         </button>
@@ -80,7 +97,32 @@ export const columns: ColumnDef<AdminUser, any>[] = [
                                 <Eye className="mr-2 h-4 w-4" /> View Details
                             </Link>
                         </DropdownMenuItem>
-                        {/* Add delete or other actions here */}
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                            disabled={!canRestrict || actions.isBusy}
+                            onSelect={() => actions.onRestrict(user)}
+                        >
+                            Restrict
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            disabled={!canUnrestrict || actions.isBusy}
+                            onSelect={() => actions.onUnrestrict(user)}
+                        >
+                            Unrestrict
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            disabled={!canBan || actions.isBusy}
+                            onSelect={() => actions.onBan(user)}
+                            variant="destructive"
+                        >
+                            Ban
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            disabled={!canUnban || actions.isBusy}
+                            onSelect={() => actions.onUnban(user)}
+                        >
+                            Unban
+                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             );

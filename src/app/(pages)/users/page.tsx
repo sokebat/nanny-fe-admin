@@ -1,9 +1,17 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useAdminUsers, useResolveRestrictionAppeal, useRestrictionAppeals } from "@/hooks/use-admin-users";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+    useAdminUsers,
+    useBanAdminUser,
+    useResolveRestrictionAppeal,
+    useRestrictAdminUser,
+    useRestrictionAppeals,
+    useUnbanAdminUser,
+    useUnrestrictAdminUser,
+} from "@/hooks/use-admin-users";
 import { UsersTable } from "@/components/users/users-table";
-import { columns } from "@/components/users/columns";
+import { getUserColumns } from "@/components/users/columns";
 import { Loader2, Search, SlidersHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -16,7 +24,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { AdminUserFilters } from "@/types/admin-users";
+import { AdminUser, AdminUserFilters } from "@/types/admin-users";
 import { Badge } from "@/components/ui/badge";
 import {
     Dialog,
@@ -41,12 +49,14 @@ const DEFAULT_FILTERS: NonSearchFilters = {
     sortOrder: "desc",
 };
 
-const getAppealUserText = (appeal: RestrictionAppeal) => {
-    if (typeof appeal.userId === "string") return appeal.userId;
-    const first = appeal.userId.firstName?.trim() || "";
-    const last = appeal.userId.lastName?.trim() || "";
+const getAppealUserText = (appeal: RestrictionAppeal): string => {
+    const appealUser = appeal.user || (typeof appeal.userId === "string" ? null : appeal.userId);
+    if (!appealUser) return typeof appeal.userId === "string" ? appeal.userId : appeal.userId._id;
+
+    const first = appealUser.firstName?.trim() || "";
+    const last = appealUser.lastName?.trim() || "";
     const fullName = `${first} ${last}`.trim();
-    return fullName || appeal.userId.email || appeal.userId._id;
+    return fullName || appealUser.email || appealUser._id;
 };
 
 export default function UsersPage() {
@@ -88,6 +98,15 @@ export default function UsersPage() {
 
     const { data, isLoading, isFetching, isError } = useAdminUsers(requestFilters);
     const resolveAppealMutation = useResolveRestrictionAppeal();
+    const restrictUserMutation = useRestrictAdminUser();
+    const unrestrictUserMutation = useUnrestrictAdminUser();
+    const banUserMutation = useBanAdminUser();
+    const unbanUserMutation = useUnbanAdminUser();
+    const isModerationBusy =
+        restrictUserMutation.isPending ||
+        unrestrictUserMutation.isPending ||
+        banUserMutation.isPending ||
+        unbanUserMutation.isPending;
 
     const appealsFilters = useMemo<RestrictionAppealsFilters>(
         () => ({
@@ -157,6 +176,63 @@ export default function UsersPage() {
             // error toast is handled by hook
         }
     };
+
+    const handleQuickRestrict = useCallback(async (user: AdminUser) => {
+        const reason = window.prompt(`Enter restriction reason for ${user.email}`);
+        if (!reason || !reason.trim()) return;
+        await restrictUserMutation.mutateAsync({
+            id: user._id,
+            data: { reason: reason.trim() },
+        });
+    }, [restrictUserMutation]);
+
+    const handleQuickUnrestrict = useCallback(async (user: AdminUser) => {
+        const confirmed = window.confirm(`Unrestrict ${user.email}?`);
+        if (!confirmed) return;
+        await unrestrictUserMutation.mutateAsync(user._id);
+    }, [unrestrictUserMutation]);
+
+    const handleQuickBan = useCallback(async (user: AdminUser) => {
+        const reason = window.prompt(`Enter ban reason for ${user.email}`);
+        if (!reason || !reason.trim()) return;
+        const banEmail = window.confirm("Also ban email reuse?");
+        const banPhone = window.confirm("Also ban phone reuse?");
+
+        await banUserMutation.mutateAsync({
+            id: user._id,
+            data: {
+                reason: reason.trim(),
+                banEmail,
+                banPhone,
+            },
+        });
+    }, [banUserMutation]);
+
+    const handleQuickUnban = useCallback(async (user: AdminUser) => {
+        const confirmed = window.confirm(`Unban ${user.email}?`);
+        if (!confirmed) return;
+        await unbanUserMutation.mutateAsync(user._id);
+    }, [unbanUserMutation]);
+
+    const userColumns = useMemo(
+        () =>
+            getUserColumns({
+                isBusy: isModerationBusy,
+                onRestrict: (user) => {
+                    void handleQuickRestrict(user);
+                },
+                onUnrestrict: (user) => {
+                    void handleQuickUnrestrict(user);
+                },
+                onBan: (user) => {
+                    void handleQuickBan(user);
+                },
+                onUnban: (user) => {
+                    void handleQuickUnban(user);
+                },
+            }),
+        [handleQuickBan, handleQuickRestrict, handleQuickUnban, handleQuickUnrestrict, isModerationBusy]
+    );
 
     return (
         <main className="flex-1 p-4 md:p-8 overflow-auto bg-muted">
@@ -412,7 +488,7 @@ export default function UsersPage() {
                 </div>
             ) : (
                 <UsersTable
-                    columns={columns}
+                    columns={userColumns}
                     data={data?.users || []}
                     pageCount={pageCount}
                     pagination={pagination}
@@ -469,15 +545,25 @@ export default function UsersPage() {
                             </thead>
                             <tbody>
                                 {appeals.map((appeal) => {
+                                    const appealUser = appeal.user || (typeof appeal.userId === "string" ? null : appeal.userId);
                                     const role =
-                                        typeof appeal.userId === "string"
+                                        !appealUser
                                             ? "N/A"
-                                            : appeal.userId.role || "N/A";
-                                    const reasonText = appeal.appealReason || appeal.reason || "No reason provided";
+                                            : appealUser.role || "N/A";
+                                    const reasonText = appeal.description || appeal.appealReason || appeal.reason || "No reason provided";
+                                    const userLabel = getAppealUserText(appeal);
+                                    const userEmail = appealUser?.email;
 
                                     return (
                                         <tr key={appeal._id} className="border-t">
-                                            <td className="px-3 py-2">{getAppealUserText(appeal)}</td>
+                                            <td className="px-3 py-2">
+                                                <div className="min-w-[220px]">
+                                                    <p className="font-medium">{userLabel}</p>
+                                                    {userEmail ? (
+                                                        <p className="text-xs text-muted-foreground">{userEmail}</p>
+                                                    ) : null}
+                                                </div>
+                                            </td>
                                             <td className="px-3 py-2 capitalize">{role}</td>
                                             <td className="px-3 py-2 capitalize">{appeal.status}</td>
                                             <td className="px-3 py-2 max-w-xs truncate" title={reasonText}>
