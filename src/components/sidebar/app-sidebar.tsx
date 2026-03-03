@@ -39,7 +39,7 @@ const data = {
       icon: BarChart3,
     },
     {
-      title: "Manage Users",
+      title: "User Management",
       url: "/users",
       icon: Users,
     },
