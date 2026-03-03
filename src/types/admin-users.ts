@@ -1,6 +1,10 @@
 import { UserRole } from "./subscription";
 
 export type ManageUserRole = "admin" | "parent" | "vendor" | "nanny";
+export type AdminUsersRoleFilter = "guest" | "nanny" | "parent" | "vendor" | "admin" | "moderator";
+export type AccountStatus = "active" | "restricted" | "banned";
+export type RestrictionAppealStatus = "pending" | "approved" | "rejected";
+export type BannedIdentifierType = "email" | "phone";
 
 export interface AdminUser {
     _id: string; // API uses _id
@@ -12,6 +16,7 @@ export interface AdminUser {
     emailVerified: boolean;
     phoneVerified: boolean;
     isActive: boolean;
+    accountStatus?: AccountStatus;
     isInternal?: boolean;
     twoFactorRequired?: boolean;
     createdAt: string;
@@ -84,7 +89,8 @@ export interface AdminUserDetails {
 export interface AdminUserFilters {
     page?: number;
     limit?: number;
-    role?: ManageUserRole | "";
+    role?: AdminUsersRoleFilter | "";
+    accountStatus?: AccountStatus | "";
     search?: string;
     fromDate?: string;
     toDate?: string;
@@ -103,6 +109,21 @@ export interface UpdateAdminUserDto {
     isActive?: boolean;
     phoneVerified?: boolean;
     emailVerified?: boolean;
+}
+
+export interface RestrictUserDto {
+    reason: string;
+}
+
+export interface BanUserDto {
+    reason: string;
+    banEmail?: boolean;
+    banPhone?: boolean;
+}
+
+export interface ResolveRestrictionAppealDto {
+    status: "approved" | "rejected";
+    adminNote?: string;
 }
 
 export interface UserJob {
@@ -179,6 +200,39 @@ export interface UserPagination {
 
 export interface PaginatedUsersResponse {
     users: AdminUser[];
+    pagination: UserPagination;
+}
+
+export interface RestrictionAppeal {
+    _id: string;
+    userId: string | {
+        _id: string;
+        email?: string;
+        role?: AdminUsersRoleFilter;
+        firstName?: string;
+        lastName?: string;
+    };
+    status: RestrictionAppealStatus;
+    reason?: string;
+    appealReason?: string;
+    adminNote?: string;
+    reviewedBy?: string;
+    reviewedAt?: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface RestrictionAppealsFilters {
+    page?: number;
+    limit?: number;
+    status?: RestrictionAppealStatus | "";
+    role?: AdminUsersRoleFilter | "";
+    fromDate?: string;
+    toDate?: string;
+}
+
+export interface PaginatedRestrictionAppealsResponse {
+    appeals: RestrictionAppeal[];
     pagination: UserPagination;
 }
 

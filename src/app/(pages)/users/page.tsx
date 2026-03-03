@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useAdminUsers } from "@/hooks/use-admin-users";
+import { useAdminUsers, useResolveRestrictionAppeal, useRestrictionAppeals } from "@/hooks/use-admin-users";
 import { UsersTable } from "@/components/users/users-table";
 import { columns } from "@/components/users/columns";
 import { Loader2, Search, SlidersHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
     Select,
     SelectContent,
@@ -25,11 +26,13 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
+import { RestrictionAppeal, RestrictionAppealStatus, RestrictionAppealsFilters } from "@/types/admin-users";
 
 type NonSearchFilters = Omit<AdminUserFilters, "page" | "limit" | "search">;
 
 const DEFAULT_FILTERS: NonSearchFilters = {
     role: "",
+    accountStatus: "",
     fromDate: "",
     toDate: "",
     isActive: "",
@@ -38,16 +41,30 @@ const DEFAULT_FILTERS: NonSearchFilters = {
     sortOrder: "desc",
 };
 
+const getAppealUserText = (appeal: RestrictionAppeal) => {
+    if (typeof appeal.userId === "string") return appeal.userId;
+    const first = appeal.userId.firstName?.trim() || "";
+    const last = appeal.userId.lastName?.trim() || "";
+    const fullName = `${first} ${last}`.trim();
+    return fullName || appeal.userId.email || appeal.userId._id;
+};
+
 export default function UsersPage() {
     const [pagination, setPagination] = useState({
         pageIndex: 0,
         pageSize: 20,
     });
     const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
+    const [isAppealDialogOpen, setIsAppealDialogOpen] = useState(false);
     const [searchInput, setSearchInput] = useState("");
     const [appliedSearch, setAppliedSearch] = useState("");
     const [draftFilters, setDraftFilters] = useState(DEFAULT_FILTERS);
     const [appliedFilters, setAppliedFilters] = useState(DEFAULT_FILTERS);
+    const [appealsPage, setAppealsPage] = useState(1);
+    const [appealStatusFilter, setAppealStatusFilter] = useState<RestrictionAppealStatus | "all">("pending");
+    const [selectedAppealId, setSelectedAppealId] = useState<string | null>(null);
+    const [resolveStatus, setResolveStatus] = useState<"approved" | "rejected">("approved");
+    const [adminNote, setAdminNote] = useState("");
 
     useEffect(() => {
         const timeoutId = setTimeout(() => {
@@ -70,12 +87,33 @@ export default function UsersPage() {
     );
 
     const { data, isLoading, isFetching, isError } = useAdminUsers(requestFilters);
+    const resolveAppealMutation = useResolveRestrictionAppeal();
+
+    const appealsFilters = useMemo<RestrictionAppealsFilters>(
+        () => ({
+            page: appealsPage,
+            limit: 10,
+            status: appealStatusFilter === "all" ? "" : appealStatusFilter,
+            role: appliedFilters.role || "",
+            fromDate: appliedFilters.fromDate || "",
+            toDate: appliedFilters.toDate || "",
+        }),
+        [appealsPage, appealStatusFilter, appliedFilters.role, appliedFilters.fromDate, appliedFilters.toDate]
+    );
+
+    const { data: appealsData, isLoading: isAppealsLoading, isFetching: isAppealsFetching } =
+        useRestrictionAppeals(appealsFilters);
 
     const pageCount = data?.pagination?.totalPages || 0;
-    const totalUsers = data?.pagination?.total || 0;
-
+    const appeals = useMemo(
+        () => ((appealsData as any)?.appeals || (appealsData as any)?.docs || []) as RestrictionAppeal[],
+        [appealsData]
+    );
+    const appealsTotalPages =
+        (appealsData as any)?.pagination?.totalPages || (appealsData as any)?.totalPages || 1;
     const applyDialogFilters = () => {
         setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+        setAppealsPage(1);
         setAppliedFilters({ ...draftFilters });
         setIsFilterDialogOpen(false);
     };
@@ -86,12 +124,38 @@ export default function UsersPage() {
         setDraftFilters(DEFAULT_FILTERS);
         setIsFilterDialogOpen(false);
         setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+        setAppealsPage(1);
         setAppliedFilters(DEFAULT_FILTERS);
     };
 
     const openFilters = () => {
         setDraftFilters(appliedFilters);
         setIsFilterDialogOpen(true);
+    };
+
+    const openResolveAppealDialog = (appealId: string, status: "approved" | "rejected") => {
+        setSelectedAppealId(appealId);
+        setResolveStatus(status);
+        setAdminNote("");
+        setIsAppealDialogOpen(true);
+    };
+
+    const handleResolveAppeal = async () => {
+        if (!selectedAppealId) return;
+
+        try {
+            await resolveAppealMutation.mutateAsync({
+                appealId: selectedAppealId,
+                data: {
+                    status: resolveStatus,
+                    adminNote: adminNote.trim() || undefined,
+                },
+            });
+            setIsAppealDialogOpen(false);
+            setSelectedAppealId(null);
+        } catch {
+            // error toast is handled by hook
+        }
     };
 
     return (
@@ -144,6 +208,7 @@ export default function UsersPage() {
                     ) : null}
                     {appliedSearch ? <Badge variant="secondary">Search: {appliedSearch}</Badge> : null}
                     {appliedFilters.role ? <Badge variant="secondary">Role: {appliedFilters.role}</Badge> : null}
+                    {appliedFilters.accountStatus ? <Badge variant="secondary">Account: {appliedFilters.accountStatus}</Badge> : null}
                     {appliedFilters.isActive !== "" ? (
                         <Badge variant="secondary">Status: {appliedFilters.isActive ? "active" : "inactive"}</Badge>
                     ) : null}
@@ -182,15 +247,39 @@ export default function UsersPage() {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">All Roles</SelectItem>
+                                    <SelectItem value="guest">Guest</SelectItem>
                                     <SelectItem value="nanny">Nanny</SelectItem>
                                     <SelectItem value="parent">Parent</SelectItem>
                                     <SelectItem value="vendor">Vendor</SelectItem>
                                     <SelectItem value="admin">Admin</SelectItem>
+                                    <SelectItem value="moderator">Moderator</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
                         <div className="space-y-1.5">
-                            <Label htmlFor="status-filter">Account Status</Label>
+                            <Label htmlFor="account-status-filter">Account Status</Label>
+                            <Select
+                                value={draftFilters.accountStatus || "all"}
+                                onValueChange={(value) =>
+                                    setDraftFilters((prev) => ({
+                                        ...prev,
+                                        accountStatus: value === "all" ? "" : (value as NonNullable<AdminUserFilters["accountStatus"]>),
+                                    }))
+                                }
+                            >
+                                <SelectTrigger id="account-status-filter" className="w-full">
+                                    <SelectValue placeholder="Select account status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">Any Account Status</SelectItem>
+                                    <SelectItem value="active">Active</SelectItem>
+                                    <SelectItem value="restricted">Restricted</SelectItem>
+                                    <SelectItem value="banned">Banned</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-1.5">
+                            <Label htmlFor="status-filter">Active Flag</Label>
                             <Select
                                 value={String(draftFilters.isActive === "" ? "all" : draftFilters.isActive)}
                                 onValueChange={(value) =>
@@ -330,6 +419,153 @@ export default function UsersPage() {
                     onPaginationChange={setPagination}
                 />
             )}
+
+            <section className="mt-6 rounded-xl border bg-card p-4 md:p-5 shadow-xs">
+                <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h3 className="text-lg font-semibold tracking-tight">Restriction Appeals</h3>
+                        <p className="text-sm text-muted-foreground">Review and resolve user restriction appeals.</p>
+                    </div>
+                    <div className="w-full sm:w-48">
+                        <Select
+                            value={appealStatusFilter}
+                            onValueChange={(value) => {
+                                setAppealsPage(1);
+                                setAppealStatusFilter(value as RestrictionAppealStatus | "all");
+                            }}
+                        >
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Filter status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All Statuses</SelectItem>
+                                <SelectItem value="pending">Pending</SelectItem>
+                                <SelectItem value="approved">Approved</SelectItem>
+                                <SelectItem value="rejected">Rejected</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
+
+                {isAppealsLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                        <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                    </div>
+                ) : appeals.length === 0 ? (
+                    <div className="rounded-lg border border-dashed p-6 text-sm text-muted-foreground">
+                        No appeals found for the selected filters.
+                    </div>
+                ) : (
+                    <div className="overflow-x-auto rounded-lg border">
+                        <table className="w-full text-sm">
+                            <thead className="bg-muted/50">
+                                <tr>
+                                    <th className="px-3 py-2 text-left font-medium">User</th>
+                                    <th className="px-3 py-2 text-left font-medium">Role</th>
+                                    <th className="px-3 py-2 text-left font-medium">Status</th>
+                                    <th className="px-3 py-2 text-left font-medium">Reason</th>
+                                    <th className="px-3 py-2 text-right font-medium">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {appeals.map((appeal) => {
+                                    const role =
+                                        typeof appeal.userId === "string"
+                                            ? "N/A"
+                                            : appeal.userId.role || "N/A";
+                                    const reasonText = appeal.appealReason || appeal.reason || "No reason provided";
+
+                                    return (
+                                        <tr key={appeal._id} className="border-t">
+                                            <td className="px-3 py-2">{getAppealUserText(appeal)}</td>
+                                            <td className="px-3 py-2 capitalize">{role}</td>
+                                            <td className="px-3 py-2 capitalize">{appeal.status}</td>
+                                            <td className="px-3 py-2 max-w-xs truncate" title={reasonText}>
+                                                {reasonText}
+                                            </td>
+                                            <td className="px-3 py-2">
+                                                <div className="flex justify-end gap-2">
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        disabled={appeal.status !== "pending" || resolveAppealMutation.isPending}
+                                                        onClick={() => openResolveAppealDialog(appeal._id, "approved")}
+                                                    >
+                                                        Approve
+                                                    </Button>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="destructive"
+                                                        disabled={appeal.status !== "pending" || resolveAppealMutation.isPending}
+                                                        onClick={() => openResolveAppealDialog(appeal._id, "rejected")}
+                                                    >
+                                                        Reject
+                                                    </Button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+
+                <div className="mt-4 flex items-center justify-end gap-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={appealsPage <= 1 || isAppealsFetching}
+                        onClick={() => setAppealsPage((prev) => Math.max(1, prev - 1))}
+                    >
+                        Previous
+                    </Button>
+                    <span className="text-sm text-muted-foreground">
+                        Page {appealsPage} of {appealsTotalPages}
+                    </span>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={appealsPage >= appealsTotalPages || isAppealsFetching}
+                        onClick={() => setAppealsPage((prev) => prev + 1)}
+                    >
+                        Next
+                    </Button>
+                </div>
+            </section>
+
+            <Dialog open={isAppealDialogOpen} onOpenChange={setIsAppealDialogOpen}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>{resolveStatus === "approved" ? "Approve Appeal" : "Reject Appeal"}</DialogTitle>
+                        <DialogDescription>
+                            Resolution will be sent using the selected status and optional admin note.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-2">
+                        <Label htmlFor="appeal-admin-note">Admin Note (optional)</Label>
+                        <Textarea
+                            id="appeal-admin-note"
+                            value={adminNote}
+                            onChange={(e) => setAdminNote(e.target.value)}
+                            placeholder="Optional admin note..."
+                        />
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsAppealDialogOpen(false)} disabled={resolveAppealMutation.isPending}>
+                            Cancel
+                        </Button>
+                        <Button
+                            variant={resolveStatus === "approved" ? "default" : "destructive"}
+                            onClick={handleResolveAppeal}
+                            disabled={resolveAppealMutation.isPending}
+                        >
+                            {resolveAppealMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                            Confirm {resolveStatus === "approved" ? "Approval" : "Rejection"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </main>
     );
 }

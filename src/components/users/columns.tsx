@@ -3,7 +3,7 @@
 import { createColumnHelper, type ColumnDef } from "@tanstack/react-table";
 import { AdminUser } from "@/types/admin-users";
 import { format } from "date-fns";
-import { MoreHorizontal, Eye, Trash } from "lucide-react";
+import { MoreHorizontal, Eye } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -17,7 +17,7 @@ import Link from "next/link";
 const columnHelper = createColumnHelper<AdminUser>();
 
 export const columns: ColumnDef<AdminUser, any>[] = [
-    columnHelper.accessor((row) => `${row.firstName} ${row.lastName}`, {
+    columnHelper.accessor((row) => `${row.firstName || ""} ${row.lastName || ""}`.trim() || "N/A", {
         id: "name",
         header: "Name",
         cell: (info) => <span className="text-sm font-medium text-foreground">{info.getValue()}</span>,
@@ -36,14 +36,21 @@ export const columns: ColumnDef<AdminUser, any>[] = [
     }),
     columnHelper.accessor("isActive", {
         header: "Status",
-        cell: (info) => (
-            <span
-                className={`px-2 py-1 rounded-full text-xs font-semibold ${info.getValue() ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-                    }`}
-            >
-                {info.getValue() ? "Active" : "Inactive"}
-            </span>
-        ),
+        cell: ({ row }) => {
+            const accountStatus = row.original.accountStatus || (row.original.isActive ? "active" : "banned");
+            const statusClass =
+                accountStatus === "active"
+                    ? "bg-green-100 text-green-800"
+                    : accountStatus === "restricted"
+                      ? "bg-amber-100 text-amber-800"
+                      : "bg-red-100 text-red-800";
+
+            return (
+                <span className={`px-2 py-1 rounded-full text-xs font-semibold ${statusClass}`}>
+                    {accountStatus}
+                </span>
+            );
+        },
     }),
     columnHelper.accessor("phone", {
         header: "Phone",

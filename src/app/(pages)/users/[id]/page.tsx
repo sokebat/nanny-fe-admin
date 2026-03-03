@@ -10,6 +10,19 @@ import { AdminUser, AdminUserSubscription, AdminUserInvoice, AdminUserCourse, Us
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import { useBanAdminUser, useRestrictAdminUser, useUnbanAdminUser, useUnrestrictAdminUser } from "@/hooks/use-admin-users";
+import { AccountStatus } from "@/types/admin-users";
 
 const safeDate = (dateVal: any, formatStr: string) => {
     try {
@@ -22,9 +35,25 @@ const safeDate = (dateVal: any, formatStr: string) => {
     }
 };
 
+const getAccountStatus = (user: AdminUser): AccountStatus => {
+    if (user.accountStatus) return user.accountStatus;
+    return user.isActive ? "active" : "banned";
+};
+
 export default function UserDetailsPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
     const { data: userDetails, isLoading: isLoadingUser } = useAdminUser(id);
+    const restrictUserMutation = useRestrictAdminUser();
+    const unrestrictUserMutation = useUnrestrictAdminUser();
+    const banUserMutation = useBanAdminUser();
+    const unbanUserMutation = useUnbanAdminUser();
+    const [actionDialogOpen, setActionDialogOpen] = useState(false);
+    const [actionType, setActionType] = useState<"restrict" | "ban" | null>(null);
+    const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+    const [confirmType, setConfirmType] = useState<"unrestrict" | "unban" | null>(null);
+    const [reason, setReason] = useState("");
+    const [banEmail, setBanEmail] = useState(true);
+    const [banPhone, setBanPhone] = useState(false);
 
     if (isLoadingUser) {
         return (
@@ -48,27 +77,128 @@ export default function UserDetailsPage({ params }: { params: Promise<{ id: stri
     }
 
     const { user, profile, stats } = userDetails;
+    const accountStatus = getAccountStatus(user);
+    const isMutationLoading =
+        restrictUserMutation.isPending ||
+        unrestrictUserMutation.isPending ||
+        banUserMutation.isPending ||
+        unbanUserMutation.isPending;
+
+    const openRestrictDialog = () => {
+        setReason("");
+        setActionType("restrict");
+        setActionDialogOpen(true);
+    };
+
+    const openBanDialog = () => {
+        setReason("");
+        setBanEmail(true);
+        setBanPhone(false);
+        setActionType("ban");
+        setActionDialogOpen(true);
+    };
+
+    const handleModerationSubmit = async () => {
+        if (!actionType || !reason.trim()) return;
+        try {
+            if (actionType === "restrict") {
+                await restrictUserMutation.mutateAsync({
+                    id: user._id,
+                    data: { reason: reason.trim() },
+                });
+            } else {
+                await banUserMutation.mutateAsync({
+                    id: user._id,
+                    data: {
+                        reason: reason.trim(),
+                        banEmail,
+                        banPhone,
+                    },
+                });
+            }
+
+            setActionDialogOpen(false);
+        } catch {
+            // errors are surfaced via mutation onError toast
+        }
+    };
+
+    const openUnrestrictConfirm = () => {
+        setConfirmType("unrestrict");
+        setConfirmDialogOpen(true);
+    };
+
+    const openUnbanConfirm = () => {
+        setConfirmType("unban");
+        setConfirmDialogOpen(true);
+    };
+
+    const handleConfirmAction = async () => {
+        if (!confirmType) return;
+        try {
+            if (confirmType === "unrestrict") {
+                await unrestrictUserMutation.mutateAsync(user._id);
+            } else {
+                await unbanUserMutation.mutateAsync(user._id);
+            }
+            setConfirmDialogOpen(false);
+            setConfirmType(null);
+        } catch {
+            // errors are surfaced via mutation onError toast
+        }
+    };
 
     return (
         <main className="flex-1 p-4 md:p-8 overflow-auto bg-muted">
             <div className="max-w-7xl mx-auto space-y-8">
                 {/* Header Navigation */}
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <Link href="/users" className="group flex items-center text-sm font-bold text-muted-foreground hover:text-brand-navy transition-colors">
                         <div className="mr-2 bg-white p-2 rounded-lg group-hover:bg-slate-100 transition-colors border border-border">
                             <ArrowLeft className="size-4" />
                         </div>
                         Back to User Management
                     </Link>
-                    <div className="flex items-center gap-2">
-                        <Badge className={`px-3 py-1 font-bold uppercase tracking-wider text-[10px] ${user.isActive ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-red-50 text-red-600 border-red-100"}`}>
-                            {user.isActive ? "Account Active" : "Account Inactive"}
+                    <div className="flex flex-wrap items-center justify-end gap-2">
+                        <Badge className={`px-3 py-1 font-bold uppercase tracking-wider text-[10px] ${
+                            accountStatus === "active"
+                                ? "bg-emerald-50 text-emerald-600 border-emerald-100"
+                                : accountStatus === "restricted"
+                                  ? "bg-amber-50 text-amber-700 border-amber-200"
+                                  : "bg-red-50 text-red-600 border-red-100"
+                        }`}>
+                            Account {accountStatus}
                         </Badge>
+                        {accountStatus === "active" ? (
+                            <>
+                                <Button size="sm" variant="outline" onClick={openRestrictDialog} disabled={isMutationLoading}>
+                                    Restrict
+                                </Button>
+                                <Button size="sm" variant="destructive" onClick={openBanDialog} disabled={isMutationLoading}>
+                                    Ban
+                                </Button>
+                            </>
+                        ) : null}
+                        {accountStatus === "restricted" ? (
+                            <>
+                                <Button size="sm" variant="outline" onClick={openUnrestrictConfirm} disabled={isMutationLoading}>
+                                    Unrestrict
+                                </Button>
+                                <Button size="sm" variant="destructive" onClick={openBanDialog} disabled={isMutationLoading}>
+                                    Ban
+                                </Button>
+                            </>
+                        ) : null}
+                        {accountStatus === "banned" ? (
+                            <Button size="sm" variant="outline" onClick={openUnbanConfirm} disabled={isMutationLoading}>
+                                Unban
+                            </Button>
+                        ) : null}
                     </div>
                 </div>
 
                 {/* Profile Header Card */}
-                <div className="bg-white rounded-[2rem] p-8 border border-border shadow-none flex flex-col md:flex-row gap-8 items-start md:items-center relative overflow-hidden">
+                <div className="bg-white rounded-[2rem] p-4 md:p-8 border border-border shadow-none flex flex-col md:flex-row gap-5 md:gap-8 items-start md:items-center relative overflow-hidden">
                     <div className="absolute top-0 right-0 size-64 bg-secondary/5 rounded-full translate-x-1/2 -translate-y-1/2 -z-10" />
 
                     <div className="relative">
@@ -90,7 +220,7 @@ export default function UserDetailsPage({ params }: { params: Promise<{ id: stri
 
                     <div className="flex-1 space-y-3 text-center md:text-left">
                         <div className="flex flex-col md:flex-row items-center gap-4">
-                            <h2 className="text-4xl font-black text-brand-navy font-outfit">{user.firstName} {user.lastName}</h2>
+                            <h2 className="text-2xl md:text-4xl font-black text-brand-navy font-outfit break-words">{user.firstName} {user.lastName}</h2>
                             <Badge className="bg-brand-navy text-white font-bold px-4 py-1 rounded-xl uppercase tracking-widest text-[10px]">
                                 {user.role}
                             </Badge>
@@ -188,9 +318,9 @@ export default function UserDetailsPage({ params }: { params: Promise<{ id: stri
 
                     {/* Right Column: Dynamic Tabs */}
                     <div className="lg:col-span-2 space-y-8">
-                        <div className="bg-white rounded-[2rem] p-8 border border-border shadow-none min-h-[500px]">
+                        <div className="bg-white rounded-[2rem] p-4 md:p-8 border border-border shadow-none min-h-[500px]">
                             <Tabs defaultValue="subscriptions" className="space-y-8">
-                                <TabsList className="flex gap-4 bg-transparent h-auto p-0">
+                                <TabsList className="flex gap-2 md:gap-4 bg-transparent h-auto p-0 overflow-x-auto pb-2">
                                     <TabTrigger value="subscriptions" label="Subscribed Plans" />
                                     <TabTrigger value="invoices" label="Billing & Invoices" />
                                     <TabTrigger value="courses" label="Learning Progress" />
@@ -216,6 +346,93 @@ export default function UserDetailsPage({ params }: { params: Promise<{ id: stri
                     </div>
                 </div>
             </div>
+
+            <Dialog open={actionDialogOpen} onOpenChange={setActionDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>{actionType === "ban" ? "Ban User" : "Restrict User"}</DialogTitle>
+                        <DialogDescription>
+                            {actionType === "ban"
+                                ? "Banning blocks account access and can block identifier reuse."
+                                : "Restricted users can log in but cannot message or apply/create jobs."}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                        <div className="space-y-1.5">
+                            <Label htmlFor="moderation-reason">Reason</Label>
+                            <Textarea
+                                id="moderation-reason"
+                                placeholder={actionType === "ban" ? "Fraud or severe abuse..." : "Policy violation details..."}
+                                value={reason}
+                                onChange={(e) => setReason(e.target.value)}
+                            />
+                        </div>
+                        {actionType === "ban" ? (
+                            <div className="space-y-2">
+                                <Label>Banned Identifiers</Label>
+                                <label className="flex items-center gap-2 text-sm">
+                                    <input
+                                        type="checkbox"
+                                        checked={banEmail}
+                                        onChange={(e) => setBanEmail(e.target.checked)}
+                                    />
+                                    Ban email reuse
+                                </label>
+                                <label className="flex items-center gap-2 text-sm">
+                                    <input
+                                        type="checkbox"
+                                        checked={banPhone}
+                                        onChange={(e) => setBanPhone(e.target.checked)}
+                                    />
+                                    Ban phone reuse
+                                </label>
+                            </div>
+                        ) : null}
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setActionDialogOpen(false)} disabled={isMutationLoading}>
+                            Cancel
+                        </Button>
+                        <Button
+                            variant={actionType === "ban" ? "destructive" : "default"}
+                            onClick={handleModerationSubmit}
+                            disabled={!reason.trim() || isMutationLoading}
+                        >
+                            {isMutationLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                            {actionType === "ban" ? "Confirm Ban" : "Confirm Restrict"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>{confirmType === "unban" ? "Unban User" : "Unrestrict User"}</DialogTitle>
+                        <DialogDescription>
+                            {confirmType === "unban"
+                                ? "This will unban the user and deactivate related banned identifiers."
+                                : "This will remove the restriction and restore messaging and job actions."}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button
+                            variant="outline"
+                            onClick={() => {
+                                setConfirmDialogOpen(false);
+                                setConfirmType(null);
+                            }}
+                            disabled={isMutationLoading}
+                        >
+                            Cancel
+                        </Button>
+                        <Button onClick={handleConfirmAction} disabled={isMutationLoading}>
+                            {isMutationLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                            Confirm
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </main>
     );
 }
@@ -224,7 +441,7 @@ export default function UserDetailsPage({ params }: { params: Promise<{ id: stri
 
 function StatItem({ label, value, color }: { label: string; value: number; color: string }) {
     return (
-        <div className={`${color} p-4 rounded-2xl flex flex-col items-center justify-center min-w-[80px]`}>
+        <div className={`${color} p-3 md:p-4 rounded-2xl flex flex-col items-center justify-center min-w-[72px]`}>
             <span className="text-2xl font-black">{value}</span>
             <span className="text-[10px] font-bold uppercase tracking-wider opacity-70">{label}</span>
         </div>
@@ -235,7 +452,7 @@ function TabTrigger({ value, label }: { value: string; label: string }) {
     return (
         <TabsTrigger
             value={value}
-            className="data-[state=active]:bg-brand-navy data-[state=active]:text-white rounded-xl px-5 py-2.5 text-xs font-bold transition-all border border-border data-[state=active]:border-brand-navy whitespace-nowrap"
+            className="data-[state=active]:bg-brand-navy data-[state=active]:text-white rounded-xl px-3 md:px-5 py-2.5 text-xs font-bold transition-all border border-border data-[state=active]:border-brand-navy whitespace-nowrap"
         >
             {label}
         </TabsTrigger>
@@ -311,7 +528,7 @@ function SubscriptionsTab({ userId }: { userId: string }) {
                 const amount = sub.billingCycle === 'yearly' ? sub.planId.pricingYearly : sub.planId.pricingMonthly;
 
                 return (
-                    <div key={sub._id} className="flex items-center justify-between p-6 bg-primary/5 border border-primary/10 rounded-2xl cursor-default">
+                    <div key={sub._id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 md:p-6 bg-primary/5 border border-primary/10 rounded-2xl cursor-default">
                         <div>
                             <p className="font-bold text-brand-navy uppercase tracking-tight">{sub.planId.name}</p>
                             <p className="text-xs text-muted-foreground font-medium capitalize">{sub.billingCycle ? `${sub.billingCycle} Billing` : 'Billing summary'}</p>
@@ -346,8 +563,8 @@ function InvoicesTab({ userId }: { userId: string }) {
     return (
         <div className="space-y-4">
             {invoices.map((invoice) => (
-                <div key={invoice._id} className="flex items-center justify-between p-5 bg-white border border-border rounded-2xl">
-                    <div className="flex items-center gap-4">
+                <div key={invoice._id} className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-4 md:p-5 bg-white border border-border rounded-2xl">
+                    <div className="flex items-start gap-4">
                         <div className="bg-secondary/5 p-3 rounded-xl border border-secondary/10">
                             <Calendar className="size-5 text-secondary" />
                         </div>
@@ -361,7 +578,7 @@ function InvoicesTab({ userId }: { userId: string }) {
                             <span className="text-xs text-muted-foreground line-clamp-1">{invoice.description || "Subscription Payment"}</span>
                         </div>
                     </div>
-                    <div className="flex items-center gap-8">
+                    <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-8">
                         <span className="text-lg font-black text-brand-navy">
                             {invoice.currency === 'USD' ? '$' : invoice.currency}{invoice.total || invoice.amount}
                         </span>
@@ -433,7 +650,7 @@ function JobsTab({ userId }: { userId: string }) {
     return (
         <div className="space-y-4">
             {jobs.map((job) => (
-                <div key={job._id} className="p-6 bg-white border border-border rounded-[2rem]">
+                <div key={job._id} className="p-4 md:p-6 bg-white border border-border rounded-[2rem]">
                     <div className="flex justify-between items-start gap-4">
                         <div className="space-y-2">
                             <h4 className="text-xl font-bold text-brand-navy">{job.title}</h4>
@@ -445,7 +662,7 @@ function JobsTab({ userId }: { userId: string }) {
                             {job.status.replace('_', ' ')}
                         </Badge>
                     </div>
-                    <div className="flex items-center justify-between mt-6 pt-4 border-t border-border">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mt-6 pt-4 border-t border-border">
                         <div className="flex items-center gap-2 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
                             <Calendar className="size-3 text-secondary" />
                             Posted {safeDate(job.createdAt, "PP")}
