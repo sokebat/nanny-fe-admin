@@ -1,21 +1,29 @@
 import { UserRole } from "./subscription";
 
+export type ManageUserRole = "admin" | "parent" | "vendor" | "nanny";
+
 export interface AdminUser {
     _id: string; // API uses _id
     id?: string; // For frontend convenience if needed
-    firstName: string;
-    lastName: string;
     email: string;
-    role: UserRole;
-    isActive: boolean;
-    phoneVerified: boolean;
+    firstName?: string;
+    lastName?: string;
+    role: UserRole | "guest";
     emailVerified: boolean;
+    phoneVerified: boolean;
+    isActive: boolean;
+    isInternal?: boolean;
+    twoFactorRequired?: boolean;
     createdAt: string;
     updatedAt: string;
-    phone?: string;
-    avatar?: string;
+    __v?: number;
     lastLogin?: string;
     googleId?: string;
+    password?: string;
+    phone?: string;
+    avatar?: string;
+    profileImageUrl?: string;
+    teachableUserId?: string;
 }
 
 export interface UserAddress {
@@ -76,8 +84,10 @@ export interface AdminUserDetails {
 export interface AdminUserFilters {
     page?: number;
     limit?: number;
-    role?: UserRole | "";
+    role?: ManageUserRole | "";
     search?: string;
+    fromDate?: string;
+    toDate?: string;
     isActive?: boolean | "";
     phoneVerified?: boolean | "";
     emailVerified?: boolean | "";
@@ -89,7 +99,7 @@ export interface UpdateAdminUserDto {
     firstName?: string;
     lastName?: string;
     email?: string;
-    role?: UserRole;
+    role?: ManageUserRole;
     isActive?: boolean;
     phoneVerified?: boolean;
     emailVerified?: boolean;
@@ -170,4 +180,10 @@ export interface UserPagination {
 export interface PaginatedUsersResponse {
     users: AdminUser[];
     pagination: UserPagination;
+}
+
+export interface AdminUsersListResponse {
+    status: number;
+    message: string;
+    data: PaginatedUsersResponse;
 }
