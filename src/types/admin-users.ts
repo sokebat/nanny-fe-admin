@@ -17,6 +17,9 @@ export interface AdminUser {
     phoneVerified: boolean;
     isActive: boolean;
     accountStatus?: AccountStatus;
+    restrictedAt?: string;
+    restrictedBy?: string;
+    restrictedReason?: string;
     isInternal?: boolean;
     twoFactorRequired?: boolean;
     createdAt: string;
@@ -84,6 +87,24 @@ export interface AdminUserDetails {
     user: AdminUser;
     profile: NannyProfile | ParentProfile | VendorProfile | null;
     stats: AdminUserStats;
+    moderation?: UserModerationSummary;
+}
+
+export interface ModerationHistoryItem {
+    _id: string;
+    userId: string;
+    adminId: string;
+    action: "restrict" | "unrestrict" | "ban" | "unban";
+    reason?: string;
+    createdAt: string;
+    updatedAt: string;
+    __v?: number;
+}
+
+export interface UserModerationSummary {
+    accountStatus: AccountStatus;
+    restrictedReason?: string;
+    history: ModerationHistoryItem[];
 }
 
 export interface AdminUserFilters {

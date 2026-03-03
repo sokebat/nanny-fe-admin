@@ -6,7 +6,7 @@ import Link from "next/link";
 import { use, useState } from "react";
 import { format } from "date-fns";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AdminUser, AdminUserSubscription, AdminUserInvoice, AdminUserCourse, UserJob, AdminUserDetails, NannyProfile, ParentProfile, VendorProfile } from "@/types/admin-users";
+import { AdminUser, AdminUserSubscription, AdminUserInvoice, AdminUserCourse, UserJob, NannyProfile, ParentProfile, VendorProfile } from "@/types/admin-users";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -77,7 +77,9 @@ export default function UserDetailsPage({ params }: { params: Promise<{ id: stri
     }
 
     const { user, profile, stats } = userDetails;
-    const accountStatus = getAccountStatus(user);
+    const accountStatus = userDetails.moderation?.accountStatus || getAccountStatus(user);
+    const restrictedReason = userDetails.moderation?.restrictedReason || user.restrictedReason;
+    const moderationHistory = userDetails.moderation?.history || [];
     const isMutationLoading =
         restrictUserMutation.isPending ||
         unrestrictUserMutation.isPending ||
@@ -312,6 +314,66 @@ export default function UserDetailsPage({ params }: { params: Promise<{ id: stri
                                 ) : (
                                     <p className="text-sm text-muted-foreground italic">No address provided</p>
                                 )}
+                            </CardContent>
+                        </Card>
+
+                        {/* Moderation Card */}
+                        <Card className="rounded-[2rem] border-border shadow-none">
+                            <CardHeader>
+                                <CardTitle className="text-lg font-bold flex items-center gap-2 text-brand-navy">
+                                    <div className="p-2 bg-amber-50 rounded-lg">
+                                        <ShieldCheck className="size-4 text-amber-700" />
+                                    </div>
+                                    Moderation
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <div className="grid grid-cols-1 gap-3 text-sm">
+                                    <div>
+                                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Account Status</p>
+                                        <p className="font-semibold capitalize">{accountStatus}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Restricted Reason</p>
+                                        <p className="font-medium">{restrictedReason || "N/A"}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Restricted At</p>
+                                        <p className="font-medium">{safeDate(user.restrictedAt, "PPP p")}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Restricted By</p>
+                                        <p className="font-medium break-all">{user.restrictedBy || "N/A"}</p>
+                                    </div>
+                                </div>
+                                <Separator className="bg-border" />
+                                <div className="space-y-2">
+                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                                        Moderation History
+                                    </p>
+                                    {moderationHistory.length === 0 ? (
+                                        <p className="text-sm text-muted-foreground italic">No moderation history.</p>
+                                    ) : (
+                                        <div className="space-y-2">
+                                            {moderationHistory.map((entry) => (
+                                                <div key={entry._id} className="rounded-xl border p-3">
+                                                    <div className="flex items-center justify-between gap-2">
+                                                        <Badge variant="outline" className="capitalize">
+                                                            {entry.action}
+                                                        </Badge>
+                                                        <span className="text-xs text-muted-foreground">
+                                                            {safeDate(entry.createdAt, "PP p")}
+                                                        </span>
+                                                    </div>
+                                                    <p className="mt-2 text-sm text-foreground/80">{entry.reason || "No reason provided"}</p>
+                                                    <p className="mt-1 text-xs text-muted-foreground break-all">
+                                                        Admin: {entry.adminId}
+                                                    </p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                             </CardContent>
                         </Card>
                     </div>
@@ -667,9 +729,7 @@ function JobsTab({ userId }: { userId: string }) {
                             <Calendar className="size-3 text-secondary" />
                             Posted {safeDate(job.createdAt, "PP")}
                         </div>
-                        <button className="text-[10px] font-black text-primary uppercase tracking-widest hover:underline">
-                            View Details
-                        </button>
+                   
                     </div>
                 </div>
             ))}
